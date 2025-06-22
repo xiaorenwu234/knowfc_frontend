@@ -32,7 +32,12 @@ const router = createRouter({
       path: '/article-detail',
       name: 'article-detail',
       component: ArticleDetailView,
-    }
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('../views/SearchView.vue')
+    },
   ],
 })
 

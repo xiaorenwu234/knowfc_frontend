@@ -195,7 +195,7 @@ svg#monkey
   border: none;
   right: calc(var(--p) + (var(--input-px) / 2));
   bottom: calc(
-    var(--p) + var(--submit-h) + var(--space-y) + (var(--input-py) / 1) + 19px
+    var(--p) + 8 * var(--input-py)
   );
   padding: 4px 0;
   width: var(--blind-w);
@@ -364,7 +364,7 @@ svg#monkey
   border: none;
   right: calc(var(--p) + (var(--input-px) / 2));
   bottom: calc(
-    var(--p) + var(--submit-h) + var(--space-y) * 4 + (var(--input-py) * 4) + 58px
+    var(--p) + (var(--input-py) * 16)
   );
   padding: 4px 0;
   width: var(--blind-w);
