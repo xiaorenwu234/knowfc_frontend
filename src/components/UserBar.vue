@@ -1,6 +1,6 @@
 <template>
     <!-- 按钮区 -->
-  <div class="flex fixed right-6 mt-4 z-50 p-1 rounded-full bg-white shadow-lg bg-opacity-70" style="backdrop-filter: var(--glass-2);">
+  <div class="flex fixed right-6 mt-4 z-50 p-1 rounded-full bg-white/60 shadow-lg" style="backdrop-filter: var(--glass-2);">
     <div v-if="showMessages &&hasNewChap" class="absolute left-[72px] bg-red-400 w-4 h-4 rounded-full"></div>
     <!-- 头像 -->
     <div ref="head" type="button" class="h-11 w-11 rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation" @mouseenter="showUserMenu=true" @mouseleave="leaveHead()" >
