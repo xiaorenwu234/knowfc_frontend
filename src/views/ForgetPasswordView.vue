@@ -29,6 +29,17 @@ const verificationCode = ref('')
 
 <template>
   <div class="w-screen h-screen flex">
+    <img
+      src="@/assets/background.png"
+      alt="背景"
+      class="background-image1 absolute"
+    />
+    <img
+      src="@/assets/background.png"
+      alt="背景"
+      class="background-image2 absolute"
+    />
+
     <div class="card m-auto">
       <input
         value=""
