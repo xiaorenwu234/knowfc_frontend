@@ -17,7 +17,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref,watch } from "vue"
 const dockItems = ref([
     {
@@ -45,7 +45,7 @@ watch(showDock, (newShow, oldShow) => {
     if (newShow) {
         dock.value.classList.remove('-translate-x-32')
         dock.value.classList.remove('opacity-0')
-    } else { 
+    } else {
         dock.value.classList.add('-translate-x-32')
         dock.value.classList.add('opacity-0')
     }
@@ -57,3 +57,9 @@ function changeTheme() {
 
 
 </script>
+
+<style scoped>
+.dock {
+  /* Dock styles here */
+}
+</style>
