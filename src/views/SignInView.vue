@@ -22,7 +22,7 @@ const username= ref('')
       </label>
 
       <form class="form">
-        <div class="title">登录</div>
+        <div class="title">登 录</div>
 
         <label class="label_input" for="email-input">邮 箱</label>
         <input spellcheck="false" class="input" type="email" name="email" id="email-input" v-model="username"/>
