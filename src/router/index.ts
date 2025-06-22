@@ -27,6 +27,11 @@ const router = createRouter({
       name: 'forget-password',
       component: ForgetPasswordView,
     },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('../views/SearchView.vue')
+    },
   ],
 })
 
