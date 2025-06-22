@@ -57,3 +57,9 @@ function changeTheme() {
 
 
 </script>
+
+<style scoped>
+.dock {
+  /* Dock styles here */
+}
+</style>
