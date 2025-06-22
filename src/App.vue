@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Dock from './components/Dock.vue';
+import DockBar from './components/DockBar.vue';
 import Header from './components/Header.vue'
 import { ref } from 'vue'
 const hideOthers = ref(false)
@@ -20,7 +20,7 @@ function leaveHome() {
 <template>
   <div v-if="!hideOthers" class="fixed left-0 w-[100px] h-[100vh] flex flex-col justify-center z-50">
 
-    <Dock @leaveHome="leaveHome" :show-dock="isNormal"></Dock>
+    <DockBar @leaveHome="leaveHome" :show-dock="isNormal"></DockBar>
   </div>
   <div class="flex flex-col">
     <div class="w-full h-screen z-0 flex justify-center items-center">
