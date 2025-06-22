@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import router from "@/router";
-import {ref} from "vue";
+import router from '@/router'
+import { ref } from 'vue'
+
 const password = ref('')
-const username= ref('')
+const username = ref('')
 </script>
 
 <template>
   <div class="w-screen h-screen flex overflow-hidden relative">
-    <img
-      src="@/assets/background.png"
-      alt="背景"
-      class="background-image1 absolute"
-    />
-    <img
-      src="@/assets/background.png"
-      alt="背景"
-      class="background-image2 absolute"
-    />
+    <img src="@/assets/background.png" alt="背景" class="background-image1 absolute" />
+    <img src="@/assets/background.png" alt="背景" class="background-image2 absolute" />
 
     <div class="card m-auto">
       <input
@@ -36,15 +29,33 @@ const username= ref('')
         <div class="title">登 录</div>
 
         <label class="label_input" for="email-input">邮 箱</label>
-        <input spellcheck="false" class="input" type="email" name="email" id="email-input" v-model="username"/>
+        <input
+          spellcheck="false"
+          class="input"
+          type="email"
+          name="email"
+          id="email-input"
+          v-model="username"
+        />
 
         <div class="frg_pss">
           <label class="label_input" for="password-input">密 码</label>
-          <div class="hover:underline translate-y-0.5" @click="router.push('forget-password')">忘记密码？</div>
+          <div class="hover:underline translate-y-0.5" @click="router.push('forget-password')">
+            忘记密码？
+          </div>
         </div>
-        <input spellcheck="false" class="input" type="text" name="password" id="password-input" v-model="password"/>
+        <input
+          spellcheck="false"
+          class="input"
+          type="text"
+          name="password"
+          id="password-input"
+          v-model="password"
+        />
         <button class="submit" type="button">登 录</button>
-        <div @click="router.push('signup')" class="text-blue-500 hover:underline jump">还没有账号？注册</div>
+        <div @click="router.push('signup')" class="text-blue-500 hover:underline jump">
+          还没有账号？注册
+        </div>
       </form>
 
       <label for="blind-input" class="avatar">
@@ -153,5 +164,4 @@ const username= ref('')
     transform: translate(0, 0);
   }
 }
-
 </style>

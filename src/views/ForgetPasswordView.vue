@@ -4,11 +4,13 @@ import router from '@/router'
 
 const showCountDown = ref(false)
 const countDownValue = ref(59)
+const hasSent = ref(false)
 
 const startCountDown = () => {
   if (showCountDown.value) return
   showCountDown.value = true
-  countDownValue.value = 5
+  countDownValue.value = 59
+  hasSent.value = true
 
   const timer = setInterval(() => {
     if (countDownValue.value > 0) {
@@ -29,16 +31,8 @@ const verificationCode = ref('')
 
 <template>
   <div class="w-screen h-screen flex overflow-hidden relative">
-    <img
-      src="@/assets/background.png"
-      alt="背景"
-      class="background-image1 absolute"
-    />
-    <img
-      src="@/assets/background.png"
-      alt="背景"
-      class="background-image2 absolute"
-    />
+    <img src="@/assets/background.png" alt="背景" class="background-image1 absolute" />
+    <img src="@/assets/background.png" alt="背景" class="background-image2 absolute" />
 
     <div class="card m-auto">
       <input
@@ -77,11 +71,13 @@ const verificationCode = ref('')
             aria-live="polite"
             aria-label="59"
             style="color: #4d4d4d"
-          >{{ countDownValue }}</span
+            >{{ countDownValue }}</span
           >
         </span>
         <span class="font-mono text-md" v-if="showCountDown"> 秒后重新发送 </span>
-        <div class="button" @click="startCountDown" v-else>发送验证码</div>
+        <div class="button" @click="startCountDown" v-else>
+          {{ hasSent ? '重新发送验证码' : '发送验证码' }}
+        </div>
       </div>
 
       <form class="form">
