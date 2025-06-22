@@ -17,7 +17,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref,watch } from "vue"
 const dockItems = ref([
     {
@@ -57,3 +57,9 @@ function changeTheme() {
 
 
 </script>
+
+<style scoped>
+.dock {
+  /* Dock styles here */
+}
+</style>

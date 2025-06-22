@@ -61,35 +61,25 @@ const verificationCode = ref('')
         <span class="show">显示密码</span>
       </label>
 
-      <div
-        class="flex count"
-        style="position: absolute; z-index: 4; bottom: 310px; right: 40px; color: #4d4d4d"
-      >
-        <span class="countdown font-mono text-xl mr-1" v-if="showCountDown">
-          <span
-            :style="`--value: ${countDownValue}`"
-            aria-live="polite"
-            aria-label="59"
-            style="color: #4d4d4d"
-            >{{ countDownValue }}</span
-          >
-        </span>
-        <span class="font-mono text-md" v-if="showCountDown"> 秒后重新发送 </span>
-        <div class="button" @click="startCountDown" v-else>
-          {{ hasSent ? '重新发送验证码' : '发送验证码' }}
-        </div>
-      </div>
+      <input
+        value=""
+        class="blind-check"
+        type="checkbox"
+        id="blind-input2"
+        name="blindcheck"
+        hidden=""
+      />
 
       <form class="form">
         <div class="title">注 册</div>
 
-        <label class="label_input" for="email-input">用户名</label>
+        <label class="label_input" for="username-input">用户名</label>
         <input
           spellcheck="false"
           class="input"
           type="text"
           name="username"
-          id="email-input"
+          id="username-input"
           v-model="username"
         />
 
@@ -103,16 +93,31 @@ const verificationCode = ref('')
           v-model="email"
         />
 
-        <label class="label_input" for="email-input">验证码</label>
-        <input
-          spellcheck="false"
-          class="input"
-          type="text"
-          name="verification-code"
-          id="email-input"
-          :style="{ paddingRight: showCountDown ? '150px' : '100px' }"
-          v-model="verificationCode"
-        />
+        <label class="label_input" for="verification-code-input">验证码</label>
+        <div class="verification-container">
+          <input
+            spellcheck="false"
+            class="input"
+            type="text"
+            name="verification-code"
+            id="verification-code-input"
+            v-model="verificationCode"
+          />
+          <div class="verification-button-container">
+            <span class="countdown" v-if="showCountDown">
+              <span
+                :style="`--value: ${countDownValue}`"
+                aria-live="polite"
+                aria-label="59"
+                >{{ countDownValue }}</span
+              >
+            </span>
+            <span class="countdown-text" v-if="showCountDown"> 秒后重新发送 </span>
+            <div class="button" @click="startCountDown" v-else>
+              {{ hasSent ? '重新发送验证码' : '发送验证码' }}
+            </div>
+          </div>
+        </div>
 
         <label class="label_input" for="password-input">密 码</label>
         <input
@@ -124,13 +129,13 @@ const verificationCode = ref('')
           v-model="password"
         />
 
-        <label class="label_input" for="password-input">确认密码</label>
+        <label class="label_input" for="confirm-password-input">确认密码</label>
         <input
           spellcheck="false"
           class="input"
           type="text"
-          name="password"
-          id="password-input"
+          name="confirm-password"
+          id="confirm-password-input"
           v-model="confirmPassword"
         />
 
@@ -204,31 +209,76 @@ const verificationCode = ref('')
 @import '../css/SignIn.css';
 
 .verification-container {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px; /* 输入框和按钮之间的间距 */
+  width: 100%;
 }
 
 .verification-container .input {
-  flex: 1; /* 输入框占据剩余空间 */
+  flex: 1;
+  width: 100%;
 }
 
-.verification-container .button {
-  padding: 0.5rem 1rem;
-  background-color: #0969da;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.verification-container .button:hover {
-  background-color: #074c9a;
-}
-
-.verification-container .countdown {
+.verification-button-container {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: #4d4d4d;
-  font-size: 14px;
+  z-index: 4;
+}
+
+.verification-button-container .button {
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  z-index: 4;
+  position: relative;
+  border: none;
+  padding: 4px 8px;
+  min-width: var(--blind-w);
+  border-radius: 4px;
+  background-color: #fff;
+  color: #4d4d4d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+  "Lucida Sans", Arial, sans-serif;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.verification-button-container .button:before {
+  content: "";
+  position: absolute;
+  left: calc((var(--input-px) / 2) * -1);
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: #8f8f8f;
+}
+
+.verification-button-container .button:hover {
+  color: #262626;
+  background-color: #f2f2f2;
+}
+
+.verification-button-container .countdown {
+  color: #4d4d4d;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+  "Lucida Sans", Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.verification-button-container .countdown-text {
+  color: #4d4d4d;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+  "Lucida Sans", Arial, sans-serif;
+  white-space: nowrap;
 }
 </style>
