@@ -18,12 +18,20 @@ function leaveHome() {
 </script>
 
 <template>
-  <div v-if="!hideOthers" class="fixed left-0 w-[100px] h-[100vh] flex flex-col justify-center z-50">
-
-    <DockBar @leaveHome="leaveHome" :show-dock="isNormal"></DockBar>
+  <!-- 顶栏 -->
+  <div class="h-24 w-full fixed top-0 z-50">
+    <Header />
   </div>
-  <div class="flex flex-col">
-    <div class="w-full h-screen z-0 flex justify-center items-center">
+
+  <!-- 下方内容区域 -->
+  <div class="flex pt-24 min-h-screen">
+    <!-- 侧边栏 -->
+    <div v-if="!hideOthers" class="w-24 fixed left-0 top-24 bottom-0 flex flex-col justify-center z-40">
+      <DockBar @leaveHome="leaveHome" :show-dock="isNormal"></DockBar>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="flex-1 ml-24">
       <RouterView></RouterView>
     </div>
   </div>
