@@ -28,7 +28,7 @@ const verificationCode = ref('')
 </script>
 
 <template>
-  <div class="w-screen h-screen flex">
+  <div class="w-screen h-screen flex overflow-hidden relative">
     <img
       src="@/assets/background.png"
       alt="背景"

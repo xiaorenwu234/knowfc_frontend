@@ -6,7 +6,7 @@ const username= ref('')
 </script>
 
 <template>
-  <div class="w-screen h-screen flex">
+  <div class="w-screen h-screen flex overflow-hidden relative">
     <img
       src="@/assets/background.png"
       alt="背景"
@@ -109,4 +109,49 @@ const username= ref('')
 
 <style scoped>
 @import '../css/SignIn.css';
+
+.background-image1 {
+  width: 900px;
+  height: auto;
+  left: -450px;
+  top: -100px;
+  opacity: 0;
+  transform: translate(-150%, -150%);
+  animation: slideInTopLeft 1s ease forwards;
+  z-index: -1;
+}
+
+@keyframes slideInTopLeft {
+  0% {
+    opacity: 0;
+    transform: translate(-150%, -150%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+.background-image2 {
+  width: 900px;
+  height: auto;
+  right: -450px;
+  bottom: -100px;
+  opacity: 0;
+  transform: translate(150%, 150%);
+  animation: slideInBottomRight 1s ease forwards;
+  z-index: -1;
+}
+
+@keyframes slideInBottomRight {
+  0% {
+    opacity: 0;
+    transform: translate(150%, 150%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
 </style>
