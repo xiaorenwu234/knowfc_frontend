@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed w-screen h-24 z-10 blurblock"></div>
+    <div class="fixed w-screen h-24 z-10" :class="{ 'bg-white': isWhiteRoute, 'blurblock': !isWhiteRoute }" ></div>
     <Logo />
     <UserBar />
 </template>
@@ -7,6 +7,15 @@
 <script setup>
 import Logo from './Logo.vue';
 import UserBar from './UserBar.vue';
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const pureWhite = [''];
+
+const isWhiteRoute = computed(() => {
+    return pureWhite.includes(route.path);
+});
 </script>
 
 <style >
