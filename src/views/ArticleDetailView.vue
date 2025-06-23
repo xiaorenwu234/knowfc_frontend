@@ -1,10 +1,10 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col h-full">
 
     <div class="w-full">
-      <div class="h-[380px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white">
+      <div class="h-[380px] mt-[-96px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white">
         
-        <div class="flex-1 flex flex-col justify-evenly h-full">
+        <div id="title" class="flex-1 flex flex-col justify-evenly h-full">
           <!-- 面包屑导航 -->
           <div class="text-sm opacity-90">
             <span class="hover:underline cursor-pointer">Home</span>
@@ -30,7 +30,7 @@
         </div>
         
         <!-- 右侧期刊封面和信息 -->
-        <div class="ml-8 flex-shrink-0 flex flex-col items-start justify-center h-full mr-50">
+        <div class="ml-8 flex-shrink-0 flex flex-col items-start justify-center h-full mr-[180px]">
           <img 
             :src="articleData.coverImage" 
             alt="Journal Cover" 
@@ -54,7 +54,7 @@
               <span class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                 <span class="text-white text-xs">✓</span>
               </span>
-              <span>Ok 被引用量</span>
+              <span>被引用量</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
@@ -107,7 +107,7 @@
 
       <!-- 右侧索引部分 -->
       <div class="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
-        <div class="sticky top-6">
+        <div class="sticky top-24">
           <div class="bg-gray-100 rounded-lg overflow-hidden">
             <!-- 索引标题 -->
             <div class="bg-gray-200 px-4 py-2 flex">
@@ -117,19 +117,49 @@
             
             <!-- 索引内容 -->
             <div class="p-4 space-y-3">
-              <a @click="scrollToSection('title')" class="block text-blue-600 hover:underline cursor-pointer transition-colors">
+              <a @click="scrollToSection('title')" 
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'title' 
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                    : 'text-blue-600 hover:underline'
+                ]">
                 标题
               </a>
-              <a @click="scrollToSection('abstract')" class="block text-blue-600 hover:underline cursor-pointer transition-colors">
+              <a @click="scrollToSection('abstract')" 
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'abstract' 
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                    : 'text-blue-600 hover:underline'
+                ]">
                 摘要
               </a>
-              <a @click="scrollToSection('related')" class="block text-gray-600 bg-gray-200 px-2 py-1 rounded cursor-pointer">
+              <a @click="scrollToSection('related')" 
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'related' 
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                    : 'text-blue-600 hover:underline'
+                ]">
                 相关文章
               </a>
-              <a @click="scrollToSection('citations')" class="block text-blue-600 hover:underline cursor-pointer transition-colors">
+              <a @click="scrollToSection('citations')" 
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'citations' 
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                    : 'text-blue-600 hover:underline'
+                ]">
                 引用
               </a>
-              <a @click="scrollToSection('authors')" class="block text-blue-600 hover:underline cursor-pointer transition-colors">
+              <a @click="scrollToSection('authors')" 
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'authors' 
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                    : 'text-blue-600 hover:underline'
+                ]">
                 作者信息
               </a>
             </div>
@@ -143,9 +173,6 @@
             <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors">
               收藏文章
             </button>
-            <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors">
-              引用格式
-            </button>
           </div>
         </div>
       </div>
@@ -156,6 +183,8 @@
 
 <script setup>
 import { ref } from 'vue'
+
+const activeSection = ref('') // 默认激活相关文章
 
 // 文章数据
 const articleData = ref({
@@ -190,6 +219,9 @@ const relatedArticles = ref([
 
 // 平滑滚动到指定区域
 const scrollToSection = (sectionId) => {
+  // 设置当前激活的章节
+  activeSection.value = sectionId
+  
   const element = document.getElementById(sectionId)
   if (element) {
     element.scrollIntoView({
