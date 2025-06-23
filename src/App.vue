@@ -6,15 +6,6 @@ const hideOthers = ref(false)
 const isNormal = ref(true)
 const isLogin = ref(false)
 const isCreatorView = ref(false)
-
-function leaveHome() {
-  logo.classList.add('-mt-[84px]')
-  logo.classList.remove('mt-60')
-  setTimeout(() => {
-    const scrollEvent = new Event('scroll')
-    window.dispatchEvent(scrollEvent)
-  }, 400)
-}
 </script>
 
 <template>
@@ -29,11 +20,22 @@ function leaveHome() {
   </div>
 
   <!-- 主体 -->
-  <div class="flex-1 pt-24">
+  <div class="flex-1 pt-24 min-h-screen bg-container">
       <RouterView></RouterView>
   </div>
 </template>
 
 <style scoped>
-
+/* .gradient-bg {
+  background: linear-gradient(135deg, #f0f2ff 0%, #fff1f9 100%);
+}
+.bg-container {
+  background-image: url('/mountain.jpg'); 
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  width: 100%;
+  min-height: 100vh;
+} */
 </style>

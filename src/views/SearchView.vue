@@ -1,29 +1,14 @@
 <template>
-  <div class="min-h-screen w-full bg-base-100 p-4 md:p-8">
+  <div class="h-full w-full  p-4 md:p-8 px-10 md:px-20">
     <!-- 搜索区域 -->
-    <div class="max-w-6xl mx-auto bg-blue-50 p-6 rounded-lg mb-8">
-      <h2 class="text-lg font-semibold mb-4">搜索文章、期刊、书籍、作者、视频</h2>
-      <div class="flex gap-4">
-        <input 
-          type="text" 
-          v-model="searchQuery" 
-          placeholder="输入搜索关键词" 
-          class="input input-bordered flex-1"
-        />
-        <button 
-          @click="handleSearch" 
-          class="btn btn-primary">
-          搜索
-        </button>
-      </div>
-      <div class="flex gap-4 mt-4 text-sm">
-        <a href="#" class="text-primary hover:underline">高级搜索</a>
-        <a href="#" class="text-primary hover:underline">搜索帮助</a>
-      </div>
+    <div class="container max-w-3xl mx-auto mb-8 sticky top-0 z-50">
+      <!-- <h2 class="text-lg font-semibold mb-4">搜索文章、期刊、书籍、作者、视频</h2> -->
+      <SearchBar />
+
     </div>
 
     <!-- 结果区域 -->
-    <div class="max-w-6xl mx-auto" v-if="hasSearched">
+    <div class="max-w-6xl mx-auto w-full" v-if="hasSearched">
       <!-- 结果统计和操作 -->
       <div class="flex justify-between items-center mb-6">
         <div class="text-sm text-gray-600">
@@ -138,7 +123,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import SearchBar from '@/components/SearchBar.vue'
+import { useSearchStore } from '@/stores/search'
 
 // 搜索相关
 const searchQuery = ref('')
@@ -148,6 +135,14 @@ const startIndex = ref(1)
 const endIndex = ref(20)
 const sortBy = ref('relevance')
 const searchType = ref('article')
+
+const searchStore = useSearchStore()
+watch(searchStore, () => {
+  if(searchStore.doSearch){
+    handleSearch()
+    searchStore.doSearch = false
+  }
+})
 
 // 内容类型过滤器
 const showContentType = ref(true)
@@ -193,10 +188,26 @@ const searchResults = ref([
     publishDate: '2024',
     coverImage: '/path/to/cover2.jpg'
   },
-  // 可以添加更多示例数据
+  {
+    id: 1,
+    type: '图书',
+    title: 'Metrics for Test Reporting: Analysis and Reporting for Effective Test Management',
+    authors: ['Frank Witte'],
+    description: '软件开发过程中定期向管理层报告项目进展和问题是很重要的。本书介绍了如何...',
+    publishDate: '2024',
+    coverImage: '/path/to/cover1.jpg'
+  },
+  {
+    id: 2,
+    type: '图书',
+    title: 'Hands-on Test-Driven Development: Using Ruby, Ruby on Rails, and RSpec',
+    authors: ['Greg Donald'],
+    description: '学习如何通过先编写失败测试，然后实现应用程序代码来正确测试Ruby和Ruby on Rails应用程序...',
+    publishDate: '2024',
+    coverImage: '/path/to/cover2.jpg'
+  },
 ])
 
-// 方法
 const handleSearch = () => {
   hasSearched.value = true
   
