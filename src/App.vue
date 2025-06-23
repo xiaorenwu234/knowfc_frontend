@@ -23,17 +23,14 @@ function leaveHome() {
     <Header />
   </div>
 
-  <!-- 下方内容区域 -->
-  <div class="flex pt-24 min-h-screen">
-    <!-- 侧边栏 -->
-    <div v-if="!hideOthers" class="w-24 fixed left-0 top-24 bottom-0 flex flex-col justify-center z-40">
-      <DockBar @leaveHome="leaveHome" :show-dock="isNormal"></DockBar>
-    </div>
+  <!-- Dock栏 -->
+  <div v-if="!hideOthers" class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
+    <DockBar />
+  </div>
 
-    <!-- 主体内容 -->
-    <div class="flex-1 ml-24">
+  <!-- 主体 -->
+  <div class="flex-1 pt-24">
       <RouterView></RouterView>
-    </div>
   </div>
 </template>
 
