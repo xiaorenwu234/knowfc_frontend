@@ -26,14 +26,14 @@ const dockItems = ref([
         icon: "icon-[material-symbols--home]",
         path:"/",
     },{
-        icon: "icon-[mingcute--fire-line]",
-        path:"/"
+        icon: "icon-[material-symbols--search]",
+        path:"/search"
     },{
-        icon: "icon-[mingcute--classify-2-fill]",
-        path:"/"
+        icon: "icon-[material-symbols--chat]",
+        path:"/chat"
     },{
         icon: "icon-[mdi--bookshelf]",
-        path:"/"
+        path:"/article-detail"
     }])
 const isDark = ref(false)
 const theme = computed(() => {

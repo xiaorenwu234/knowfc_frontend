@@ -26,7 +26,7 @@ const isCreatorView = ref(false)
 </template>
 
 <style scoped>
-/* .gradient-bg {
+.gradient-bg {
   background: linear-gradient(135deg, #f0f2ff 0%, #fff1f9 100%);
 }
 .bg-container {
@@ -37,5 +37,5 @@ const isCreatorView = ref(false)
   background-attachment: fixed;
   width: 100%;
   min-height: 100vh;
-} */
+}
 </style>
