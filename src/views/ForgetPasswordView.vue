@@ -30,7 +30,7 @@ const verificationCode = ref('')
 </script>
 
 <template>
-  <div class="w-screen h-screen flex overflow-hidden relative">
+  <div class="w-screen flex overflow-hidden relative" style="height: calc(100vh - 192px)">
     <img src="@/assets/background.png" alt="背景" class="background-image1 absolute" />
     <img src="@/assets/background.png" alt="背景" class="background-image2 absolute" />
 
