@@ -1,10 +1,9 @@
 <template>
-  <div
-    ref="header"
-    class="transition-transform duration-300 ease-in-out fixed w-screen h-24 z-10 -translate-y-24"
-    :class="{ 'translate-y-0': !isHidden, 'opacity-100': !isHidden, 'opacity-0': isHidden }"
-  >
-    <div class="absolute w-full h-full" :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute }"></div>
+  <div ref="header" class="transition-all duration-300 ease-in-out">
+    <div
+      class="fixed w-screen h-24 z-10"
+      :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute }"
+    ></div>
     <Logo />
     <UserBar />
   </div>
@@ -16,7 +15,7 @@ import Logo from './Logo.vue'
 import UserBar from './UserBar.vue'
 import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { hidePath } from '@/js/hidePaths.js'
+import { hideHeader } from '@/js/hidePaths.js'
 
 const route = useRoute()
 const pureWhite = ['']
@@ -34,7 +33,7 @@ watch(
   (newPath) => {
     if (!header.value) return
 
-    isHidden.value = hidePath.includes(newPath)
+    isHidden.value = hideHeader.includes(newPath)
     if (isHidden.value) {
       header.value.classList.add('-translate-y-24')
       header.value.classList.add('opacity-0')
@@ -45,26 +44,6 @@ watch(
   },
   { immediate: true },
 )
-
-const handleMouseMove = (e: MouseEvent) => {
-  if (!header.value || !isHidden.value) return
-
-  if (e.clientY <= 96) {
-    header.value.classList.remove('-translate-y-24')
-    header.value.classList.remove('opacity-0')
-  } else {
-    header.value.classList.add('-translate-y-24')
-    header.value.classList.add('opacity-0')
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('mousemove', handleMouseMove)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('mousemove', handleMouseMove)
-})
 </script>
 
 <style>
