@@ -38,6 +38,11 @@ const router = createRouter({
       name: 'chat',
       component: () => import('../views/MessageView.vue'),
     },
+    {
+      path: '/personal-center',
+      name: 'personal-center',
+      component: () => import('../views/PersonalCenterView.vue'),
+    },
   ],
 })
 
