@@ -1,14 +1,14 @@
 <template>
-    <div ref="searchBar" class="flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto" 
+    <div ref="searchBar" class="pt-36 flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto"
         :class="[isNearTop ? 'max-w-80' : 'max-w-3xl']"
         @focusin="isFocused = true" @focusout="isFocused = false; showAdvancedSearch = false;">
         <!-- 搜索框 -->
         <label class="input input-bordered flex items-center gap-2 rounded-full focus-within:shadow-2xl  focus-within:shadow-blue-400 transition-all bg-opacity-60 backdrop-blur-sm" >
-            <input 
+            <input
                 ref="searchInput"
-                type="text" 
-                class="grow min-w-32" 
-                placeholder="Search" 
+                type="text"
+                class="grow min-w-32"
+                placeholder="Search"
                 v-model="searchQuery"
                 @keyup.enter="doSearch"
             />
@@ -30,7 +30,7 @@
         </label>
 
         <div class="flex flex-col">
-            <div class="flex items-center justify-between transition-all duration-300" 
+            <div class="flex items-center justify-between transition-all duration-300"
                 :class="isFocused ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'">
                 <button class="btn btn-xs glass gap-0" @click="showAdvancedSearch = !showAdvancedSearch">
                     <span class="font-bold">高级搜索</span>
@@ -52,7 +52,7 @@
             enter-from-class="opacity-0 -translate-y-4"
             enter-to-class="opacity-100 translate-y-0"
             leave-active-class="transition-all duration-300 ease-in"
-            leave-from-class="opacity-100 translate-y-0" 
+            leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 -translate-y-4"
         >
             <div v-show="showAdvancedSearch && isFocused" class="flex flex-col gap-4 bg-white/70 backdrop-blur-lg rounded-3xl p-4" >
@@ -60,14 +60,14 @@
                 <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium">时间范围</label>
                     <div class="flex flex-wrap gap-2" @mousedown.prevent>
-                        <input 
-                            type="date" 
+                        <input
+                            type="date"
                             class="input input-bordered w-full"
                             v-model="dateRange.start"
                         />
                         <span class="self-center">至</span>
-                        <input 
-                            type="date" 
+                        <input
+                            type="date"
                             class="input input-bordered w-full"
                             v-model="dateRange.end"
                         />
@@ -90,9 +90,9 @@
                     <label class="text-sm font-medium">学科领域</label>
                     <div class="flex flex-wrap gap-2" @mousedown.prevent>
                         <label v-for="subject in subjects" :key="subject.value" class="flex items-center gap-2 cursor-pointer">
-                            <input 
-                                type="checkbox" 
-                                class="checkbox checkbox-sm" 
+                            <input
+                                type="checkbox"
+                                class="checkbox checkbox-sm"
                                 :value="subject.value"
                                 v-model="selectedSubjects"
                             />
@@ -116,7 +116,7 @@ const doSearch = () => {
     searchStore.doSearch = true
     searchStore.setContent(searchQuery.value)
     searchStore.setType(selectedType.value)
-    
+
     // 清除搜索内容
     searchQuery.value = ''
     // 清除高级搜索内容

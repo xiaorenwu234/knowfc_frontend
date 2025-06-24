@@ -10,7 +10,7 @@ const isCreatorView = ref(false)
 
 <template>
   <!-- 顶栏 -->
-  <div class="h-24 w-full fixed top-0 z-50">
+  <div class="h-24 w-full fixed top-0 z-50" v-if="!hideOthers">
     <Header />
   </div>
 
@@ -20,7 +20,7 @@ const isCreatorView = ref(false)
   </div>
 
   <!-- 主体 -->
-  <div class="flex-1 pt-24 min-h-screen bg-container">
+  <div class="flex-1 min-h-screen bg-container">
       <RouterView></RouterView>
   </div>
 </template>
@@ -30,7 +30,7 @@ const isCreatorView = ref(false)
   background: linear-gradient(135deg, #f0f2ff 0%, #fff1f9 100%);
 }
 .bg-container {
-  background-image: url('/mountain.jpg'); 
+  background-image: url('/mountain.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
