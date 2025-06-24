@@ -45,7 +45,7 @@
 
     <div class="flex-grow flex flex-col md:flex-row">
       <!-- 文章内容部分 -->
-      <div class="w-full md:w-2/3 bg-white rounded-lg shadow-sm p-16">
+      <div class="w-full md:w-2/3 bg-white shadow-sm p-16">
         <!-- 作者信息 -->
         <div class="mb-6">
           <h3 class="text-lg font-semibold mb-3">作者：</h3>
@@ -99,14 +99,13 @@
                  class="p-4 border rounded-lg">
               <h4 class="font-semibold">{{ author.name }}</h4>
               <p class="text-sm text-gray-600">{{ author.affiliation }}</p>
-              <p class="text-sm text-gray-600">{{ author.email }}</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 右侧索引部分 -->
-      <div class="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
+      <div class="w-full md:w-1/3 bg-white shadow-sm p-6">
         <div class="sticky top-24">
           <div class="bg-gray-100 rounded-lg overflow-hidden">
             <!-- 索引标题 -->
@@ -200,7 +199,6 @@ const articleData = ref({
     {
       name: "张三",
       affiliation: "某某大学计算机学院",
-      email: "zhangsan@university.edu"
     }
   ]
 })

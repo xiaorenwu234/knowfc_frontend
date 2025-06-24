@@ -12,10 +12,4 @@
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Galada&family=Pacifico&display=swap');
-.galada-regular {
-  font-family: "Galada", cursive;
-  font-weight: 400;
-  font-style: normal;
-}
-</style> 
+</style>
