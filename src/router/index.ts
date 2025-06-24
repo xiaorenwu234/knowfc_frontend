@@ -38,6 +38,11 @@ const router = createRouter({
       name: 'chat',
       component: () => import('../views/MessageView.vue'),
     },
+    {
+      path: '/Individual/IndividualHistory',
+      name: 'IndividualHistory',
+      component: () => import('../views/IndividualHistoryView.vue'),
+    }
   ],
 })
 
