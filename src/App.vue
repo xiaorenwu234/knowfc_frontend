@@ -20,7 +20,7 @@ const isCreatorView = ref(false)
   </div>
 
   <!-- 主体 -->
-  <div class="flex-1 pt-24 min-h-screen bg-container">
+  <div class="flex-1 min-h-screen bg-container">
       <RouterView></RouterView>
   </div>
 </template>

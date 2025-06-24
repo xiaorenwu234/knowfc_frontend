@@ -1,5 +1,5 @@
 <template>
-  <div class="flex w-screen bg-gray-100 overflow-hidden" style="height: calc(100vh - 96px)">
+  <div class="flex w-screen h-screen bg-gray-100 overflow-hidden">
     <div
       ref="sidebar"
       class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"

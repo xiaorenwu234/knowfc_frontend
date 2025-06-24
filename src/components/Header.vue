@@ -1,13 +1,15 @@
 <template>
-  <div ref="header">
-    <div
-      class="fixed w-screen h-24 z-10  transition-all duration-300 ease-in-out"
-      :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute }"
-    ></div>
+  <div
+    ref="header"
+    class="transition-transform duration-300 ease-in-out fixed w-screen h-24 z-10 -translate-y-24"
+    :class="{ 'translate-y-0': !isHidden, 'opacity-100': !isHidden, 'opacity-0': isHidden }"
+  >
+    <div class="absolute w-full h-full" :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute }"></div>
     <Logo />
     <UserBar />
   </div>
 </template>
+
 
 <script setup lang="ts">
 import Logo from './Logo.vue'

@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-full pt-24 ">
 
     <div class="w-full">
       <div class="h-[380px] mt-[-96px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white">
-        
+
         <div id="title" class="flex-1 flex flex-col justify-evenly h-full">
           <!-- 面包屑导航 -->
           <div class="text-sm opacity-90">
@@ -13,12 +13,12 @@
             <span class="mx-2">></span>
             <span>Article</span>
           </div>
-          
+
           <!-- 文章标题 -->
           <h1 class="text-2xl font-bold leading-tight my-4 max-w-4xl">
             {{ articleData.title }}
           </h1>
-          
+
           <!-- 文章信息 -->
           <div class="text-sm opacity-90 flex flex-wrap items-center gap-4">
             <span>{{ articleData.type }}</span>
@@ -28,12 +28,12 @@
             <button class="underline hover:no-underline transition-all">Cite this article</button>
           </div>
         </div>
-        
+
         <!-- 右侧期刊封面和信息 -->
         <div class="ml-8 flex-shrink-0 flex flex-col items-start justify-center h-full mr-[180px]">
-          <img 
-            :src="articleData.coverImage" 
-            alt="Journal Cover" 
+          <img
+            :src="articleData.coverImage"
+            alt="Journal Cover"
             class="w-32 h-48 object-cover rounded shadow-lg mb-3"
           />
           <div class="text-lg text-left opacity-90 max-w-80">
@@ -77,7 +77,7 @@
         <div id="related" class="mb-8 bg-gray-50 p-6 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">其他人正在查看类似内容</h3>
           <div class="space-y-3">
-            <div v-for="(article, index) in relatedArticles" :key="index" 
+            <div v-for="(article, index) in relatedArticles" :key="index"
                  class="p-3 bg-white rounded border hover:shadow-md transition-shadow cursor-pointer">
               <h4 class="font-medium text-blue-600 hover:underline">{{ article.title }}</h4>
               <p class="text-sm text-gray-600 mt-1">{{ article.authors }}</p>
@@ -95,7 +95,7 @@
         <div id="authors" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">作者信息</h2>
           <div class="space-y-4">
-            <div v-for="(author, index) in articleData.authors" :key="index" 
+            <div v-for="(author, index) in articleData.authors" :key="index"
                  class="p-4 border rounded-lg">
               <h4 class="font-semibold">{{ author.name }}</h4>
               <p class="text-sm text-gray-600">{{ author.affiliation }}</p>
@@ -113,50 +113,50 @@
               <span class="flex-1 font-semibold">概块</span>
               <span class="text-blue-600 cursor-pointer hover:underline">引用</span>
             </div>
-            
+
             <!-- 索引内容 -->
             <div class="p-4 space-y-3">
-              <a @click="scrollToSection('title')" 
+              <a @click="scrollToSection('title')"
                 :class="[
                   'block cursor-pointer transition-colors',
-                  activeSection === 'title' 
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                  activeSection === 'title'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
                     : 'text-blue-600 hover:underline'
                 ]">
                 标题
               </a>
-              <a @click="scrollToSection('abstract')" 
+              <a @click="scrollToSection('abstract')"
                 :class="[
                   'block cursor-pointer transition-colors',
-                  activeSection === 'abstract' 
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                  activeSection === 'abstract'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
                     : 'text-blue-600 hover:underline'
                 ]">
                 摘要
               </a>
-              <a @click="scrollToSection('related')" 
+              <a @click="scrollToSection('related')"
                 :class="[
                   'block cursor-pointer transition-colors',
-                  activeSection === 'related' 
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                  activeSection === 'related'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
                     : 'text-blue-600 hover:underline'
                 ]">
                 相关文章
               </a>
-              <a @click="scrollToSection('citations')" 
+              <a @click="scrollToSection('citations')"
                 :class="[
                   'block cursor-pointer transition-colors',
-                  activeSection === 'citations' 
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                  activeSection === 'citations'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
                     : 'text-blue-600 hover:underline'
                 ]">
                 引用
               </a>
-              <a @click="scrollToSection('authors')" 
+              <a @click="scrollToSection('authors')"
                 :class="[
                   'block cursor-pointer transition-colors',
-                  activeSection === 'authors' 
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded' 
+                  activeSection === 'authors'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
                     : 'text-blue-600 hover:underline'
                 ]">
                 作者信息
@@ -210,7 +210,7 @@ const relatedArticles = ref([
     authors: "Smith, J. et al."
   },
   {
-    title: "Detecting AI-Generated Content in Academic Papers", 
+    title: "Detecting AI-Generated Content in Academic Papers",
     authors: "Wang, L. & Chen, M."
   }
 ])
@@ -219,7 +219,7 @@ const relatedArticles = ref([
 const scrollToSection = (sectionId) => {
   // 设置当前激活的章节
   activeSection.value = sectionId
-  
+
   const element = document.getElementById(sectionId)
   if (element) {
     element.scrollIntoView({
