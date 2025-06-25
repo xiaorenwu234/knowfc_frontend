@@ -5,7 +5,7 @@
       <!-- display authors in <a> with comma separated -->
       <p class="text-sm text-gray-600">
         <span v-for="(author, index) in work.authors" :key="index">
-          <a :href="`/author/${author}`" class="text-blue-900 hover:underline">{{ author }}</a>
+          <a :href="`/personal-center/${author.id}`" class="text-blue-900 hover:underline">{{ author.name }}</a>
           <span v-if="index < work.authors.length - 1">, </span>
         </span>
       </p>
