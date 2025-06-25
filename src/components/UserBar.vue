@@ -408,6 +408,7 @@
 
 <script setup>
 import { onMounted, ref } from 'vue'
+import router from '@/router/index.js'
 
 // 投稿类型选择菜单
 const showUploadTypeMenu = ref(false)
@@ -418,9 +419,10 @@ const showPatentForm = ref(false)
 const showDatasetForm = ref(false)
 const isLogin = ref(false)
 
-onMounted(()=>{
-  isLogin.value = localStorage.getItem('user')===null;
-})
+router.beforeEach((to, from, next) => {
+  isLogin.value = localStorage.getItem('user') != null;
+  next();
+});
 
 // 切换投稿类型菜单显示
 const toggleUploadTypeMenu = () => {

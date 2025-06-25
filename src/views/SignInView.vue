@@ -29,6 +29,7 @@ const handleLogin = async () => {
     const data = await response.json()
     if (data.code === 0 || data.code === 200) {
       alert('登录成功！')
+      console.log(data)
       localStorage.setItem('user', JSON.stringify(data.data))
       router.push('/home')
     } else {
