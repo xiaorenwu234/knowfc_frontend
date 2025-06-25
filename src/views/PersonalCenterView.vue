@@ -4,7 +4,7 @@ import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import  router from '@/router'
 
 const windowSize = ref({
@@ -21,7 +21,7 @@ const updateWindowSize = () => {
 
 const handleQuit = ()=>{
   localStorage.removeItem('user');
-  router.push( '/' )
+  router.push('/')
 }
 
 const ownerReference = ref('');
