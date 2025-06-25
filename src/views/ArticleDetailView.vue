@@ -335,7 +335,7 @@ import {
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
-const articleId = 1
+const articleId = route.query.id;
 const articleDetail = ref({})
 const getArticleDetail = async (articleId) => {
   articleDetail.value = await getArticleContent(articleId)
