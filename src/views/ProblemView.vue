@@ -1,7 +1,7 @@
 <template>
     <div class="min-h-screen bg-gray-50">
       <!-- 主要内容区域 -->
-      <div class="max-w-5xl mx-auto px-4 py-6">
+      <div class="max-w-5xl mt-24 mx-auto px-4 py-6">
         <!-- 问题标题 -->
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h1 class="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
@@ -10,24 +10,26 @@
           
           <!-- 问题描述 -->
           <div class="text-gray-700 mb-4 leading-relaxed">
-            <!-- 预览内容 -->
-            <div v-if="!showFullDescription" class="relative">
-              <p class="line-clamp-3">
-                {{ questionData.description.preview }}
-              </p>
+            <!-- 描述内容 -->
+            <div 
+              ref="descriptionRef"
+              :style="{
+                maxHeight: showFullDescription ? 'none' : '6rem',
+                overflow: 'hidden',
+                transition: 'max-height 0.3s ease'
+              }"
+              class="relative">
+              <p class="whitespace-pre-wrap">{{ questionData.description }}</p>
               <!-- 渐变遮罩效果 -->
-              <div class="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
-            </div>
-            
-            <!-- 完整内容 -->
-            <div v-else class="space-y-3">
-              <p v-for="(paragraph, index) in questionData.description.full" :key="index">
-                {{ paragraph }}
-              </p>
+              <div 
+                v-if="!showFullDescription && showToggleButton" 
+                class="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent pointer-events-none">
+              </div>
             </div>
             
             <!-- 展开/收起按钮 -->
             <button 
+              v-if="showToggleButton"
               @click="toggleDescription" 
               class="text-blue-500 hover:text-blue-600 text-sm mt-2 flex items-center gap-1 transition-colors">
               {{ showFullDescription ? '收起' : '显示全部' }}
@@ -110,12 +112,18 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, nextTick } from 'vue'
+ import { ref, onMounted, nextTick } from 'vue'
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
   
   // 控制问题描述的展开状态
   const showFullDescription = ref(false)
+  
+  // 控制是否显示展开/收起按钮
+  const showToggleButton = ref(false)
+  
+  // 描述内容的引用
+  const descriptionRef = ref(null)
   
   // 控制回答编辑器的显示状态
   const showAnswerEditor = ref(false)
@@ -125,7 +133,7 @@
   const vditorContainer = ref(null)
 
   // 渲染 Markdown 内容
-    const setAnswerRef = (el, answerId) => {
+  const setAnswerRef = (el, answerId) => {
     if (el) {
         const answer = answers.value.find(a => a.id === answerId)
         if (answer) {
@@ -139,22 +147,39 @@
         })
         }
     }
-    }
+  }
   
   // 问题数据
   const questionData = ref({
     title: '如何看待清华校长李路明在2025年本科生毕业典礼上讲话称张校"发表了中国第一篇人工智能领域论文"？',
-    description: {
-      preview: '今年以来，"张校老师发表了中国第一篇人工智能领域论文"的说法突然盛行，虽然觉得可笑，但终归没上大雅之堂。但现在居然连清华校长在这么庄严的场合下讲断，这就让人很无语了。',
-      full: [
-        '今年以来，"张校老师发表了中国第一篇人工智能领域论文"的说法突然盛行，虽然觉得可笑，但终归没上大雅之堂。但现在居然连清华校长在这么庄严的场合下讲断，这就让人很无语了。',
-        '首先需要明确的是，人工智能作为一个学科领域，其发展历史可以追溯到20世纪50年代。而中国在这一领域的起步虽然相对较晚，但也有着悠久的历史。',
-        '对于"第一篇论文"的说法，我们需要从几个维度来考虑：一是时间维度，二是内容维度，三是发表平台的权威性。不同的标准可能会得出不同的结论。',
-        '更重要的是，学术研究应该注重的是其科学价值和对学科发展的贡献，而不是简单的"第一"标签。我们应该以更加客观和理性的态度来看待学术史上的各种说法。',
-        '希望大家能够理性讨论，共同推动学术环境的健康发展。'
-      ]
-    }
+    description: `今年以来，"张校老师发表了中国第一篇人工智能领域论文"的说法突然盛行，虽然觉得可笑，但终归没上大雅之堂。但现在居然连清华校长在这么庄严的场合下讲断，这就让人很无语了。
+
+首先需要明确的是，人工智能作为一个学科领域，其发展历史可以追溯到20世纪50年代。而中国在这一领域的起步虽然相对较晚，但也有着悠久的历史。
+
+对于"第一篇论文"的说法，我们需要从几个维度来考虑：一是时间维度，二是内容维度，三是发表平台的权威性。不同的标准可能会得出不同的结论。
+
+更重要的是，学术研究应该注重的是其科学价值和对学科发展的贡献，而不是简单的"第一"标签。我们应该以更加客观和理性的态度来看待学术史上的各种说法。
+
+希望大家能够理性讨论，共同推动学术环境的健康发展。`
   })
+  
+  // 检查内容高度是否需要显示展开/收起按钮
+  const checkContentHeight = async () => {
+    await nextTick()
+    if (descriptionRef.value) {
+      const element = descriptionRef.value
+      // 临时移除高度限制获取真实高度
+      const originalMaxHeight = element.style.maxHeight
+      element.style.maxHeight = 'none'
+      const fullHeight = element.scrollHeight
+      
+      // 恢复原始高度设置
+      element.style.maxHeight = originalMaxHeight
+      
+      // 如果内容高度超过96px，则显示展开/收起按钮
+      showToggleButton.value = fullHeight > 96
+    }
+  }
   
   // 切换问题描述的展开/收起状态
   const toggleDescription = () => {
@@ -264,15 +289,9 @@
   
   onMounted(() => {
     // 组件挂载后的初始化逻辑
+    checkContentHeight()
   })
   </script>
   
-  <style scoped>
-  /* 自定义样式 */
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+  <style scoped>  
   </style>
