@@ -18,18 +18,22 @@ const updateWindowSize = () => {
   }
 }
 
+const ownerReference = ref('');
 const userInfo = ref(null);
 const route = useRoute()
 const userId= String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id',userId))
 const fetchUserInfo = async() => {
-  await axios.get(url).then((res) => {userInfo.value=res.data.data
-  console.log(userInfo.value)})
+  await axios.get(url).then((res) => {
+    userInfo.value=res.data.data
+    console.log(userInfo.value)
+  })
 }
 
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
+  ownerReference.value=(userId==(JSON.parse(localStorage.getItem('user')||'').id))?'我':'Ta'
 })
 
 onUnmounted(() => {
@@ -89,7 +93,7 @@ const showForm = ref(false)
 
       <div class="flex-1 mt-4">
         <div>
-          <div class="font-bold text-xl">我的科研项目</div>
+          <div class="font-bold text-xl">{{ownerReference+'的科研项目'}}</div>
           <div class="flex w-full flex-wrap">
             <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
               <div class="border-[2px] rounded-xl h-full">
@@ -105,7 +109,7 @@ const showForm = ref(false)
           </div>
         </div>
         <div>
-          <div class="font-bold text-xl mt-4">我的论文</div>
+          <div class="font-bold text-xl mt-4">{{ownerReference+'的论文'}}</div>
           <ArticlesTimeLine class="mt-2"></ArticlesTimeLine>
         </div>
       </div>
