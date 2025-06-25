@@ -1,5 +1,5 @@
 <template>
-    <div ref="searchBar" class="pt-36 flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto"
+    <div ref="searchBar" class="flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto"
         :class="[isNearTop ? 'max-w-80' : 'max-w-3xl']"
         @focusin="isFocused = true" @focusout="isFocused = false; showAdvancedSearch = false;">
         <!-- 搜索框 -->

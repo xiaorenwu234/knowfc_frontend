@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, useTemplateRef, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { hidePath } from '@/js/hidePaths.ts'
+import { hideDock } from '@/js/hidePaths.ts'
 
 const dockItems = ref([
   {
@@ -66,7 +66,7 @@ watch(
   (newPath) => {
     if (!dock.value) return
 
-    isHidden.value = hidePath.includes(newPath)
+    isHidden.value = hideDock.includes(newPath)
     if (isHidden.value) {
       dock.value.classList.add('-translate-x-32')
       dock.value.classList.add('opacity-0')

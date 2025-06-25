@@ -39,10 +39,15 @@ const router = createRouter({
       component: () => import('../views/MessageView.vue'),
     },
     {
+      path: '/Individual/IndividualHistory',
+      name: 'IndividualHistory',
+      component: () => import('../views/IndividualHistoryView.vue'),
+    },
+    {
       path: '/personal-center',
       name: 'personal-center',
       component: () => import('../views/PersonalCenterView.vue'),
-    },
+    }
   ],
 })
 

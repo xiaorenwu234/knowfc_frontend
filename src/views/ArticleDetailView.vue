@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col h-full pt-24 ">
+  <div class="flex flex-col h-full ">
 
     <div class="w-full">
-      <div class="h-[380px] mt-[-96px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white">
+      <div class="h-[380px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white">
 
         <div id="title" class="flex-1 flex flex-col justify-evenly h-full">
           <!-- 面包屑导航 -->
