@@ -5,6 +5,7 @@ import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute, useRouter } from 'vue-router'
+import  router from '@/router'
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -19,9 +20,8 @@ const updateWindowSize = () => {
 }
 
 const handleQuit = ()=>{
-  const router=useRouter() ;
   localStorage.removeItem('user');
-  router.push({ path: '/' })
+  router.push( '/' )
 }
 
 const ownerReference = ref('');
