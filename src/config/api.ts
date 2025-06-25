@@ -9,7 +9,8 @@ export const API_CONFIG = {
     SEND_VERIFICATION_CODE: '/users/send-verification-code',
     USER_INFO: '/users/id',
     UNREAD_MESSAGE_NUMBER: '/message/unread-count',
-    WORK_CONTENT:'/works/content'
+    WORK_CONTENT:'/works/content',
+    APPLY_FOR_PROJECT:'/project/apply'
   }
 }
 
