@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import router from '@/router'
 import { ref } from 'vue'
-import { buildApiUrl, API_CONFIG } from '@/config/api'
+import {login} from "@/js/User.ts";
 
 const password = ref('')
 const username = ref('')
@@ -15,27 +15,13 @@ const handleLogin = async () => {
     alert('请输入密码')
     return
   }
-  try {
-    const params = new URLSearchParams()
-    params.append('username', username.value.trim())
-    params.append('password', password.value.trim())
-    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.LOGIN), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params
-    })
-    const data = await response.json()
-    if (data.code === 0 || data.code === 200) {
-      alert('登录成功！')
-      localStorage.setItem('user', JSON.stringify(data.data))
-      router.push('/home')
-    } else {
-      alert(data.msg || '用户名或密码错误')
-    }
-  } catch (error) {
-    alert('网络错误，请稍后重试')
+  const [success, message] = await login(username.value, password.value)
+  if(success){
+    alert('登录成功')
+    router.push('/')
+  }
+  else{
+    alert(message)
   }
 }
 </script>
