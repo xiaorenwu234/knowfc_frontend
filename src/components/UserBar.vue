@@ -65,7 +65,7 @@
 
   <!-- 论文上传模态框 -->
   <div v-if="showPaperForm" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100"
        @click.self="hideAllForms">
     <div class="card bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden">
       <div class="card-body p-8 overflow-y-auto scrollbar-hide">
@@ -184,7 +184,7 @@
 
   <!-- 专利上传模态框 -->
   <div v-if="showPatentForm" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100"
        @click.self="hideAllForms">
     <div class="card bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden">
       <div class="card-body p-8 overflow-y-auto scrollbar-hide">
@@ -290,7 +290,7 @@
 
   <!-- 数据集上传模态框 -->
   <div v-if="showDatasetForm" 
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-100"
        @click.self="hideAllForms">
     <div class="card bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden">
       <div class="card-body p-8 overflow-y-auto scrollbar-hide">
