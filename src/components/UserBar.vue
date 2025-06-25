@@ -4,7 +4,7 @@
     <div v-if="showMessages &&hasNewChap" class="absolute left-[72px] bg-red-400 w-4 h-4 rounded-full"></div>
     <!-- 头像 -->
     <div ref="head" type="button" class="h-11 w-11 rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation" @mouseenter="showUserMenu=true" @mouseleave="leaveHead()" >
-      <RouterLink v-if="isLogin" to="/personal-center">
+      <RouterLink v-if="isLogin" :to="personalCenterPath">
         <img :src="headSrc" class="image-full" alt="头像">
       </RouterLink>
       <RouterLink v-if="!isLogin" to="/signin">
@@ -418,9 +418,12 @@ const showPaperForm = ref(false)
 const showPatentForm = ref(false)
 const showDatasetForm = ref(false)
 const isLogin = ref(false)
+const personalCenterPath = ref('')
 
 router.beforeEach((to, from, next) => {
   isLogin.value = localStorage.getItem('user') != null;
+  if(isLogin.value)
+    personalCenterPath.value = "/personal-center/"+JSON.parse(localStorage.getItem('user')).id;
   next();
 });
 

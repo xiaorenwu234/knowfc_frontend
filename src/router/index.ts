@@ -44,7 +44,7 @@ const router = createRouter({
       component: () => import('../views/IndividualHistoryView.vue'),
     },
     {
-      path: '/personal-center',
+      path: '/personal-center/:id',
       name: 'personal-center',
       component: () => import('../views/PersonalCenterView.vue'),
     }
