@@ -39,7 +39,7 @@ const fetchUserInfo = async () => {
 const showModal = ref(false);
 const reason = ref('');
 const errorMessage = ref('');
-const projectId = ref(null);
+const projectId = ref();
 
 const openModal = (pId:number) => {
   showModal.value = true;
