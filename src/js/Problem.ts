@@ -38,7 +38,7 @@ export const getQuestionDetail = async (questionId: string): Promise<any> => {
       content: content,
       userId: getUserId()
     }
-  
+    console.log('提交回答数据:', data)
     try {
       const response = await instance.post(url, data, {
         headers: {
@@ -54,6 +54,34 @@ export const getQuestionDetail = async (questionId: string): Promise<any> => {
     } catch (err) {
       console.error('提交回答失败:', err)
       return false
+    }
+  }
+
+  // ...existing code...
+
+export const searchProblem = async (keyword: string): Promise<any[]> => {
+    const url = '/question/search'
+    const formData = new FormData()
+    formData.append('keyword', keyword)
+    formData.append('page', '0')
+    formData.append('size', '10')
+    
+    // 将 FormData 转换为 URLSearchParams
+    const params = new URLSearchParams()
+    for (const [key, value] of formData.entries()) {
+      params.append(key, value.toString())
+    }
+    
+    try {
+      const response = await instance.get(`${url}?${params.toString()}`)
+      console.log('搜索问题结果:', response.data)
+      if (response.data.code === 200) {
+        return response.data.data || []
+      }
+      return []
+    } catch (err) {
+      console.error('搜索问题失败:', err)
+      return []
     }
   }
 

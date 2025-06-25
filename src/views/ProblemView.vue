@@ -92,7 +92,7 @@
                 <div class="flex-1">
                   <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-gray-900">{{ answer.author }}</h3>
-                    <button class="btn btn-sm btn-outline text-blue-500 border-blue-500 hover:bg-blue-500 px-3 py-1 text-xs">
+                    <button v-show="userName !== answer.author" class="btn btn-sm btn-outline text-blue-500 border-blue-500 hover:bg-blue-500 px-3 py-1 text-xs">
                       + 关注
                     </button>
                   </div>
@@ -112,10 +112,15 @@
   </template>
   
   <script setup>
- import { ref, onMounted, nextTick } from 'vue'
+  import { ref, onMounted, nextTick } from 'vue'
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
-  import { getQuestionDetail, getAnswers, submitAnswerTo } from '@/js/Problem'
+  import { getQuestionDetail, getAnswers, submitAnswerTo, searchProblem } from '@/js/Problem'
+import { useRoute } from 'vue-router'
+  
+  const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
+  const userName = userInfo.username
+  console.log('当前用户:', userName)
   
   // 控制问题描述的展开状态
   const showFullDescription = ref(false)
@@ -132,6 +137,7 @@
   // Vditor 编辑器实例
   let contentEditor = null
   const vditorContainer = ref(null)
+
 
   const questionId = 2 // 假设路由参数名为 id
 
@@ -255,7 +261,7 @@
         // 添加新回答到回答列表
         const newAnswer = {
           id: answers.value.length + 1,
-          author: '当前用户', // 这里应该是实际的用户名
+          author: userName, // 这里应该是实际的用户名
           content: content,
           likes: 0
         }

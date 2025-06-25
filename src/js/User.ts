@@ -5,7 +5,9 @@ const userName = ref('')
 const id = ref(0)
 
 export const getUserId = () => {
-  return JSON.parse(localStorage.getItem('userId') || '').id || 2;
+  const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
+  const userId = userInfo.id
+  return userId
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {

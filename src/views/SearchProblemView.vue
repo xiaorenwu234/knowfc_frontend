@@ -23,7 +23,7 @@
                     :data-content="question.content"
                     :class="[
                       'text-gray-700 leading-relaxed transition-all duration-300',
-                      !expandedQuestions.has(question.id) ? 'content-collapsed' : 'content-expanded'
+                      (!expandedQuestions.has(question.id) && questionsNeedExpand.has(question.id))  ? 'content-collapsed' : 'content-expanded'
                     ]"
                   ></div>
                 </div>
@@ -143,6 +143,9 @@
   import { ref, onMounted, nextTick } from 'vue'
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
+  import { searchProblem } from '@/js/Problem'
+  import { useSearchStore } from '@/stores/search'
+  const searchStore = useSearchStore()
   
   // 响应式数据
   const showPublishDialog = ref(false)
@@ -151,50 +154,7 @@ const expandedQuestions = ref(new Set())
 const questionsNeedExpand = ref(new Set())
   
   // 问题数据
-  const questions = ref([
-    {
-        id: 1,
-        title: '大二分流，遥感和地信选哪个专业？',
-        content: `## 专业选择建议
-
-    **一个流浪汉**：才看到这个问题。本科遥感和地信没区别，读研以后也完全看你导师干嘛的路向。
-
-    ### 建议要点：
-    1. 根据本校**学科评估**，选择学科评估等级更高的一个
-    2. 考虑个人兴趣和职业规划
-    3. 了解两个专业的就业方向
-
-    > 以后本硕博发展方向完全看你导师的研究领域和你的个人努力程度。
-
-    还有更多内容需要展示，这里是额外的详细说明和建议，帮助你更好地理解专业选择的重要性。`,
-    },
-    {
-        id: 2,
-        title: '香港永久身份与大陆双重身份的利弊，8种申请香港身份途径解析',
-        content: `**香港优才娜娜姐**：许多人选择申请香港身份和定居的原因主要有以下几个方面：
-
-    ### 主要原因
-    1. **财富管理** - 高净值家庭希望实现财富的稳定增值
-    2. **税务优化** - 企业家寻求更有利的税务安排  
-    3. **教育资源** - 希望子女能在内地就读于国际学校
-    4. **升学优势** - 通过华侨生联考或香港DSE考试入读重点大学
-
-    \`\`\`
-    申请流程概览：
-    1. 准备材料
-    2. 在线申请
-    3. 面试评估
-    4. 获批通知
-    \`\`\`
-
-    详细内容包括申请流程、所需材料、费用标准等各个方面的详细说明。`,
-    },
-    {
-        id: 3,
-        title: '在二次元圈子里，你知道哪些令人印象深刻的coser？',
-        content: '**茶破**：根据知名度和影响力分级：\n **T1** '
-    }
-    ])
+  const questions = ref([])
     
     // 新问题表单
     const newQuestion = ref({
@@ -295,6 +255,25 @@ const checkIfNeedExpand = (questionId, element) => {
       alert('问题发布成功！')
     }
     
+    
+    const initSearch = async () => {
+    try {
+      const results = await searchProblem(searchStore.searchQuery.content)
+      console.log('Search results:', results)
+      // 将搜索结果映射到 questions 数组
+      questions.value = results.content.map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content
+      }))
+    } catch (error) {
+      console.error('Search failed:', error)
+
+    }
+  }
+
+  initSearch()
+
     // 生命周期
     onMounted(async () => {
     await nextTick()
