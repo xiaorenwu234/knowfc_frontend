@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE消息接收演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#6B7280',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        info: '#3B82F6',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .message-appear {
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 min-h-screen flex flex-col">
+<!-- 顶部导航栏 -->
+<header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i class="fa fa-comments text-primary text-2xl"></i>
+            <h1 class="text-xl font-semibold text-gray-800">SSE消息接收演示</h1>
+        </div>
+        <div id="connection-status" class="flex items-center space-x-1 text-secondary">
+            <i class="fa fa-circle-o text-xs"></i>
+            <span>未连接</span>
+        </div>
+    </div>
+</header>
+
+<!-- 主内容区 -->
+<main class="flex-grow container mx-auto px-4 py-6">
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- 控制面板 -->
+        <div class="p-5 border-b border-gray-200 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative">
+                    <input
+                            type="number"
+                            id="user-id"
+                            class="w-full md:w-40 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all"
+                            placeholder="用户ID"
+                            value="123"
+                    >
+                </div>
+                <button
+                        id="connect-btn"
+                        class="px-5 py-2 bg-primary text-white rounded-lg shadow hover:bg-primary/90 active:bg-primary/80 focus:ring-2 focus:ring-primary/30 transition-all flex items-center gap-2"
+                >
+                    <i class="fa fa-plug"></i>
+                    <span>连接</span>
+                </button>
+                <button
+                        id="disconnect-btn"
+                        class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 active:bg-gray-400 focus:ring-2 focus:ring-gray-300 transition-all flex items-center gap-2"
+                        disabled
+                >
+                    <i class="fa fa-plug fa-rotate-135"></i>
+                    <span>断开</span>
+                </button>
+                <button
+                        id="test-btn"
+                        class="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg shadow hover:bg-gray-300 active:bg-gray-400 focus:ring-2 focus:ring-gray-300 transition-all flex items-center gap-2"
+                        disabled
+                >
+                    <span>发送测试通知</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">消息类型:</span>
+                <select id="event-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all text-sm">
+                    <option value="all">全部</option>
+                    <option value="项目邀请">项目邀请</option>
+                    <option value="问题收到回答">问题收到回答</option>
+                    <option value="系统通知">系统通知</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 消息显示区 -->
+        <div class="h-[400px] overflow-y-auto p-4 scrollbar-hide bg-gray-50" id="messages-container">
+            <div class="flex justify-center items-center h-full text-gray-400">
+                <div class="text-center">
+                    <i class="fa fa-comments-o text-4xl mb-3"></i>
+                    <p>连接后接收的消息将显示在这里</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 消息统计 -->
+        <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-between text-sm text-gray-600">
+            <div>
+                <span id="message-count">0</span> 条消息
+            </div>
+            <div>
+                最后更新: <span id="last-update">--</span>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-white border-t border-gray-200 py-4">
+    <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
+        <p>SSE消息接收演示 &copy; 2025</p>
+    </div>
+</footer>
+
+<!-- JavaScript -->
+<script>
+    // SSE客户端类
+    class SSEClient {
+        constructor() {
+            this.eventSource = null;
+            this.userId = null;
+            this.reconnectTimer = null;
+            this.reconnectInterval = 3000; // 重连间隔时间（毫秒）
+            this.maxRetries = 10; // 最大重连次数
+            this.retryCount = 0;
+            this.messageCount = 0;
+            this.messageHandlers = {};
+            this.storedMessages = null; // 缓存的消息
+        }
+
+        // 建立SSE连接
+        connect(userId) {
+            this.userId = userId;
+
+            // 如果已有连接，先关闭
+            if (this.eventSource) {
+                this.disconnect();
+            }
+
+            // 创建新的EventSource连接
+            const url = `http://39.107.99.145:8081/notification/sse?id=${userId}`; // 修改为正确的后端接口URL和端口
+            this.eventSource = new EventSource(url);
+
+            // 连接成功回调
+            this.eventSource.onopen = () => {
+                console.log('SSE连接已建立');
+                this.retryCount = 0;
+                clearInterval(this.reconnectTimer);
+                this.updateConnectionStatus(true);
+                // 清空消息容器
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.innerHTML = '';
+                this.storedMessages = null;
+                this.messageCount = 0;
+            };
+
+            // 错误处理
+            this.eventSource.onerror = (error) => {
+                console.error('SSE连接发生错误:', error);
+
+                // 如果连接关闭，尝试重连
+                if (this.eventSource.readyState === EventSource.CLOSED) {
+                    this.updateConnectionStatus(false);
+                    this.scheduleReconnect();
+                }
+            };
+
+            // 默认消息处理
+            this.eventSource.onmessage = (event) => {
+                console.log('收到默认消息:', event.data);
+                this.handleMessage('default', event.data);
+            };
+
+            // 注册特定事件处理
+            this.registerEventHandler('项目邀请', (data) => this.handleMessage('项目邀请', data));
+            this.registerEventHandler('问题收到回答', (data) => this.handleMessage('问题收到回答', data));
+            this.registerEventHandler('系统通知', (data) => this.handleMessage('系统通知', data));
+        }
+
+        // 注册事件处理函数
+        registerEventHandler(eventType, handler) {
+            this.eventSource.addEventListener(eventType, (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handler(data);
+                } catch (e) {
+                    handler(event.data);
+                }
+            });
+        }
+
+        // 消息处理
+        handleMessage(eventType, data) {
+            this.messageCount++;
+            this.updateMessageCount();
+            this.updateLastUpdateTime();
+
+            // 调用注册的消息处理器
+            if (this.messageHandlers[eventType]) {
+                this.messageHandlers[eventType](data);
+            }
+
+            // 显示消息
+            this.displayMessage(eventType, data);
+        }
+
+        // 显示消息
+        displayMessage(eventType, data) {
+            const messagesContainer = document.getElementById('messages-container');
+            const eventFilter = document.getElementById('event-filter').value;
+
+            // 过滤消息
+            if (eventFilter !== 'all' && eventFilter !== eventType) {
+                return;
+            }
+
+            // 创建消息元素
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'mb-4 p-4 rounded-lg shadow-sm message-appear';
+
+            // 根据事件类型设置不同的样式
+            let iconClass, bgColor;
+            switch (eventType) {
+                case '项目邀请':
+                    iconClass = 'fa-bell';
+                    bgColor = 'bg-blue-50 border-l-4 border-blue-400';
+                    break;
+                case '问题收到回答':
+                    iconClass = 'fa-envelope';
+                    bgColor = 'bg-green-50 border-l-4 border-green-400';
+                    break;
+                case '系统通知':
+                    iconClass = 'fa-newspaper-o';
+                    bgColor = 'bg-purple-50 border-l-4 border-purple-400';
+                    break;
+                default:
+                    iconClass = 'fa-comment-o';
+                    bgColor = 'bg-gray-50 border-l-4 border-gray-400';
+            }
+
+            // 格式化消息时间
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+
+            // 设置消息内容
+            messageDiv.className = `mb-4 p-4 rounded-lg ${bgColor} shadow-sm message-appear`;
+            messageDiv.innerHTML = `
+          <div class="flex">
+            <div class="flex-shrink-0 pt-0.5">
+              <i class="fa ${iconClass} text-lg"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-800">${eventType}</p>
+              <div class="mt-1 text-sm text-gray-700">
+                ${typeof data === 'object' ? JSON.stringify(data, null, 2) : data}
+              </div>
+              <p class="mt-1 text-xs text-gray-500">${timeString}</p>
+            </div>
+          </div>
+        `;
+
+            // 如果是第一条消息，清空初始提示
+            if (this.messageCount === 1) {
+                messagesContainer.innerHTML = '';
+            }
+
+            // 添加消息到容器
+            messagesContainer.appendChild(messageDiv);
+
+            // 滚动到底部
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // 安排重连
+        scheduleReconnect() {
+            if (this.retryCount < this.maxRetries) {
+                this.retryCount++;
+                console.log(`尝试重连 (${this.retryCount}/${this.maxRetries})...`);
+
+                clearInterval(this.reconnectTimer);
+                this.reconnectTimer = setTimeout(() => {
+                    this.connect(this.userId);
+                }, this.reconnectInterval);
+            } else {
+                console.error('达到最大重连次数，停止重连');
+            }
+        }
+
+        // 断开连接
+        disconnect() {
+            if (this.eventSource) {
+                this.eventSource.close();
+                this.eventSource = null;
+                clearInterval(this.reconnectTimer);
+                this.updateConnectionStatus(false);
+                console.log('SSE连接已断开');
+            }
+        }
+
+        // 检查连接状态
+        isConnected() {
+            return this.eventSource && this.eventSource.readyState === EventSource.OPEN;
+        }
+
+        // 更新连接状态UI
+        updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            const connectBtn = document.getElementById('connect-btn');
+            const disconnectBtn = document.getElementById('disconnect-btn');
+            const testBtn = document.getElementById('test-btn');
+
+            if (connected) {
+                statusElement.innerHTML = `
+            <i class="fa fa-circle text-success text-xs"></i>
+            <span class="text-success">已连接</span>
+          `;
+                connectBtn.disabled = true;
+                connectBtn.classList.remove('bg-primary', 'hover:bg-primary/90');
+                connectBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+                disconnectBtn.disabled = false;
+                disconnectBtn.classList.remove('bg-gray-200', 'cursor-not-allowed');
+                disconnectBtn.classList.add('bg-danger', 'text-white', 'hover:bg-danger/90');
+                testBtn.disabled = false;
+                testBtn.classList.remove('bg-gray-200', 'cursor-not-allowed');
+                testBtn.classList.add('bg-primary', 'text-white', 'hover:bg-primary/90');
+            } else {
+                statusElement.innerHTML = `
+            <i class="fa fa-circle-o text-danger text-xs"></i>
+            <span class="text-danger">未连接</span>
+          `;
+                connectBtn.disabled = false;
+                connectBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+                connectBtn.classList.add('bg-primary', 'hover:bg-primary/90');
+                disconnectBtn.disabled = true;
+                disconnectBtn.classList.remove('bg-danger', 'text-white', 'hover:bg-danger/90');
+                disconnectBtn.classList.add('bg-gray-200', 'cursor-not-allowed');
+                testBtn.disabled = true;
+                testBtn.classList.remove('bg-primary', 'text-white', 'hover:bg-primary/90');
+                testBtn.classList.add('bg-gray-200', 'cursor-not-allowed');
+            }
+        }
+
+        // 更新消息计数
+        updateMessageCount() {
+            document.getElementById('message-count').textContent = this.messageCount;
+        }
+
+        // 更新最后更新时间
+        updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('last-update').textContent = timeString;
+        }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        const sseClient = new SSEClient();
+        const userIdInput = document.getElementById('user-id');
+        const connectBtn = document.getElementById('connect-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const testBtn = document.getElementById('test-btn');
+        const eventFilter = document.getElementById('event-filter');
+
+        // 连接按钮点击事件
+        connectBtn.addEventListener('click', () => {
+            const userId = parseInt(userIdInput.value);
+            if (isNaN(userId) || userId <= 0) {
+                alert('请输入有效的用户ID');
+                return;
+            }
+
+            sseClient.userId = userId;
+            sseClient.connect(userId);
+        });
+
+        // 断开按钮点击事件
+        disconnectBtn.addEventListener('click', () => {
+            sseClient.disconnect();
+        });
+
+        // 测试按钮点击事件
+        testBtn.addEventListener('click', () => {
+            if (sseClient.isConnected()) {
+                const url = 'http://39.107.99.145:8081/notification/test/push/' + sseClient.userId;
+                fetch(url, { method: 'GET' })
+                    .then(response => response.json())
+                    .catch(error => {
+                        console.error('测试消息发送失败:', error);
+                    });
+            } else {
+                alert('当前未连接到SSE服务器');
+            }
+        });
+
+        // 消息过滤器变更事件
+        eventFilter.addEventListener('change', () => {
+            if (sseClient.storedMessages === null) {
+                sseClient.storedMessages = document.getElementById('messages-container').innerHTML;
+            }
+            const messagesContainer = document.getElementById('messages-container');
+            messagesContainer.innerHTML = sseClient.storedMessages;
+            const messageElements = messagesContainer.querySelectorAll('.message-appear');
+            const filterValue = eventFilter.value;
+
+            // 临时保存消息
+            messagesContainer.innerHTML = '<div class="flex justify-center items-center h-full text-gray-400"><p>正在过滤消息...</p></div>';
+
+            // 模拟异步处理，让过渡效果更平滑
+            setTimeout(() => {
+                sseClient.messageCount = 0;
+                messagesContainer.innerHTML = '';
+
+                // 重新计算消息数量
+                messageElements.forEach(messageElement => {
+                    const eventType = messageElement.querySelector('.text-gray-800').textContent;
+                    if (filterValue === 'all' || filterValue === eventType) {
+                        sseClient.messageCount++;
+                        messageElement.style.display = 'block';
+                    } else {
+                        messageElement.style.display = 'none';
+                    }
+                    messagesContainer.appendChild(messageElement);
+                });
+                sseClient.updateMessageCount();
+
+                // 如果没有消息，显示空状态
+                if (sseClient.messageCount === 0) {
+                    messagesContainer.innerHTML = `
+              <div class="flex justify-center items-center h-full text-gray-400">
+                <div class="text-center">
+                  <i class="fa fa-comments-o text-4xl mb-3"></i>
+                  <p>没有匹配的消息</p>
+                </div>
+              </div>
+            `;
+                }
+            }, 300);
+        });
+    });
+</script>
+</body>
+</html>
