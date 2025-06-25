@@ -7,7 +7,9 @@ export const API_CONFIG = {
     REGISTER: '/users/register',
     RESET_PASSWORD: '/users/change-password',
     SEND_VERIFICATION_CODE: '/users/send-verification-code',
-    USER_INFO: `/users/id`,
+    USER_INFO: '/users/id',
+    UNREAD_MESSAGE_NUMBER: '/message/unread-count',
+    WORK_CONTENT:'/works/content'
   }
 }
 

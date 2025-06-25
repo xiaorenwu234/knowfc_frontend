@@ -5,6 +5,7 @@ import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
+import  router from '@/router'
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -16,6 +17,11 @@ const updateWindowSize = () => {
     width: window.innerWidth,
     height: window.innerHeight,
   }
+}
+
+const handleQuit = ()=>{
+  localStorage.removeItem('user');
+  router.push('/')
 }
 
 const ownerReference = ref('');
@@ -83,11 +89,12 @@ const showForm = ref(false)
 
         <div class="flex flex-col sm:block sm:my-[25px] w-full sm:w-auto mx-auto">
           <div
-            class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center sm:text-left"
+            class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center "
           >
             {{userInfo?.username}}
           </div>
           <button class="btn w-full mx-auto" @click="showForm=true">修改个人信息</button>
+          <button class="btn w-full mx-auto mt-6" @click="handleQuit">退出登陆</button>
         </div>
       </div>
 

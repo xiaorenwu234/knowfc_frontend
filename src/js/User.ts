@@ -21,6 +21,7 @@ export const login = async (username: string, password: string): Promise<[boolea
       userName.value = res.data.username
       id.value = res.data.id
       if (res.data.code == 200) {
+        localStorage.setItem('user',JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
       } else {
         return [false, res.data.message] as [boolean, string]

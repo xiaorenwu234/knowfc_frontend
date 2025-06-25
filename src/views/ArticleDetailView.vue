@@ -267,39 +267,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { API_CONFIG, buildApiUrl } from '@/config/api.js'
+import axios from 'axios'
 
 const activeSection = ref('') // 默认激活相关文章
-const likeCount = ref(0)
-const liked = ref(false)
-const showCommentEditor = ref(false)
-const commentContent = ref('')
-
-const handleLike = () => {
-  if (!liked.value) {
-    likeCount.value++
-    liked.value = true
-  } else {
-    likeCount.value = Math.max(0, likeCount.value - 1)
-    liked.value = false
-  }
+const route = useRoute()
+const articleId= route.params.id
+const getArticleContent = async(articleId) => {
+  await axios.get(buildApiUrl(API_CONFIG.ENDPOINTS.WORK_CONTENT),{params:{id:articleId}}).then((res)=>{
+    console.log(res.data.data)
+    //TODO return null
+    articleData.value=res.data.data
+  })
 }
-
-const toggleCommentEditor = () => {
-  showCommentEditor.value = !showCommentEditor.value
-}
-
-const closeCommentEditor = () => {
-  showCommentEditor.value = false
-  commentContent.value = ''
-}
-
-const submitComment = () => {
-  // 这里应该添加提交评论的逻辑
-  console.log('评论提交:', commentContent.value)
-  closeCommentEditor()
-}
-
+onMounted(()=>{
+  getArticleContent()
+})
 // 文章数据
 const articleData = ref({
   title: "AI-generated or AI touch-up? Identifying AI contribution in text data",
