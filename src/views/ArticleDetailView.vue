@@ -328,4 +328,27 @@ const scrollToSection = (sectionId) => {
     })
   }
 }
+
+const liked = ref(false)
+
+const handleLike = () => {
+  liked.value = !liked.value
+}
+
+const showCommentEditor = ref(false)
+const commentContent = ref('')
+
+const toggleCommentEditor = () => {
+  showCommentEditor.value = !showCommentEditor.value
+}
+
+const closeCommentEditor = () => {
+  showCommentEditor.value = false
+  commentContent.value = ''
+}
+
+const submitComment = () => {
+  
+  closeCommentEditor()
+}
 </script>
