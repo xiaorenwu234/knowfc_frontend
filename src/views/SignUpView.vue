@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import router from '@/router'
+import { buildApiUrl, API_CONFIG } from '@/config/api'
 
 const showCountDown = ref(false)
 const countDownValue = ref(59)
 const hasSent = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+// 定义响应数据类型
+interface RegisterResponse {
+  code: number
+  msg: string
+  data: string
+  timestamp: number
+}
 
 const startCountDown = () => {
   if (showCountDown.value) return
@@ -27,6 +38,96 @@ const password = ref('')
 const email = ref('')
 const confirmPassword = ref('')
 const verificationCode = ref('')
+
+const handleRegister = async () => {
+  // 表单验证
+  if (!username.value.trim()) {
+    errorMessage.value = '请输入用户名'
+    return
+  }
+  if (!email.value.trim()) {
+    errorMessage.value = '请输入邮箱'
+    return
+  }
+  if (!verificationCode.value.trim()) {
+    errorMessage.value = '请输入验证码'
+    return
+  }
+  if (!password.value.trim()) {
+    errorMessage.value = '请输入密码'
+    return
+  }
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = '两次输入的密码不一致'
+    return
+  }
+
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    // 构建请求参数
+    const params = new URLSearchParams()
+    params.append('username', username.value.trim())
+    params.append('email', email.value.trim())
+    params.append('verificationCode', verificationCode.value.trim())
+    params.append('password', password.value)
+
+    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.REGISTER), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params
+    })
+
+    const data: RegisterResponse = await response.json()
+
+    if (data.code === 200) {
+      // 注册成功
+      console.log('注册成功:', data.data)
+      alert('注册成功！')
+      // 跳转到登录页面
+      router.push('/signin')
+    } else {
+      // 注册失败
+      errorMessage.value = data.msg || '注册失败，请检查输入信息'
+    }
+  } catch (error) {
+    console.error('注册请求失败:', error)
+    errorMessage.value = '网络错误，请稍后重试'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleVerifyCode = async () => {
+  if (!email.value.trim()) {
+    errorMessage.value = '请输入邮箱'
+    return
+  }
+  try {
+    const params = new URLSearchParams()
+    params.append('email', email.value.trim())
+
+    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.SEND_VERIFICATION_CODE), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params
+    })
+    const data = await response.json()
+    if (data.code === 200) {
+      alert('验证码已发送，请查收邮箱')
+      startCountDown()
+    } else {
+      errorMessage.value = data.msg || '发送失败'
+    }
+  } catch (error) {
+    errorMessage.value = '网络错误，请稍后重试'
+  }
+}
 </script>
 
 <template>
@@ -113,7 +214,7 @@ const verificationCode = ref('')
               >
             </span>
             <span class="countdown-text" v-if="showCountDown"> 秒后重新发送 </span>
-            <div class="button" @click="startCountDown" v-else>
+            <div class="button" @click="handleVerifyCode" v-else>
               {{ hasSent ? '重新发送验证码' : '发送验证码' }}
             </div>
           </div>
@@ -137,9 +238,22 @@ const verificationCode = ref('')
           name="confirm-password"
           id="confirm-password-input"
           v-model="confirmPassword"
+          @keyup.enter="handleRegister"
         />
 
-        <button class="submit" type="button">注 册</button>
+        <!-- 错误消息显示 -->
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <button 
+          class="submit" 
+          type="button" 
+          @click="handleRegister"
+          :disabled="isLoading"
+        >
+          {{ isLoading ? '注册中...' : '注 册' }}
+        </button>
         <div @click="router.push('signin')" class="text-blue-500 hover:underline jump">
           已有账号？登录
         </div>

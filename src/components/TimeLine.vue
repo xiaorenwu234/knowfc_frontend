@@ -23,9 +23,10 @@
       <div class="grow pt-0.5 pb-8">
         <h3 class="flex gap-x-1.5 font-semibold text-gray-800">{{ m.title }}</h3>
         <p class="mt-1 text-sm text-gray-600">{{ m.content }}</p>
-        <button
+        <RouterLink
           type="button"
           class="mt-1 -ms-1 p-1 inline-flex items-center gap-x-2 text-xs rounded-lg border border-transparent text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none"
+          :to="personalCenterPath(m.userId)"
         >
           <img
             class="shrink-0 size-4 rounded-full"
@@ -33,7 +34,7 @@
             alt="Avatar"
           />
           {{ m.user }}
-        </button>
+        </RouterLink>
       </div>
       <!-- End Right Content -->
     </div>
@@ -43,7 +44,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+
+const personalCenterPath = (userId:string) => {
+  return "/personal-center/" + userId
+}
 
 const messages = ref([
   {
@@ -51,6 +56,7 @@ const messages = ref([
     title: 'Created "Preline in React" task',
     content: 'Find more detailed instructions here.',
     user: 'James Collins',
+    userId: '1',
     avatar:
       'https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80',
   },
@@ -59,6 +65,7 @@ const messages = ref([
     title: 'Release v5.2.0 quick bug fix 🐞',
     content: '',
     user: 'James Collins',
+    userId: '1',
     avatar: 'https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80',
   },
   {
@@ -66,6 +73,7 @@ const messages = ref([
     title: 'Marked "Install Charts" completed',
     content: 'Finally! You can check it out here.',
     user: 'James Collins',
+    userId: '1',
     avatar:
       'https://images.unsplash.com/photo-1659482633369-9fe69af50bfb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80',
   },

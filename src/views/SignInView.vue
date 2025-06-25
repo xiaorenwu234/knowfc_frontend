@@ -1,9 +1,43 @@
 <script setup lang="ts">
 import router from '@/router'
 import { ref } from 'vue'
+import { buildApiUrl, API_CONFIG } from '@/config/api'
 
 const password = ref('')
 const username = ref('')
+
+const handleLogin = async () => {
+  if (!username.value.trim()) {
+    alert('请输入用户名')
+    return
+  }
+  if (!password.value.trim()) {
+    alert('请输入密码')
+    return
+  }
+  try {
+    const params = new URLSearchParams()
+    params.append('username', username.value.trim())
+    params.append('password', password.value.trim())
+    const response = await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.LOGIN), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params
+    })
+    const data = await response.json()
+    if (data.code === 0 || data.code === 200) {
+      alert('登录成功！')
+      localStorage.setItem('user', JSON.stringify(data.data))
+      router.push('/home')
+    } else {
+      alert(data.msg || '用户名或密码错误')
+    }
+  } catch (error) {
+    alert('网络错误，请稍后重试')
+  }
+}
 </script>
 
 <template>
@@ -28,13 +62,13 @@ const username = ref('')
       <form class="form">
         <div class="title">登 录</div>
 
-        <label class="label_input" for="email-input">邮 箱</label>
+        <label class="label_input" for="username-input">用户名</label>
         <input
           spellcheck="false"
           class="input"
-          type="email"
-          name="email"
-          id="email-input"
+          type="text"
+          name="username"
+          id="username-input"
           v-model="username"
         />
 
@@ -52,7 +86,7 @@ const username = ref('')
           id="password-input"
           v-model="password"
         />
-        <button class="submit" type="button">登 录</button>
+        <button class="submit" type="button" @click="handleLogin">登 录</button>
         <div @click="router.push('signup')" class="text-blue-500 hover:underline jump">
           还没有账号？注册
         </div>

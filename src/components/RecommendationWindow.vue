@@ -27,39 +27,14 @@
           v-for="(posts, idx) in Object.values(categories)"
           :key="idx"
           :class="[
-            'rounded-xl bg-white p-3',
+            'rounded-xl bg-white p-3 flex flex-col gap-4',
             'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
           ]"
         >
-          <ul>
-            <li
-              v-for="post in posts"
-              :key="post.id"
-              class="relative rounded-md p-3 text-black hover:bg-gray-100"
-            >
-              <h3 class="text-sm font-medium leading-5">
-                {{ post.title }}
-              </h3>
+        <template v-if="idx === 0">
+          <WorkCard v-for="(work, i) in posts" :work="work" :key="i"/>
+        </template>
 
-              <ul
-                class="mt-1 flex space-x-1 text-xs font-normal leading-4"
-              >
-                <li>{{ post.date }}</li>
-                <li>&middot;</li>
-                <li>{{ post.commentCount }} comments</li>
-                <li>&middot;</li>
-                <li>{{ post.shareCount }} shares</li>
-              </ul>
-
-              <a
-                href="#"
-                :class="[
-                  'absolute inset-0 rounded-md',
-                  'ring-blue-400 focus:z-10 focus:outline-none focus:ring-2',
-                ]"
-              />
-            </li>
-          </ul>
         </TabPanel>
       </TabPanels>
     </TabGroup>
@@ -69,24 +44,40 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
+import WorkCard from './WorkCard.vue';
+import type { Work } from '@/js/Work';
+
+const works: Work[] = [
+  {
+    id: '1',
+    title: 'Understanding the Impact of AI on Coffee Production',
+    authors: ['Alice Smith', 'Bob Johnson'],
+    fields: ['Agriculture', 'AI'],
+    keywords: ['AI', 'Coffee', 'Agriculture'],
+    abstract: 'This paper explores how AI technologies are transforming coffee production processes, enhancing yield and quality. It discusses the integration of machine learning algorithms in crop management and quality assessment. The findings suggest significant improvements in efficiency and sustainability. The study highlights the potential of AI to revolutionize traditional agricultural practices, particularly in the coffee industry.',
+    date: new Date('2023-10-01'),
+    type: 'arxiv',
+    source: 'unknown',
+    likes: 120,
+    comments: 45,
+  },
+  {
+    id: '2',
+    title: 'AI in Coffee Quality Assessment',
+    authors: ['Charlie Brown', 'Diana Prince'],
+    fields: ['Food Science', 'AI', 'Quality Control', 'Machine Learning', 'Sensory Analysis'],
+    keywords: ['AI', 'Coffee Quality', 'Food Science'],
+    abstract: 'This study investigates the use of AI in assessing coffee quality, focusing on sensory analysis and machine learning techniques. It highlights how AI can predict flavor profiles and optimize roasting parameters, leading to better quality control in coffee production. The results indicate a promising future for AI applications in the coffee industry.',
+    date: new Date('2023-09-15'),
+    type: 'arxiv',
+    source: 'unknown',
+    likes: 95,
+    comments: 30,
+  },
+];
 
 const categories = ref({
-  文章: [
-    {
-      id: 1,
-      title: 'Does drinking coffee make you smarter?',
-      date: '5h ago',
-      commentCount: 5,
-      shareCount: 2,
-    },
-    {
-      id: 2,
-      title: "So you've bought coffee... now what?",
-      date: '2h ago',
-      commentCount: 3,
-      shareCount: 2,
-    },
-  ],
+  文章: works,
   同仁: [
     {
       id: 1,
@@ -120,4 +111,5 @@ const categories = ref({
     },
   ],
 })
+
 </script>
