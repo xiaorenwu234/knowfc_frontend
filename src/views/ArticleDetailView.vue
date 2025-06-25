@@ -27,6 +27,21 @@
             <span>({{ articleData.year }})</span>
             <button class="underline hover:no-underline transition-all">Cite this article</button>
           </div>
+          
+          <div class="flex items-center gap-6 text-white font-medium -mb-10">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline w-5 h-5 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z" />
+              </svg>
+              点赞数：12
+            </span>
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline w-5 h-5 mr-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+              </svg>
+              评论数：2
+            </span>
+          </div>
         </div>
 
         <!-- 右侧期刊封面和信息 -->
@@ -72,7 +87,6 @@
             <p class="mb-4">{{ articleData.abstract || '文章摘要内容将在这里显示...' }}</p>
           </div>
         </div>
-
         <!-- 相关文章推荐 -->
         <div id="related" class="mb-8 bg-gray-50 p-6 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">其他人正在查看类似内容</h3>
@@ -99,6 +113,33 @@
                  class="p-4 border rounded-lg">
               <h4 class="font-semibold">{{ author.name }}</h4>
               <p class="text-sm text-gray-600">{{ author.affiliation }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 评论区 -->
+        <div id="comments" class="mb-8">
+          <h2 class="text-2xl font-bold mb-4">评论区</h2>
+          <div class="space-y-4">
+            <div class="p-4 border rounded-lg bg-gray-50">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">A</div>
+                <span class="font-semibold text-gray-800">Alice</span>
+                <span class="text-xs text-gray-400 mt-1">2024-06-30</span>
+              </div>
+              <div class="text-gray-700 leading-relaxed">
+                这篇文章的选题很有意义，内容也很详实，支持作者！
+              </div>
+            </div>
+            <div class="p-4 border rounded-lg bg-gray-50">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold">B</div>
+                <span class="font-semibold text-gray-800">Bob</span>
+                <span class="text-xs text-gray-400 mt-1">2024-06-29</span>
+              </div>
+              <div class="text-gray-700 leading-relaxed">
+                观点新颖，分析也很到位，期待后续更多相关研究！
+              </div>
             </div>
           </div>
         </div>
@@ -161,6 +202,15 @@
                 ]">
                 作者信息
               </a>
+              <a @click="scrollToSection('comments')"
+                :class="[
+                  'block cursor-pointer transition-colors',
+                  activeSection === 'comments'
+                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
+                    : 'text-blue-600 hover:underline'
+                ]">
+                评论区
+              </a>
             </div>
           </div>
 
@@ -169,9 +219,45 @@
             <button class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
               下载 PDF
             </button>
+            <button 
+              class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
+              :class="{ 'bg-orange-50 border-orange-700 text-orange-700': liked }"
+              @click="handleLike"
+            >
+              {{ liked ? '已点赞' : '点赞文章' }}
+            </button>
             <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors">
               收藏文章
             </button>
+            <button 
+              class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
+              @click="toggleCommentEditor"
+            >
+              评论文章
+            </button>
+            <div v-if="showCommentEditor" class="bg-white rounded-lg shadow-sm p-4 mt-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-gray-900">写评论</h3>
+                <button 
+                  @click="closeCommentEditor"
+                  class="text-gray-400 hover:text-gray-600 transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+              <textarea v-model="commentContent" rows="4" class="w-full border rounded p-2 mb-2" placeholder="请输入您的评论..."></textarea>
+              <div class="flex items-center gap-3">
+                <button 
+                  @click="submitComment"
+                  class="bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
+                  发布评论
+                </button>
+                <button 
+                  @click="closeCommentEditor"
+                  class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors">
+                  取消
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -241,5 +327,28 @@ const scrollToSection = (sectionId) => {
       block: 'start'
     })
   }
+}
+
+const liked = ref(false)
+
+const handleLike = () => {
+  liked.value = !liked.value
+}
+
+const showCommentEditor = ref(false)
+const commentContent = ref('')
+
+const toggleCommentEditor = () => {
+  showCommentEditor.value = !showCommentEditor.value
+}
+
+const closeCommentEditor = () => {
+  showCommentEditor.value = false
+  commentContent.value = ''
+}
+
+const submitComment = () => {
+  
+  closeCommentEditor()
 }
 </script>
