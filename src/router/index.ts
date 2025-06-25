@@ -24,7 +24,7 @@ const router = createRouter({
       component: () => import('../views/ForgetPasswordView.vue'),
     },
     {
-      path: '/article-detail/:id',
+      path: '/article-detail',
       name: 'article-detail',
       component: () => import('../views/ArticleDetailView.vue'),
     },
@@ -32,6 +32,21 @@ const router = createRouter({
       path: '/search',
       name: 'search',
       component: () => import('../views/SearchView.vue'),
+      children: [
+        {
+          path: 'works',
+          name: 'search-works',
+          component: () => import('../views/SearchWorkView.vue'),
+        }, {
+          path: 'users',
+          name: 'search-users',
+          component: () => import('../views/SearchUserView.vue'),
+        }, {
+          path: 'problems',
+          name: 'search-problems',
+          component: () => import('../views/SearchProblemView.vue'),
+        }
+      ]
     },
     {
       path: '/chat',
