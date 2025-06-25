@@ -18,7 +18,7 @@ export const getArticleContent = async (articleId: string): Promise<string> => {
 }
 
 export const getArticleLike = async (articleId: number): Promise<boolean> => {
-  const url = `/works/like/${workId}/${getUserId()}`
+  const url = `/works/like/${articleId}/${getUserId()}`
   try {
     const response = await instance.get(url)
     if (response.data.code === 200) {
@@ -68,6 +68,31 @@ export const cancelLikeArticle = async (articleId: number): Promise<boolean> => 
     }
   } catch (err) {
     console.error('取消点赞请求失败:', err)
+    return false
+  }
+}
+
+
+export const sendComment = async (articleId: number, content: string): Promise<boolean> => {
+  const url = '/works/comment'
+
+  const data = {
+    userId: getUserId(),
+    workId: articleId,
+    content: content,
+  }
+
+  try{
+    const response = await instance.post(url, data)
+    if (response.data.code === 200) {
+      return true
+    } else {
+      console.error('评论失败:', response.data.message)
+      return false
+    }
+  }
+  catch (err) {
+    console.error('评论请求失败:', err)
     return false
   }
 }
