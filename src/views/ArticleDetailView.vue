@@ -16,18 +16,18 @@
 
           <!-- 文章标题 -->
           <h1 class="text-2xl font-bold leading-tight my-4 max-w-4xl">
-            {{ articleData.title }}
+            {{ articleDetail.title }}
           </h1>
 
           <!-- 文章信息 -->
           <div class="text-sm opacity-90 flex flex-wrap items-center gap-4">
             <span>{{ articleData.type }}</span>
             <span>|</span>
-            <span>Published: {{ articleData.publishDate }}</span>
+            <span>Published: {{ articleDetail.publish_date }}</span>
             <span>({{ articleData.year }})</span>
             <button class="underline hover:no-underline transition-all">Cite this article</button>
           </div>
-          
+
           <div class="flex items-center gap-6 text-white font-medium -mb-10">
             <span>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline w-5 h-5 mr-1">
@@ -84,7 +84,7 @@
         <div id="abstract" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">摘要</h2>
           <div class="text-gray-700 leading-relaxed">
-            <p class="mb-4">{{ articleData.abstract || '文章摘要内容将在这里显示...' }}</p>
+            <p class="mb-4">{{ articleDetail.abstractContent || '文章摘要内容将在这里显示...' }}</p>
           </div>
         </div>
         <!-- 相关文章推荐 -->
@@ -120,25 +120,15 @@
         <!-- 评论区 -->
         <div id="comments" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">评论区</h2>
-          <div class="space-y-4">
+          <div class="space-y-4" v-for = "(comment, index) in articleDetail.comments" :key="index">
             <div class="p-4 border rounded-lg bg-gray-50">
               <div class="flex items-center gap-2 mb-2">
-                <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">A</div>
-                <span class="font-semibold text-gray-800">Alice</span>
+                <img class="w-8 h-8 rounded-full  flex items-center justify-center aspect-square" :src ="comment.avatar" alt="头像"/>
+                <span class="font-semibold text-gray-800">{{comment.username}}</span>
                 <span class="text-xs text-gray-400 mt-1">2024-06-30</span>
               </div>
               <div class="text-gray-700 leading-relaxed">
-                这篇文章的选题很有意义，内容也很详实，支持作者！
-              </div>
-            </div>
-            <div class="p-4 border rounded-lg bg-gray-50">
-              <div class="flex items-center gap-2 mb-2">
-                <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-sm font-bold">B</div>
-                <span class="font-semibold text-gray-800">Bob</span>
-                <span class="text-xs text-gray-400 mt-1">2024-06-29</span>
-              </div>
-              <div class="text-gray-700 leading-relaxed">
-                观点新颖，分析也很到位，期待后续更多相关研究！
+                {{comment.content}}
               </div>
             </div>
           </div>
@@ -219,17 +209,18 @@
             <button class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
               下载 PDF
             </button>
-            <button 
-              class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-orange-50 border-orange-700 text-orange-700': liked }"
-              @click="handleLike"
-            >
-              {{ liked ? '已点赞' : '点赞文章' }}
-            </button>
+            <button
+            class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
+            :class="{ 'bg-orange-50 border-orange-700 text-orange-700': liked_statement }"
+            @click="handleLike"
+          >
+            {{ liked_statement ? '已点赞' : '点赞文章' }}
+          </button>
+
             <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors">
               收藏文章
             </button>
-            <button 
+            <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
               @click="toggleCommentEditor"
             >
@@ -238,7 +229,7 @@
             <div v-if="showCommentEditor" class="bg-white rounded-lg shadow-sm p-4 mt-4">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="text-lg font-semibold text-gray-900">写评论</h3>
-                <button 
+                <button
                   @click="closeCommentEditor"
                   class="text-gray-400 hover:text-gray-600 transition-colors">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -246,12 +237,12 @@
               </div>
               <textarea v-model="commentContent" rows="4" class="w-full border rounded p-2 mb-2" placeholder="请输入您的评论..."></textarea>
               <div class="flex items-center gap-3">
-                <button 
+                <button
                   @click="submitComment"
                   class="bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors">
                   发布评论
                 </button>
-                <button 
+                <button
                   @click="closeCommentEditor"
                   class="border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors">
                   取消
@@ -271,19 +262,18 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { API_CONFIG, buildApiUrl } from '@/config/api.js'
 import axios from 'axios'
+import {getArticleContent} from "@/js/ArticleDetail.js";
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
-const articleId= route.params.id
-const getArticleContent = async(articleId) => {
-  await axios.get(buildApiUrl(API_CONFIG.ENDPOINTS.WORK_CONTENT),{params:{id:articleId}}).then((res)=>{
-    console.log(res.data.data)
-    //TODO return null
-    articleData.value=res.data.data
-  })
+// const articleId= route.params.id
+const articleDetail = ref({})
+const getArticleDetail = async(articleId) => {
+  articleDetail.value = await getArticleContent(articleId)
+  console.log(articleDetail.value)
 }
 onMounted(()=>{
-  getArticleContent()
+  getArticleDetail(1)
 })
 // 文章数据
 const articleData = ref({
@@ -329,10 +319,11 @@ const scrollToSection = (sectionId) => {
   }
 }
 
-const liked = ref(false)
+const liked_statement = ref(false)
 
 const handleLike = () => {
-  liked.value = !liked.value
+  liked_statement.value = !liked_statement.value
+  console.log(liked_statement.value)
 }
 
 const showCommentEditor = ref(false)
@@ -348,7 +339,7 @@ const closeCommentEditor = () => {
 }
 
 const submitComment = () => {
-  
+
   closeCommentEditor()
 }
 </script>

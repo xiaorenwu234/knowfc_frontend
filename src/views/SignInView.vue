@@ -1,27 +1,27 @@
 <script setup lang="ts">
 import router from '@/router'
 import { ref } from 'vue'
-import {login} from "@/js/User.ts";
+import { login } from '@/js/User.ts'
+import { notify } from '@/js/toast.ts'
 
 const password = ref('')
 const username = ref('')
 
 const handleLogin = async () => {
   if (!username.value.trim()) {
-    alert('请输入用户名')
+    notify('error', '请输入用户名')
     return
   }
   if (!password.value.trim()) {
-    alert('请输入密码')
+    notify('error', '请输入密码')
     return
   }
   const [success, message] = await login(username.value, password.value)
-  if(success){
-    alert('登录成功')
+  if (success) {
+    notify('success', '登录成功')
     router.push('/')
-  }
-  else{
-    alert(message)
+  } else {
+    notify('error', '登录失败', message)
   }
 }
 </script>
