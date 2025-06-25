@@ -52,7 +52,17 @@ const router = createRouter({
       path: '/Problem',
       name: 'Problem',
       component: () => import('../views/ProblemView.vue'),
-    }
+    },
+    {
+      path: '/personal-notify/:id',
+      name: 'personal-notify',
+      component: () => import('../views/NotifiView.vue'),
+    },
+    {
+      path: '/project/:id',
+      name: 'project',
+      component: () => import('../views/Project.vue'),
+    },
   ],
 })
 
