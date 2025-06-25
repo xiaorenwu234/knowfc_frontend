@@ -2,7 +2,6 @@
   <div class="card shadow-xl">
     <div class="card-body">
       <h2 class="text-xl font-bold hover:underline cursor-pointer">{{ work.title }}</h2>
-      <!-- display authors in <a> with comma separated -->
       <p class="text-sm text-gray-600">
         <span v-for="(author, index) in work.authors" :key="index">
           <a :href="`/author/${author}`" class="text-blue-900 hover:underline">{{ author }}</a>
@@ -14,7 +13,6 @@
       </div>
 
       <div class="flex">
-        <!-- work.date 显示为 2023-10-01 的格式 -->
         <div>
           {{ new Intl.DateTimeFormat('zh-CN').format(work.date) }}
         </div>
@@ -25,7 +23,12 @@
         <div class="divider divider-horizontal"></div>
         <div ref="scroll-container" class="scroll-container overflow-scroll whitespace-nowrap">
           <div ref="scroll-track" class="scroll-track">
-            <div class="badge badge-outline badge-info mx-1" v-for="(f, i) in work.fields" :key="i">
+            <div
+              class="badge badge-outline mx-1"
+              :class="getBadgeClass(f)"
+              v-for="(f, i) in work.fields"
+              :key="i"
+            >
               {{ f }}
             </div>
           </div>
@@ -104,11 +107,26 @@ function startScroll() {
   )
 }
 
-onMounted(() => [startScroll()])
+onMounted(() => startScroll())
 window.addEventListener('resize', () => {
-  track.value!.style.animation = 'none' // 先清除动画
+  track.value!.style.animation = 'none'
   startScroll()
 })
+
+const colors = [
+  'badge-primary',
+  'badge-secondary',
+  'badge-accent',
+  'badge-info',
+  'badge-success',
+  'badge-warning',
+  'badge-error',
+]
+
+const getBadgeClass = (name: string) => {
+  const idx = name.charCodeAt(0) % 7
+  return colors[idx]
+}
 </script>
 
 <style scoped>
@@ -143,6 +161,6 @@ window.addEventListener('resize', () => {
 }
 
 .scroll-container:hover .scroll-track {
-  animation-play-state: paused;
+  animation-play-state: paused !important;
 }
 </style>
