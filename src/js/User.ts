@@ -1,11 +1,12 @@
 import { ref } from 'vue'
 import instance from '@/js/axios.ts'
+import { local } from 'd3'
 
 const userName = ref('')
 const id = ref(0)
 
 export const getUserId = () => {
-  return JSON.parse(localStorage.getItem('userId') || '').id || 2;
+  return JSON.parse(localStorage.getItem('user') || '').id || 2;
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
