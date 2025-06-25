@@ -62,13 +62,13 @@
                     <div class="flex flex-wrap gap-2" @mousedown.prevent>
                         <input
                             type="date"
-                            class="input input-bordered w-full"
+                            class="input input-bordered grow"
                             v-model="dateRange.start"
                         />
                         <span class="self-center">至</span>
                         <input
                             type="date"
-                            class="input input-bordered w-full"
+                            class="input input-bordered grow"
                             v-model="dateRange.end"
                         />
                     </div>
@@ -113,7 +113,6 @@ const searchBar = ref()
 const searchInput = ref()
 
 const doSearch = () => {
-    searchStore.doSearch = true
     searchStore.setContent(searchQuery.value)
     searchStore.setType(selectedType.value)
 
@@ -130,6 +129,8 @@ const doSearch = () => {
     showAdvancedSearch.value = false
 
     searchInput.value.blur()
+
+    searchStore.doSearch = true
 }
 
 // 高级搜索

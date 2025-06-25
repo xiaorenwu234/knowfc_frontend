@@ -1,7 +1,8 @@
+// @ts-check
 <template>
   <div class="h-full w-full  p-4 md:p-8 px-10 md:px-20">
     <!-- 搜索区域 -->
-    <div class="container max-w-3xl mx-auto mb-8 sticky top-0 z-50">
+    <div class="container max-w-3xl mx-auto mb-8 sticky top-0 z-50 mt-40">
       <!-- <h2 class="text-lg font-semibold mb-4">搜索文章、期刊、书籍、作者、视频</h2> -->
       <SearchBar />
 
@@ -10,7 +11,7 @@
     <!-- 结果区域 -->
     <div class="max-w-6xl mx-auto w-full" v-if="hasSearched">
       <!-- 结果统计和操作 -->
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center mb-6 sticky top-16 z-50">
         <div class="text-sm text-gray-600">
           显示 {{ startIndex }}-{{ endIndex }} 共 {{ totalResults }} 条结果
         </div>
@@ -30,7 +31,7 @@
       <!-- 主要内容区域 -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- 左侧过滤器 -->
-        <div class="space-y-6">
+        <div class="space-y-6 ">
           <!-- 内容类型过滤器 -->
           <div class="card bg-base-100 shadow">
             <div class="card-body p-4">
@@ -93,53 +94,41 @@
 
         <!-- 右侧搜索结果 -->
         <div class="md:col-span-3 space-y-6">
-          <div v-for="result in searchResults" :key="result.id" class="card bg-base-100 shadow hover:shadow-lg transition-shadow">
-            <div class="card-body">
-              <div class="flex justify-between items-start">
-                <div>
-                  <div class="badge badge-sm mb-2">{{ result.type }}</div>
-                  <h3 class="card-title text-primary hover:underline cursor-pointer">
-                    {{ result.title }}
-                  </h3>
-                  <p class="text-sm text-gray-600 mt-2">{{ result.authors.join(', ') }}</p>
-                  <p class="text-sm mt-2">{{ result.description }}</p>
-                  <div class="text-sm text-gray-600 mt-2">
-                    发布于 {{ result.publishDate }}
-                  </div>
-                </div>
-                <img 
-                  v-if="result.coverImage" 
-                  :src="result.coverImage" 
-                  :alt="result.title"
-                  class="w-24 h-32 object-cover rounded"
-                />
-              </div>
-            </div>
-          </div>
+          <WorkCard 
+            v-for="work in searchResults" 
+            :key="work.id" 
+            :work="work"
+            class="card bg-base-100 shadow hover:shadow-lg transition-shadow"
+          />
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import SearchBar from '@/components/SearchBar.vue'
 import { useSearchStore } from '@/stores/search'
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
+import WorkCard from '@/components/WorkCard.vue'
+import { searchWorks, type Work } from '@/js/Work'
 
 // 搜索相关
 const searchQuery = ref('')
 const hasSearched = ref(false)
-const totalResults = ref(601528)
+const totalResults = ref(0)
 const startIndex = ref(1)
 const endIndex = ref(20)
 const sortBy = ref('relevance')
 const searchType = ref('article')
 
 const searchStore = useSearchStore()
-watch(searchStore, () => {
+const searchResults = ref<Work[]>([])
+
+watch(searchStore, async () => {
   if(searchStore.doSearch){
-    handleSearch()
+    await handleSearch()
     searchStore.doSearch = false
   }
 })
@@ -168,49 +157,19 @@ const datePeriods = ref([
   { id: 'custom', name: '自定义日期范围' },
 ])
 
-// 搜索结果
-const searchResults = ref([
-  {
-    id: 1,
-    type: '图书',
-    title: 'Metrics for Test Reporting: Analysis and Reporting for Effective Test Management',
-    authors: ['Frank Witte'],
-    description: '软件开发过程中定期向管理层报告项目进展和问题是很重要的。本书介绍了如何...',
-    publishDate: '2024',
-    coverImage: '/path/to/cover1.jpg'
-  },
-  {
-    id: 2,
-    type: '图书',
-    title: 'Hands-on Test-Driven Development: Using Ruby, Ruby on Rails, and RSpec',
-    authors: ['Greg Donald'],
-    description: '学习如何通过先编写失败测试，然后实现应用程序代码来正确测试Ruby和Ruby on Rails应用程序...',
-    publishDate: '2024',
-    coverImage: '/path/to/cover2.jpg'
-  },
-  {
-    id: 1,
-    type: '图书',
-    title: 'Metrics for Test Reporting: Analysis and Reporting for Effective Test Management',
-    authors: ['Frank Witte'],
-    description: '软件开发过程中定期向管理层报告项目进展和问题是很重要的。本书介绍了如何...',
-    publishDate: '2024',
-    coverImage: '/path/to/cover1.jpg'
-  },
-  {
-    id: 2,
-    type: '图书',
-    title: 'Hands-on Test-Driven Development: Using Ruby, Ruby on Rails, and RSpec',
-    authors: ['Greg Donald'],
-    description: '学习如何通过先编写失败测试，然后实现应用程序代码来正确测试Ruby和Ruby on Rails应用程序...',
-    publishDate: '2024',
-    coverImage: '/path/to/cover2.jpg'
-  },
-])
-
-const handleSearch = () => {
+const handleSearch = async () => {
   hasSearched.value = true
-  
+  try {
+    const results = await searchWorks(searchStore.searchQuery.content)
+    searchResults.value = results
+    totalResults.value = results.length
+    endIndex.value = Math.min(startIndex.value + 19, totalResults.value)
+  } catch (error) {
+    console.error('Search failed:', error)
+    searchResults.value = []
+    totalResults.value = 0
+    endIndex.value = 0
+  }
 }
 
 const toggleContentType = (typeId) => {
