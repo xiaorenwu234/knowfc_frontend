@@ -1,5 +1,6 @@
 <template>
   <div class="flex w-screen h-screen bg-gray-100 overflow-hidden">
+    <!-- 侧边栏部分保持不变 -->
     <div
       ref="sidebar"
       class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"
@@ -31,24 +32,25 @@
 
       <div class="overflow-y-auto h-[calc(100%-56px)]">
         <div
-          v-for="contact in contacts"
-          :key="contact.id"
+          v-for="contact in contactPersonList"
+          :key="contact.chatWithUserId"
           @click="selectContact(contact)"
           class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer flex items-center"
-          :class="{ 'bg-blue-50': activeContact?.id === contact.id }"
+          :class="{ 'bg-blue-50': activeContact?.chatWithUserId === contact.chatWithUserId }"
         >
           <div
             class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3 shrink-0"
           >
-            {{ contact.name.charAt(0) }}
+            {{ contact.chatWithUsername.charAt(0) }}
           </div>
           <div class="overflow-hidden">
-            <p class="font-medium truncate w-36">{{ contact.name }}</p>
+            <p class="font-medium truncate w-36">{{ contact.chatWithUsername }}</p>
             <p class="text-sm text-gray-500 truncate w-36">{{ contact.lastMessage }}</p>
           </div>
         </div>
       </div>
 
+      <!-- 侧边栏尺寸调整控件 -->
       <div
         v-show="!isMobileView && !isCollapsed"
         class="absolute top-0 right-0 w-1 h-full cursor-ew-resize"
@@ -56,7 +58,9 @@
       ></div>
     </div>
 
+    <!-- 聊天区域部分 -->
     <div class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-in-out">
+      <!-- 聊天头部 -->
       <div class="bg-white border-b border-gray-200 p-3 flex items-center">
         <button
           @click="toggleCollapse"
@@ -78,54 +82,55 @@
         </button>
         <div v-if="activeContact" class="flex items-center">
           <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-2">
-            {{ activeContact.name.charAt(0) }}
+            {{ activeContact.chatWithUsername.charAt(0) }}
           </div>
-          <h2 class="font-medium">{{ activeContact.name }}</h2>
+          <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
         <div v-else class="text-gray-500">请选择联系人</div>
       </div>
 
+      <!-- 消息显示区域 -->
       <div ref="chatArea" class="flex-1 overflow-y-auto p-4 bg-gray-50" v-if="activeContact">
         <div
-          v-for="(message, index) in activeContact.messages"
+          v-for="(message, index) in messages"
           :key="index"
           class="mb-4 flex"
-          :class="message.sender === 'me' ? 'justify-end' : 'justify-start'"
+          :class="message.isMe ? 'justify-end' : 'justify-start'"
         >
-          <template v-if="message.sender !== 'me'">
+          <template v-if="!message.isMe">
             <div
               class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-2 shrink-0 translate-y-5"
             >
-              {{ activeContact.name.charAt(0) }}
+              {{ activeContact.chatWithUsername.charAt(0) }}
             </div>
           </template>
 
           <div class="flex flex-col max-w-xs md:max-w-md">
             <p
-              v-if="message.sender !== 'me'"
+              v-if="!message.isMe"
               class="text-xs text-gray-500 mt-1"
-              :class="message.sender === 'me' ? 'text-right self-end' : 'text-left self-start'"
+              :class="message.isMe ? 'text-right self-end' : 'text-left self-start'"
             >
-              {{ activeContact.name }}
+              {{ activeContact.chatWithUsername }}
             </p>
             <div
               class="inline-block px-4 py-2 rounded-lg"
               :class="{
-                'bg-blue-500 text-white': message.sender === 'me',
-                'bg-white border border-gray-200': message.sender !== 'me',
+                'bg-blue-500 text-white': message.isMe,
+                'bg-white border border-gray-200': !message.isMe,
               }"
             >
-              {{ message.text }}
+              {{ message.content }}
             </div>
             <p
               class="text-xs text-gray-500 mt-1"
-              :class="message.sender === 'me' ? 'text-right self-end' : 'text-left self-start'"
+              :class="message.isMe ? 'text-right self-end' : 'text-left self-start'"
             >
-              {{ formatTime(message.time) }}
+              {{ formatTime(message.sendDate) }}
             </p>
           </div>
 
-          <template v-if="message.sender === 'me'">
+          <template v-if="message.isMe">
             <div
               class="w-10 h-10 bg-blue-300 rounded-full flex items-center justify-center ml-2 shrink-0"
             >
@@ -138,6 +143,7 @@
         请从左侧选择联系人开始聊天
       </div>
 
+      <!-- 消息输入区域 -->
       <div class="bg-white border-t border-gray-200 p-3" v-if="activeContact">
         <div class="flex">
           <textarea
@@ -165,42 +171,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import '@/js/chat.ts'
+import { getChatDetail, getChatList } from '@/js/chat.ts'
 
 const MAX_MESSAGE_LENGTH = 100
 
-const contacts = ref([
+const contactPersonList = ref([
   {
-    id: 1,
-    name: '张三',
-    lastMessage: '你好，最近怎么样？你好，最近怎么样？你好，最近怎么样？',
-    messages: [
-      { text: '你好！', sender: 'them', time: new Date(Date.now() - 3600000) },
-      { text: '最近怎么样？', sender: 'them', time: new Date(Date.now() - 3500000) },
-      { text: '我很好，谢谢关心！', sender: 'me', time: new Date(Date.now() - 3400000) },
-    ],
-  },
-  {
-    id: 2,
-    name: '李四',
-    lastMessage: '项目进展如何？',
-    messages: [
-      { text: '项目进展如何？', sender: 'them', time: new Date(Date.now() - 86400000) },
-      { text: '正在进行中，下周可以完成', sender: 'me', time: new Date(Date.now() - 86000000) },
-    ],
-  },
-  {
-    id: 3,
-    name: '王五',
-    lastMessage: '周末有空吗？',
-    messages: [
-      { text: '周末有空吗？', sender: 'them', time: new Date(Date.now() - 172800000) },
-      { text: '有空，有什么计划？', sender: 'me', time: new Date(Date.now() - 172000000) },
-    ],
+    chatWithUserId: 2,
+    chatWithUsername: '李四',
+    chatWithAvatar: 'http://example.com/avatar2.jpg',
+    lastMessage: '你好，最近怎么样？',
+    lastMessageTime: '',
+    unreadCount: 3,
   },
 ])
 
 const activeContact = ref(null)
+const messages = ref([])
 const newMessage = ref('')
 const textarea = ref(null)
 
@@ -259,8 +248,13 @@ const toggleCollapse = () => {
   isCollapsed.value = !isCollapsed.value
 }
 
-const selectContact = (contact) => {
+const selectContact = async (contact) => {
   activeContact.value = contact
+  // 加载聊天消息
+  messages.value = await getChatDetail(contact.chatWithUserId)
+
+  console.log(messages.value)
+
   if (isMobileView.value) {
     isCollapsed.value = true
   }
@@ -271,34 +265,35 @@ const selectContact = (contact) => {
 }
 
 const sendMessage = () => {
-  if (!newMessage.value.trim()) return
+  if (!newMessage.value.trim() || !activeContact.value) return
 
   const msg = {
-    text: newMessage.value,
-    sender: 'me',
-    time: new Date(),
+    content: newMessage.value,
+    sendDate: new Date(),
+    isMe: true,
   }
 
-  activeContact.value.messages.push(msg)
-  activeContact.value.lastMessage = newMessage.value
+  messages.value.push(msg)
+  // 更新联系人的最后一条消息
+  if (activeContact.value) {
+    activeContact.value.lastMessage = newMessage.value
+  }
   newMessage.value = ''
   resizeTextarea()
   nextTick(scrollToBottom)
 }
 
-const formatTime = (date) => {
+const formatTime = (dateStr) => {
+  const date = dateStr instanceof Date ? dateStr : new Date(dateStr)
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize()
-  if (contacts.value.length > 0 && !isMobileView.value) {
-    activeContact.value = contacts.value[0]
-    nextTick(() => {
-      resizeTextarea()
-      scrollToBottom()
-    })
+  contactPersonList.value = await getChatList();
+  if (contactPersonList.value.length > 0 && !isMobileView.value) {
+    selectContact(contactPersonList.value[0])
   }
 })
 

@@ -51,7 +51,7 @@ const works: Work[] = [
   {
     id: '1',
     title: 'Understanding the Impact of AI on Coffee Production',
-    authors: ['Alice Smith', 'Bob Johnson'],
+    authors: [{name:'Alice Smith',id:1}, {name:'Bob Johnson',id:2}],
     fields: ['Agriculture', 'AI'],
     keywords: ['AI', 'Coffee', 'Agriculture'],
     abstract: 'This paper explores how AI technologies are transforming coffee production processes, enhancing yield and quality. It discusses the integration of machine learning algorithms in crop management and quality assessment. The findings suggest significant improvements in efficiency and sustainability. The study highlights the potential of AI to revolutionize traditional agricultural practices, particularly in the coffee industry.',
@@ -64,7 +64,7 @@ const works: Work[] = [
   {
     id: '2',
     title: 'AI in Coffee Quality Assessment',
-    authors: ['Charlie Brown', 'Diana Prince'],
+    authors: [{name:'Alice Smith',id:1}, {name:'Bob Johnson',id:2}],
     fields: ['Food Science', 'AI', 'Quality Control', 'Machine Learning', 'Sensory Analysis'],
     keywords: ['AI', 'Coffee Quality', 'Food Science'],
     abstract: 'This study investigates the use of AI in assessing coffee quality, focusing on sensory analysis and machine learning techniques. It highlights how AI can predict flavor profiles and optimize roasting parameters, leading to better quality control in coffee production. The results indicate a promising future for AI applications in the coffee industry.',

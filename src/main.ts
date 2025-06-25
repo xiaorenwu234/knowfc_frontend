@@ -14,6 +14,7 @@ app.use(router)
 app.use(Vue3Toasity, {
   autoClose: 2000,
   closeButton: false,
+  expandCustomProps: true,
   hideProgressBar: true,
   position: toast.POSITION.TOP_CENTER,
   theme: toast.THEME.COLORED,
