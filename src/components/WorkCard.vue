@@ -23,11 +23,14 @@
           {{ work.source }}
         </div>
         <div class="divider divider-horizontal"></div>
-        <div class="overflow-scroll flex-nowrap">
-          <div class="badge badge-outline badge-info mx-1" v-for="(f, i) in work.fields" :key="i">
-            {{ f }}
+        <div ref="scroll-container" class="scroll-container overflow-scroll whitespace-nowrap">
+          <div ref="scroll-track" class="scroll-track">
+            <div class="badge badge-outline badge-info mx-1" v-for="(f, i) in work.fields" :key="i">
+              {{ f }}
+            </div>
           </div>
         </div>
+        <div class="mr-8"></div>
         <!-- <div class="divider divider-horizontal"></div> -->
         <!-- <div>
           关键词
@@ -55,8 +58,57 @@
 
 <script setup lang="ts">
 import type { Work } from '@/js/Work'
+import { onMounted, useTemplateRef } from 'vue'
 
 const { work } = defineProps<{ work: Work }>()
+
+const container = useTemplateRef('scroll-container')
+const track = useTemplateRef('scroll-track')
+
+function startScroll() {
+  const containerWidth = container.value!.clientWidth
+  const contentWidth = track.value!.scrollWidth
+  const distance = contentWidth - containerWidth
+
+  if (distance <= 0) {
+    track.value!.style.animation = 'none'
+    track.value!.style.transform = 'translateX(0)'
+    return
+  }
+
+  const speed = 50
+  const duration = distance / speed
+
+  track.value!.style.animation = `scroll-left ${duration}s linear forwards alternate infinite`
+
+  const styleSheet = document.styleSheets[0]
+  const animationName = 'scroll-left'
+
+  for (let i = styleSheet.cssRules.length - 1; i >= 0; i--) {
+    const rule = styleSheet.cssRules[i]
+    if ((rule as unknown as CSSKeyframesRule).name === animationName) {
+      styleSheet.deleteRule(i)
+    }
+  }
+
+  styleSheet.insertRule(
+    `
+      @keyframes ${animationName} {
+        0%   { transform: translateX(0); }
+        10%  { transform: translateX(0); }
+        90%  { transform: translateX(-${distance}px); }
+        100%  { transform: translateX(-${distance}px); }
+      }
+    `,
+    styleSheet.cssRules.length,
+  )
+}
+
+onMounted(() => [startScroll()])
+window.addEventListener('resize', () => {
+  track.value!.style.animation = 'none' // 先清除动画
+  startScroll()
+})
 </script>
 
 <style scoped>
@@ -88,5 +140,9 @@ const { work } = defineProps<{ work: Work }>()
       var(--color-base-100)
     );
   }
+}
+
+.scroll-container:hover .scroll-track {
+  animation-play-state: paused;
 }
 </style>
