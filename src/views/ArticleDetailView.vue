@@ -181,10 +181,24 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { API_CONFIG, buildApiUrl } from '@/config/api.js'
+import axios from 'axios'
 
 const activeSection = ref('') // 默认激活相关文章
-
+const route = useRoute()
+const articleId= route.params.id
+const getArticleContent = async(articleId) => {
+  await axios.get(buildApiUrl(API_CONFIG.ENDPOINTS.WORK_CONTENT),{params:{id:articleId}}).then((res)=>{
+    console.log(res.data.data)
+    //TODO return null
+    articleData.value=res.data.data
+  })
+}
+onMounted(()=>{
+  getArticleContent()
+})
 // 文章数据
 const articleData = ref({
   title: "AI-generated or AI touch-up? Identifying AI contribution in text data",

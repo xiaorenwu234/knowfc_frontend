@@ -24,7 +24,7 @@ const router = createRouter({
       component: () => import('../views/ForgetPasswordView.vue'),
     },
     {
-      path: '/article-detail',
+      path: '/article-detail/:id',
       name: 'article-detail',
       component: () => import('../views/ArticleDetailView.vue'),
     },
