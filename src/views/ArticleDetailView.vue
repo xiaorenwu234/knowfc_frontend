@@ -9,7 +9,9 @@
           <div class="text-sm opacity-90">
             <span class="hover:underline cursor-pointer">Home</span>
             <span class="mx-2">></span>
-            <span class="hover:underline cursor-pointer">{{ articleData.journal }}</span>
+            <span>{{ articleDetail.type }}</span>
+            <span class="mx-2">></span>
+            <span>{{ articleDetail.title }}</span>
             <span class="mx-2">></span>
             <span>Article</span>
           </div>
@@ -42,7 +44,7 @@
                   d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 0 1-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 9.953 4.167 9.5 5 9.5h1.053c.472 0 .745.556.5.96a8.958 8.958 0 0 0-1.302 4.665c0 1.194.232 2.333.654 3.375Z"
                 />
               </svg>
-              点赞数：{{articleDetail.likes}}
+              点赞数：{{ articleDetail.likes }}
             </span>
             <span>
               <svg
@@ -59,7 +61,7 @@
                   d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
                 />
               </svg>
-              评论数：{{articleDetail.comments ? articleDetail.comments.length : 0}}
+              评论数：{{ articleDetail.comments ? articleDetail.comments.length : 0 }}
             </span>
           </div>
         </div>
@@ -133,12 +135,12 @@
           <h2 class="text-2xl font-bold mb-4">作者信息</h2>
           <div class="space-y-4">
             <div
-              v-for="(author, index) in articleData.authors"
+              v-for="(author, index) in articleDetail.authors"
               :key="index"
               class="p-4 border rounded-lg"
             >
-              <h4 class="font-semibold">{{ author.name }}</h4>
-              <p class="text-sm text-gray-600">{{ author.affiliation }}</p>
+              <h4 class="font-semibold">姓名：{{ author.name }}</h4>
+              <p class="text-sm text-gray-600 mt-2">所属机构：{{ author.affiliation }}</p>
             </div>
           </div>
         </div>
@@ -146,7 +148,7 @@
         <!-- 评论区 -->
         <div id="comments" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">评论区</h2>
-          <div class="space-y-4" v-for="(comment, index) in articleDetail.comments" :key="index">
+          <div class="space-y-4 mb-4" v-for="(comment, index) in articleDetail.comments" :key="index">
             <div class="p-4 border rounded-lg bg-gray-50">
               <div class="flex items-center gap-2 mb-2">
                 <img
@@ -327,7 +329,8 @@ import {
   cancelLikeArticle,
   getArticleContent,
   getArticleLike,
-  likeArticle, sendComment,
+  likeArticle,
+  sendComment,
 } from '@/js/ArticleDetail.js'
 
 const activeSection = ref('') // 默认激活相关文章
