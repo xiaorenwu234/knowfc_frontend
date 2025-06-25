@@ -24,7 +24,7 @@ const router = createRouter({
       component: () => import('../views/ForgetPasswordView.vue'),
     },
     {
-      path: '/article-detail',
+      path: '/article-detail/:id',
       name: 'article-detail',
       component: () => import('../views/ArticleDetailView.vue'),
     },
@@ -52,6 +52,11 @@ const router = createRouter({
       path: '/Problem',
       name: 'Problem',
       component: () => import('../views/ProblemView.vue'),
+    },
+    {
+      path: '/ProblemSquare',
+      name: 'ProblemSquare',
+      component: () => import('../views/ProblemSquareView.vue'),
     }
   ],
 })
