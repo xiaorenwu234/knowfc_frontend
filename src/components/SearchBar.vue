@@ -62,28 +62,36 @@
                     <div class="flex flex-wrap gap-2" @mousedown.prevent>
                         <input
                             type="date"
-                            class="input input-bordered w-full"
+                            class="input input-bordered grow"
                             v-model="dateRange.start"
                         />
                         <span class="self-center">至</span>
                         <input
                             type="date"
-                            class="input input-bordered w-full"
+                            class="input input-bordered grow"
                             v-model="dateRange.end"
                         />
                     </div>
                 </div>
 
                 <!-- 类型选择 -->
-                <!-- <div class="flex flex-col gap-2">
-                    <label class="text-sm font-medium">类型</label>
-                    <select class="select select-bordered w-full" v-model="selectedType" @mousedown.stop>
-                        <option value="" >全部</option>
-                        <option value="type1" >类型一</option>
-                        <option value="type2" >类型二</option>
-                        <option value="type3" >类型三</option>
-                    </select>
-                </div> -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-sm font-medium">类型选择</label>
+                    <div class="flex flex-wrap gap-2" @mousedown.prevent>
+                        <label class="cursor-pointer flex items-center gap-2">
+                            <input type="radio" name="type" class="radio radio-sm" value="works" v-model="selectedType" />
+                            <span>成果</span>
+                        </label>
+                        <label class="cursor-pointer flex items-center gap-2">
+                            <input type="radio" name="type" class="radio radio-sm" value="users" v-model="selectedType" />
+                            <span>用户</span>
+                        </label>
+                        <label class="cursor-pointer flex items-center gap-2">
+                            <input type="radio" name="type" class="radio radio-sm" value="problems" v-model="selectedType" />
+                            <span>问题</span>
+                        </label>
+                    </div>
+                </div>
 
                 <!-- 学科领域选择 -->
                 <div class="flex flex-col gap-2">
@@ -113,7 +121,6 @@ const searchBar = ref()
 const searchInput = ref()
 
 const doSearch = () => {
-    searchStore.doSearch = true
     searchStore.setContent(searchQuery.value)
     searchStore.setType(selectedType.value)
 
@@ -130,6 +137,8 @@ const doSearch = () => {
     showAdvancedSearch.value = false
 
     searchInput.value.blur()
+
+    searchStore.doSearch = true
 }
 
 // 高级搜索
@@ -184,7 +193,7 @@ const dateRange = ref({
 })
 
 // 类型选择
-const selectedType = ref('')
+const selectedType = ref('works')
 
 // 学科领域选项
 const subjects = [

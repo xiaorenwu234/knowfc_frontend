@@ -1,7 +1,7 @@
 <template>
   <div class="card shadow-xl">
     <div class="card-body">
-      <h2 class="text-xl font-bold hover:underline cursor-pointer">{{ work.title }}</h2>
+      <RouterLink :to="`/article-detail?id=${work.id}`" class="text-xl font-bold hover:underline cursor-pointer">{{ work.title }}</RouterLink>
       <p class="text-sm text-gray-600">
         <span v-for="(author, index) in work.authors" :key="index">
           <a :href="`/personal-center/${author.id}`" class="text-blue-900 hover:underline">{{ author.name }}</a>
@@ -62,6 +62,7 @@
 <script setup lang="ts">
 import type { Work } from '@/js/Work'
 import { onMounted, useTemplateRef } from 'vue'
+import { RouterLink } from 'vue-router';
 
 const { work } = defineProps<{ work: Work }>()
 

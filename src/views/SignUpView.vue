@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import router from '@/router'
 import {sendVerificationCode, signup} from "@/js/User.ts";
+import {notify} from "@/js/toast.ts";
 
 const showCountDown = ref(false)
 const countDownValue = ref(59)
@@ -35,32 +36,32 @@ const verificationCode = ref('')
 const handleRegister = async () => {
   // 表单验证
   if (!username.value.trim()) {
-    errorMessage.value = '请输入用户名'
+    notify("error","请输入用户名")
     return
   }
   if (!email.value.trim()) {
-    errorMessage.value = '请输入合法邮箱'
+    notify("error","请输入合法邮箱")
     return
   }
   if (!verificationCode.value.trim()) {
-    errorMessage.value = '请输入验证码'
+    notify("error","请输入验证码")
     return
   }
   if (!password.value.trim()) {
-    errorMessage.value = '请输入密码'
+    notify("error","请输入密码")
     return
   }
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = '两次输入的密码不一致'
+    notify("error","两次输入的密码不一致")
     return
   }
 
   const [success,message] = await signup(username.value, password.value, email.value, verificationCode.value)
   if(success){
-    alert('注册成功，请登录')
+    notify("success", '注册成功，请登录')
     router.push('signin')
   } else {
-    alert(message || '注册失败，请稍后重试')
+    notify("error", message || '注册失败，请稍后重试')
     errorMessage.value = message || '注册失败，请稍后重试'
   }
 }
@@ -73,10 +74,10 @@ const handleVerifyCode = async () => {
 
   const [success, message] = await sendVerificationCode(email.value)
   if(success){
-    alert('验证码已发送，请注意查收')
+    notify("success",'登录成功')
     startCountDown()
   } else {
-    alert(message || '发送验证码失败，请稍后重试')
+    notify("error", message || '发送验证码失败，请稍后重试')
     errorMessage.value = message || '发送验证码失败，请稍后重试'
   }
 }

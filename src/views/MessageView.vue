@@ -174,6 +174,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
 import { getChatDetail, getChatList } from '@/js/chat.ts'
+import {getUserId} from "@/js/User.ts";
 
 const MAX_MESSAGE_LENGTH = 100
 
@@ -250,6 +251,7 @@ const toggleCollapse = () => {
 
 const selectContact = async (contact) => {
   activeContact.value = contact
+  readMessages(contact.chatWithUserId, getUserId())
   // 加载聊天消息
   messages.value = await getChatDetail(contact.chatWithUserId)
 

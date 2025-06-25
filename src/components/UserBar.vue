@@ -1,6 +1,6 @@
 <template>
   <!-- 按钮区 -->
-  <div class="flex fixed right-6 mt-4 z-50 p-1 rounded-full bg-white/60 shadow-lg" style="backdrop-filter: var(--glass-2);">
+  <div class="flex fixed right-6 mt-4 p-1 rounded-full bg-white/60 shadow-lg" style="backdrop-filter: var(--glass-2); z-index: 60;">
     <div v-if="showMessages &&hasNewChap" class="absolute left-[72px] bg-red-400 w-4 h-4 rounded-full"></div>
     <!-- 头像 -->
     <div ref="head" type="button" class="h-11 w-11 rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation" @mouseenter="showUserMenu=true" @mouseleave="leaveHead()" >
@@ -72,7 +72,7 @@
   <div v-if="showPaperForm"
        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
        @click.self="hideAllForms">
-    <div class="card bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden">
+    <div class="card  bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden" >
       <div class="card-body p-8 overflow-y-auto scrollbar-hide">
         <!-- 关闭按钮 -->
         <button @click="hideAllForms"

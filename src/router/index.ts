@@ -32,6 +32,21 @@ const router = createRouter({
       path: '/search',
       name: 'search',
       component: () => import('../views/SearchView.vue'),
+      children: [
+        {
+          path: 'works',
+          name: 'search-works',
+          component: () => import('../views/SearchWorkView.vue'),
+        }, {
+          path: 'users',
+          name: 'search-users',
+          component: () => import('../views/SearchUserView.vue'),
+        }, {
+          path: 'problems',
+          name: 'search-problems',
+          component: () => import('../views/SearchProblemView.vue'),
+        }
+      ]
     },
     {
       path: '/chat',
@@ -52,6 +67,11 @@ const router = createRouter({
       path: '/Problem',
       name: 'Problem',
       component: () => import('../views/ProblemView.vue'),
+    },
+    {
+      path: '/ProblemSquare',
+      name: 'ProblemSquare',
+      component: () => import('../views/ProblemSquareView.vue'),
     },
     {
       path: '/personal-notify/:id',
