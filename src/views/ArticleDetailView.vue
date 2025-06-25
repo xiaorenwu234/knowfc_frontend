@@ -270,7 +270,6 @@ const route = useRoute()
 const articleDetail = ref({})
 const getArticleDetail = async(articleId) => {
   articleDetail.value = await getArticleContent(articleId)
-  console.log(articleDetail.value)
 }
 onMounted(()=>{
   getArticleDetail(1)
