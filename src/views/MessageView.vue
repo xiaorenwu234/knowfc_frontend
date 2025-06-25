@@ -38,11 +38,11 @@
           class="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer flex items-center"
           :class="{ 'bg-blue-50': activeContact?.chatWithUserId === contact.chatWithUserId }"
         >
-          <div
+          <img
             class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3 shrink-0"
-          >
-            {{ contact.chatWithUsername.charAt(0) }}
-          </div>
+            :src="contact.chatWithAvatar"
+            alt="头像"
+          />
           <div class="overflow-hidden">
             <p class="font-medium truncate w-36">{{ contact.chatWithUsername }}</p>
             <p class="text-sm text-gray-500 truncate w-36">{{ contact.lastMessage }}</p>
@@ -61,7 +61,7 @@
     <!-- 聊天区域部分 -->
     <div class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-in-out">
       <!-- 聊天头部 -->
-      <div class="bg-white border-b border-gray-200 p-3 flex items-center">
+      <div class="bg-white border-b border-gray-200 p-3.5 flex items-center">
         <button
           @click="toggleCollapse"
           v-if="isCollapsed"
@@ -81,9 +81,11 @@
           </svg>
         </button>
         <div v-if="activeContact" class="flex items-center">
-          <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-2">
-            {{ activeContact.chatWithUsername.charAt(0) }}
-          </div>
+          <img
+            class="w-8 h-8 rounded-full aspect-square flex items-center justify-center mr-2"
+            :src="activeContact.chatWithAvatar"
+            alt="头像"
+          />
           <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
         <div v-else class="text-gray-500">请选择联系人</div>
@@ -98,11 +100,11 @@
           :class="message.isMe ? 'justify-end' : 'justify-start'"
         >
           <template v-if="!message.isMe">
-            <div
-              class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-2 shrink-0 translate-y-5"
-            >
-              {{ activeContact.chatWithUsername.charAt(0) }}
-            </div>
+            <img
+              class="w-10 h-10 rounded-full flex items-center justify-center mr-2 shrink-0 translate-y-5"
+              :src="message.senderAvatar"
+              alt="头像"
+            />
           </template>
 
           <div class="flex flex-col max-w-xs md:max-w-md">
@@ -131,11 +133,10 @@
           </div>
 
           <template v-if="message.isMe">
-            <div
-              class="w-10 h-10 bg-blue-300 rounded-full flex items-center justify-center ml-2 shrink-0"
-            >
-              我
-            </div>
+            <img
+              class="w-10 h-10  rounded-full flex items-center justify-center ml-2 shrink-0" :src = "message.senderAvatar" alt="头像"
+            />
+
           </template>
         </div>
       </div>
@@ -173,21 +174,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
-import { getChatDetail, getChatList } from '@/js/chat.ts'
-import {getUserId} from "@/js/User.ts";
+import { getChatDetail, getChatList, readMessages } from '@/js/chat.ts'
+import { getUserId } from '@/js/User.ts'
 
 const MAX_MESSAGE_LENGTH = 100
 
-const contactPersonList = ref([
-  {
-    chatWithUserId: 2,
-    chatWithUsername: '李四',
-    chatWithAvatar: 'http://example.com/avatar2.jpg',
-    lastMessage: '你好，最近怎么样？',
-    lastMessageTime: '',
-    unreadCount: 3,
-  },
-])
+const contactPersonList = ref([])
 
 const activeContact = ref(null)
 const messages = ref([])
@@ -293,10 +285,12 @@ const formatTime = (dateStr) => {
 onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize()
-  contactPersonList.value = await getChatList();
+  contactPersonList.value = await getChatList()
+  console.log(contactPersonList.value)
   if (contactPersonList.value.length > 0 && !isMobileView.value) {
-    selectContact(contactPersonList.value[0])
+    await selectContact(contactPersonList.value[0])
   }
+  console.log(activeContact.value)
 })
 
 onBeforeUnmount(() => {

@@ -6,6 +6,7 @@ import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { followUser, unfollowUser } from '@/js/FollowUser.ts'
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -27,12 +28,13 @@ const handleQuit = () => {
 const ownerReference = ref('')
 const userInfo = ref(null)
 const route = useRoute()
-const userId = String(route.params.id)
-const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userId))
+const userIdOnDisplay = String(route.params.id)
+const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
+const following = ref(false)
 const fetchUserInfo = async () => {
   await axios.get(url).then((res) => {
     userInfo.value = res.data.data
-    console.log(userInfo.value)
+    // console.log(userInfo.value)
   })
 }
 
@@ -69,10 +71,19 @@ const submit = async () => {
   }
 };
 
+const handleFollow= async()=>{
+  if(following.value)
+    await unfollowUser(userIdOnDisplay)
+  else
+    await followUser(userIdOnDisplay)
+
+  following.value = !following.value;
+}
+
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
-  ownerReference.value = (userId == (JSON.parse(localStorage.getItem('user') || '').id)) ? '我' : 'Ta'
+  ownerReference.value = (userIdOnDisplay == (JSON.parse(localStorage.getItem('user') || '').id)) ? '我' : 'Ta'
 })
 
 onUnmounted(() => {
@@ -169,9 +180,9 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center ">
             {{ userInfo?.username }}
           </div>
-          <button class="btn w-full mx-auto" @click="showForm = true">修改个人信息</button>
-          
-          <button class="btn w-full mx-auto mt-6" @click="handleQuit">退出登陆</button>
+          <button v-if="ownerReference!='Ta'" class="btn w-full mx-auto" @click="showForm=true">修改个人信息</button>
+          <button v-if="ownerReference!='Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">退出登陆</button>
+          <button v-if="ownerReference=='Ta'" class ="btn mx-auto mt-6 w-24" :class="following? '':'btn-primary'" @click="handleFollow">{{following?"取关":"关注"}}</button>
         </div>
       </div>
 

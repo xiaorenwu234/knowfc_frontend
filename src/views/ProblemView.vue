@@ -86,13 +86,13 @@
               <div class="flex items-start gap-3 mb-4">
                 <div class="avatar">
                   <div class="w-10 h-10 rounded-full bg-gray-800 text-white flex items-center justify-center text-sm font-medium">
-                    {{ answer.author.slice(0, 1) }}
+                    <img :src="answer.avatar">
                   </div>
                 </div>
                 <div class="flex-1">
                   <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-gray-900">{{ answer.author }}</h3>
-                    <button class="btn btn-sm btn-outline text-blue-500 border-blue-500 hover:bg-blue-500 px-3 py-1 text-xs">
+                    <button v-show="userName !== answer.author" class="btn btn-sm btn-outline text-blue-500 border-blue-500 hover:bg-blue-500 px-3 py-1 text-xs">
                       + 关注
                     </button>
                   </div>
@@ -112,9 +112,15 @@
   </template>
   
   <script setup>
- import { ref, onMounted, nextTick } from 'vue'
+  import { ref, onMounted, nextTick } from 'vue'
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
+  import { getQuestionDetail, getAnswers, submitAnswerTo, searchProblem } from '@/js/Problem'
+import { useRoute } from 'vue-router'
+  
+  const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
+  const userName = userInfo.username
+  console.log('当前用户:', userName)
   
   // 控制问题描述的展开状态
   const showFullDescription = ref(false)
@@ -131,6 +137,9 @@
   // Vditor 编辑器实例
   let contentEditor = null
   const vditorContainer = ref(null)
+
+
+  const questionId = 2 // 假设路由参数名为 id
 
   // 渲染 Markdown 内容
   const setAnswerRef = (el, answerId) => {
@@ -151,17 +160,26 @@
   
   // 问题数据
   const questionData = ref({
-    title: '如何看待清华校长李路明在2025年本科生毕业典礼上讲话称张校"发表了中国第一篇人工智能领域论文"？',
-    description: `今年以来，"张校老师发表了中国第一篇人工智能领域论文"的说法突然盛行，虽然觉得可笑，但终归没上大雅之堂。但现在居然连清华校长在这么庄严的场合下讲断，这就让人很无语了。
-
-首先需要明确的是，人工智能作为一个学科领域，其发展历史可以追溯到20世纪50年代。而中国在这一领域的起步虽然相对较晚，但也有着悠久的历史。
-
-对于"第一篇论文"的说法，我们需要从几个维度来考虑：一是时间维度，二是内容维度，三是发表平台的权威性。不同的标准可能会得出不同的结论。
-
-更重要的是，学术研究应该注重的是其科学价值和对学科发展的贡献，而不是简单的"第一"标签。我们应该以更加客观和理性的态度来看待学术史上的各种说法。
-
-希望大家能够理性讨论，共同推动学术环境的健康发展。`
+    title: '',
+    description: ''
   })
+
+  const loadQuestionDetail = async () => {
+  if (questionId) {
+    try {
+      const data = await getQuestionDetail(questionId)
+      if (data) {
+        questionData.value.title = data.title
+        questionData.value.description = data.content
+        // 重新检查内容高度
+        await nextTick()
+        checkContentHeight()
+      }
+    } catch (error) {
+      console.error('加载问题详情失败:', error)
+    }
+  }
+}
   
   // 检查内容高度是否需要显示展开/收起按钮
   const checkContentHeight = async () => {
@@ -237,15 +255,17 @@
       const content = contentEditor.getValue()
       if (content.trim()) {
         // 这里添加提交回答的逻辑
+        submitAnswerTo(questionId, content)
         console.log('回答内容:', content)
         
         // 添加新回答到回答列表
         const newAnswer = {
           id: answers.value.length + 1,
-          author: '当前用户', // 这里应该是实际的用户名
+          author: userName, // 这里应该是实际的用户名
           content: content,
           likes: 0
         }
+        
         answers.value.unshift(newAnswer)
         
         // 关闭编辑器
@@ -260,36 +280,32 @@
   }
   
   // 回答数据
-  const answers = ref([
-    {
-      id: 1,
-      author: 'NO1WDS',
-      content: '## 可以参考这个回答：\n\n严格意义上是中国大陆的第一篇IJCAI+',
-      likes: 22,
-    },
-    {
-      id: 2,
-      author: '学术研究者',
-      content: '这个说法需要从历史背景来看。中国在人工智能领域的起步确实比较早，但是要说"第一篇"这个表述可能需要更严谨的考证。建议大家理性看待，重要的是推动学科发展。',
-      likes: 156,
-    },
-    {
-      id: 3,
-      author: '历史档案员',
-      content: '从档案资料来看，这个问题比较复杂。需要明确"人工智能"的定义范围，以及"中国第一篇"的具体标准。不同的定义可能会得出不同的结论。',
-      likes: 89,
-    },
-    {
-      id: 4,
-      author: 'AI观察者',
-      content: '建议大家回归学术本质，不要过分纠结于"第一"的称号。重要的是认真做研究，推动学科进步。每个时代都有每个时代的贡献。',
-      likes: 67,
+  const answers = ref([])
+
+  // 加载回答列表
+const loadAnswers = async () => {
+  if (questionId) {
+    try {
+      const data = await getAnswers(questionId)
+      if (data && data.length > 0) {
+        answers.value = data.map(item => ({
+          id: item.id,
+          author: item.username,
+          avatar: item.userAvatar,
+          content: item.content
+        }))
+      }
+    } catch (error) {
+      console.error('加载回答失败:', error)
     }
-  ])
+  }
+}
   
   onMounted(() => {
     // 组件挂载后的初始化逻辑
     checkContentHeight()
+    loadQuestionDetail()
+    loadAnswers() 
   })
   </script>
   
