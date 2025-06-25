@@ -262,17 +262,23 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { API_CONFIG, buildApiUrl } from '@/config/api.js'
 import axios from 'axios'
-import {getArticleContent} from "@/js/ArticleDetail.js";
+import {
+  cancelLikeArticle,
+  getArticleContent,
+  getArticleLike,
+  likeArticle
+} from "@/js/ArticleDetail.js";
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
-// const articleId= route.params.id
+const articleId= 1
 const articleDetail = ref({})
 const getArticleDetail = async(articleId) => {
   articleDetail.value = await getArticleContent(articleId)
+  liked_statement.value = await getArticleLike(articleId)
 }
 onMounted(()=>{
-  getArticleDetail(1)
+  getArticleDetail(articleId)
 })
 // 文章数据
 const articleData = ref({
@@ -320,9 +326,17 @@ const scrollToSection = (sectionId) => {
 
 const liked_statement = ref(false)
 
-const handleLike = () => {
-  liked_statement.value = !liked_statement.value
-  console.log(liked_statement.value)
+const handleLike = async () => {
+  if(!liked_statement.value){
+    if(await likeArticle(articleId)){
+      liked_statement.value = true
+    }
+  }
+  else{
+    if(await cancelLikeArticle(articleId)){
+      liked_statement.value = false
+    }
+  }
 }
 
 const showCommentEditor = ref(false)
