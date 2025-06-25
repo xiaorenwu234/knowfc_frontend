@@ -1,15 +1,15 @@
 import instance from '@/js/axios.ts'
 import { getUserId } from '@/js/User.ts'
 
-export const addFavor= async (workId:string): Promise<Boolean>=>{
+export const addFavor = async (workId: string): Promise<Boolean> => {
   const url = '/favor/add'
   const userId = getUserId()
   try {
     const response = await instance.post(url, {
       params: {
         workId: workId,
-        userId:getUserId(),
-      },
+        userId: userId
+      }
     })
     if (response.data.code === 200) {
       console.log('收藏成功')
@@ -23,15 +23,15 @@ export const addFavor= async (workId:string): Promise<Boolean>=>{
     return false
   }
 }
-export const cancelFavor= async (workId:string): Promise<Boolean>=>{
+export const cancelFavor = async (workId: string): Promise<Boolean> => {
   const url = '/favor/del'
   const userId = getUserId()
   try {
     const response = await instance.post(url, {
       params: {
         workId: workId,
-        userId:getUserId(),
-      },
+        userId: userId
+      }
     })
     if (response.data.code === 200) {
       console.log('取消收藏成功')
