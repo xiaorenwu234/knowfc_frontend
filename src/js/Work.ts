@@ -1,7 +1,7 @@
 export interface Work {
   id: string;
   title: string;
-  authors: string[];
+  authors: Author[];
   fields: string[];
   keywords: string[];
   abstract: string;
@@ -10,4 +10,8 @@ export interface Work {
   source: string;
   likes: number;
   comments: number;
+}
+interface Author{
+  id:number;
+  name:string;
 }

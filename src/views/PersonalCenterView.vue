@@ -2,6 +2,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
+import axios from 'axios'
+import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
+import { useRoute } from 'vue-router'
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -15,8 +18,18 @@ const updateWindowSize = () => {
   }
 }
 
+const userInfo = ref(null);
+const route = useRoute()
+const userId= String(route.params.id)
+const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id',userId))
+const fetchUserInfo = async() => {
+  await axios.get(url).then((res) => {userInfo.value=res.data.data
+  console.log(userInfo.value)})
+}
+
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
+  fetchUserInfo()
 })
 
 onUnmounted(() => {
@@ -68,7 +81,7 @@ const showForm = ref(false)
           <div
             class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center sm:text-left"
           >
-            xiaorenwu234
+            {{userInfo?.username}}
           </div>
           <button class="btn w-full mx-auto" @click="showForm=true">修改个人信息</button>
         </div>
