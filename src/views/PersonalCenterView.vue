@@ -51,7 +51,7 @@ const showForm = ref(false)
 </script>
 
 <template>
-  <div class="w-screen min-h-[calc(100vh-96px)] bg-white z-10">
+  <div class="w-screen h-screen pt-24 bg-white z-10">
     <div class="flex flex-col sm:flex-row w-full h-full p-6 sm:p-0">
       <div
         class="flex sm:flex-col items-center sm:items-start sm:w-[28%] sm:min-h-[250px] gap-4 sm:gap-0"
