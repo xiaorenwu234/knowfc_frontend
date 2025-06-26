@@ -8,7 +8,7 @@ import { useRoute } from 'vue-router'
 import router from '@/router'
 import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
-import { getUserId, logout } from '@/js/User'
+import { getUserDetail, getUserId, logout, type User } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
 
@@ -26,19 +26,17 @@ const updateWindowSize = () => {
 
 const handleQuit = () => {
   logout()
+  fetchUserInfo()
   router.push('/')
 }
 
 const ownerReference = ref('Ta')
-const userInfo = ref(null)
+const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
-const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
 const following = ref(false)
-const fetchUserInfo = async () => {
-  await axios.get(url).then((res) => {
-    userInfo.value = res.data.data
-  })
+const fetchUserInfo = () => {
+  userInfo.value = getUserDetail();
 }
 
 const showModal = ref(false)
@@ -131,7 +129,7 @@ const updateAvatar = async (avatar: File) => {
       })
       if (response.data.code === 200) {
         notify('success', '头像更新成功')
-        fetchUserInfo() // 刷新用户信息
+        fetchUserInfo()
       } else {
         notify('error', '头像更新失败', response.data.msg)
       }
@@ -217,7 +215,7 @@ const submitCreate = async () => {
       >
         <div class="w-full sm:flex sm:justify-center">
           <img
-            class="w-[140px] aspect-square sm:w-[calc(100%-50px)] rounded-full border-2 mx-auto sm:mx-0 mt-4"
+            class="w-[140px] aspect-square sm:w-[calc(100%-50px)] rounded-full border-2 mx-auto sm:mx-0 mt-4 hover:glass"
             :src="userInfo?.avatar || '/image.png'"
             alt="头像"
           />
