@@ -29,7 +29,7 @@ const handleQuit = () => {
   router.push('/')
 }
 
-const ownerReference = ref('')
+const ownerReference = ref('Ta')
 const userInfo = ref(null)
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
@@ -38,7 +38,6 @@ const following = ref(false)
 const fetchUserInfo = async () => {
   await axios.get(url).then((res) => {
     userInfo.value = res.data.data
-    // console.log(userInfo.value)
   })
 }
 
@@ -231,6 +230,7 @@ const submitCreate = async () => {
             </button>
           </div>
           <div class="flex w-full flex-wrap">
+
             <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
