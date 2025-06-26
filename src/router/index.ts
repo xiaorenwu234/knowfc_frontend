@@ -68,11 +68,11 @@ const router = createRouter({
       name: 'Problem',
       component: () => import('../views/ProblemView.vue'),
     },
-    {
-      path: '/ProblemSquare',
-      name: 'ProblemSquare',
-      component: () => import('../views/ProblemSquareView.vue'),
-    },
+    // {
+    //   path: '/ProblemSquare',
+    //   name: 'ProblemSquare',
+    //   component: () => import('../views/ProblemSquareView.vue'),
+    // },
     {
       path: '/personal-notify/:id',
       name: 'personal-notify',
