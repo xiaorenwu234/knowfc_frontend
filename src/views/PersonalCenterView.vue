@@ -1,4 +1,4 @@
-<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
