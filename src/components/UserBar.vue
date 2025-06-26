@@ -4,10 +4,10 @@
     <div v-if="showMessages &&hasNewChap" class="absolute left-[72px] bg-red-400 w-4 h-4 rounded-full"></div>
     <!-- 头像 -->
     <div ref="head" type="button" class="h-11 w-11 rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation" @mouseenter="showUserMenu=true" @mouseleave="leaveHead()" >
-      <RouterLink v-if="isLogin" :to="personalCenterPath">
+      <RouterLink v-if="computedIsLogin" :to="personalCenterPath">
         <img :src="headSrc" class="image-full" alt="头像">
       </RouterLink>
-      <RouterLink v-if="!isLogin" to="/signin">
+      <RouterLink v-else to="/signin">
         <img src="../assets/default-avatar.png" class="image-full" alt="默认头像">
       </RouterLink>
     </div>
@@ -598,7 +598,7 @@ const doBatchImport = async () => {
 }
 
 const computedIsLogin = computed(() => {
-  return getUserId() !== ''
+  return getUserId() !== 0
 })
 
 const closeBatchResult = () => {
