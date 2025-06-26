@@ -17,24 +17,40 @@ export const getChatList = async (): Promise<any[]> => {
   }
 }
 
-export const getChatDetail = async (chatId: number): Promise<{ content: string; isMe: boolean }[]> => {
-  const url = '/message/chat';
+export const getChatDetail = async (
+  chatId: number,
+): Promise<{ content: string; isMe: boolean }[]> => {
+  const url = '/message/chat'
   try {
     const res = await instance.get(url, {
       params: {
         userId1: 1,
         userId2: 2,
-        page:0,
-        size:100
+        page: 0,
+        size: 100,
       },
-    });
+    })
     console.log(res.data.data.content)
     return res.data.data.content.map((item: { senderId: number; content: string }) => ({
       ...item,
       isMe: item.senderId === getUserId(),
-    }));
+    }))
   } catch (err) {
-    console.error('Error fetching chat detail:', err);
-    return [];
+    console.error('Error fetching chat detail:', err)
+    return []
   }
-};
+}
+
+export const readMessages = (receiverId: number, senderId: number) => {
+  const url = '/message/mark-read'
+  const formData = new FormData()
+  formData.append('receiverId', receiverId)
+  formData.append('senderId', senderId)
+  instance.post(url, formData, {})
+      .then((res) => {
+        console.log(res.data)
+      })
+      .catch((err) => {
+        console.error('Error marking messages as read:', err)
+      })
+}
