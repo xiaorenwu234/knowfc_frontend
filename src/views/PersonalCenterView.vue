@@ -227,9 +227,9 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
-            关注列表
-          </button>
+<!--          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">-->
+<!--            关注列表-->
+<!--          </button>-->
           <button
             v-if="ownerReference != 'Ta'"
             class="btn w-full mx-auto mt-6"
@@ -240,14 +240,14 @@ const submitCreate = async () => {
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
             退出登录
           </button>
-          <button
-            v-if="ownerReference == 'Ta'"
-            class="btn mx-auto mt-6 w-24"
-            :class="following ? '' : 'btn-primary'"
-            @click="handleFollow"
-          >
-            {{ following ? '取关' : '关注' }}
-          </button>
+<!--          <button-->
+<!--            v-if="ownerReference == 'Ta'"-->
+<!--            class="btn mx-auto mt-6 w-24"-->
+<!--            :class="following ? '' : 'btn-primary'"-->
+<!--            @click="handleFollow"-->
+<!--          >-->
+<!--            {{ following ? '取关' : '关注' }}-->
+<!--          </button>-->
         </div>
       </div>
 
