@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-r flex flex-col">
-    <div class="max-w-[120rem] w-[80vw] mx-auto flex flex-col flex-1">
+  <div class="min-h-screen bg-gradient-to-r flex flex-col w-full">
+    <div class="max-w-[120rem] w-full mx-auto flex flex-col flex-1">
       <!-- 顶部大色块 -->
       <div
         class="h-[320px] bg-gradient-to-r from-blue-800 to-blue-900 rounded-t-2xl px-4 md:px-12 pb-8 text-white flex items-end"
       >
-        <div class="flex-1">
+        <div class="ml-20 flex-1">
           <div class="text-sm opacity-90 mb-2">
             <span class="hover:underline cursor-pointer">Home</span>
             <span class="mx-2">></span>
@@ -20,7 +20,7 @@
             <span>创建时间：{{ formatTime(project.createTime) }}</span>
           </div>
         </div>
-        <div class="ml-auto flex flex-col items-center justify-end h-full">
+        <div class="ml-auto mr-20 flex flex-col items-center justify-end h-full">
           <img
             :src="project.owner?.avatar || '/default-avatar.png'"
             alt="负责人头像"
@@ -38,7 +38,7 @@
         class="flex flex-col h-screen md:flex-row gap-8 px-4 pb-12 bg-white rounded-b-2xl shadow-xl -mt-6"
       >
         <!-- 主体卡片 -->
-        <div class="flex-1 pt-8">
+        <div class="flex-1 pt-8 ml-28">
           <!-- 项目简介 -->
           <div id="project-intro" class="mb-10 scroll-mt-32">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">项目简介</h2>
@@ -79,7 +79,7 @@
           </div>
         </div>
         <!-- 右侧操作区 -->
-        <div class="w-full md:w-80 flex-shrink-0 pt-8">
+        <div class="w-full md:w-80 flex-shrink-0 pt-8 mr-20">
           <div class="sticky top-32">
             <div class="bg-gray-50 rounded-2xl shadow-lg mb-6 overflow-hidden">
               <div class="bg-gray-100 px-6 py-3 font-semibold text-gray-700">项目导航</div>

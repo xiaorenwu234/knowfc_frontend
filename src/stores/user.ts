@@ -1,26 +1,43 @@
+import type { User } from '@/js/User'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useUserStore = defineStore(
   'user',
   () => {
-    const userName = ref('')
-    const id = ref(0)
-    const avatar = ref('')
+    const detail = ref<User>({
+      id: 0,
+      email: '',
+      username: '',
+      password: '',
+      degree: '',
+      title: '',
+      institution: '',
+      researchArea: '',
+      bio: '',
+      avatar: '',
+      userType: 0,
+      status: 0,
+      createdAt: ''
+    })
 
     const setUserName = (name: string) => {
-      userName.value = name
+      detail.value.username = name
     }
 
     const setId = (userId: number) => {
-      id.value = userId
+      detail.value.id = userId
     }
 
     const setAvatar = (avatarUrl: string) => {
-      avatar.value = avatarUrl
+      detail.value.avatar = avatarUrl
     }
 
-    return { userName, id, avatar, setUserName, setId, setAvatar }
+    const setDetail = (user: User) => {
+      detail.value = user
+    }
+
+    return { detail, setUserName, setId, setAvatar, setDetail }
   },
   { persist: true },
 )

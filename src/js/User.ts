@@ -84,15 +84,19 @@ let userStore = () => {
 }
 
 export const getUserId = () => {
-  return userStore().id
+  return userStore().detail.id
 }
 
 export const getUserName = () => {
-  return userStore().userName
+  return userStore().detail.username
 }
 
 export const getAvatar = () => {
-  return userStore().avatar
+  return userStore().detail.avatar
+}
+
+export const getUserDetail = () => {
+  return userStore().detail
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {

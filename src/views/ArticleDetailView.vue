@@ -25,7 +25,7 @@
           <div class="text-sm opacity-90 flex flex-wrap items-center gap-4">
             <span>{{ articleDetail.type }}</span>
             <span>|</span>
-            <span>发布日期: {{ articleDetail.publish_date }}</span>
+            <span>发布日期: {{ articleDetail.date }}</span>
           </div>
 
           <div class="flex items-center gap-6 text-white font-medium -mb-10">
@@ -102,7 +102,7 @@
         <div id="abstract" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">摘要</h2>
           <div class="text-gray-700 leading-relaxed">
-            <p class="mb-4">{{ articleDetail.abstractContent || '文章摘要内容将在这里显示...' }}</p>
+            <p class="mb-4">{{ articleDetail.abstract || '文章摘要内容将在这里显示...' }}</p>
           </div>
         </div>
         <!-- 相关文章推荐 -->
@@ -246,10 +246,11 @@
 
           <!-- 下载和操作按钮 -->
           <div class="mt-6 space-y-3">
-            <button
+            <button 
+              
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
-              下载 PDF
+              <a :href="articleDetail.pdf_url">查看 PDF</a>
             </button>
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
@@ -323,23 +324,27 @@ import { API_CONFIG, buildApiUrl } from '@/config/api.js'
 import axios from 'axios'
 import {
   cancelLikeArticle,
-  getArticleContent,
   getArticleLike,
   likeArticle,
   sendComment,
 } from '@/js/ArticleDetail.js'
+import { getWorkDetail } from '@/js/Work.js'
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
 const articleId = route.query.id;
 const articleDetail = ref({})
 const getArticleDetail = async (articleId) => {
-  articleDetail.value = await getArticleContent(articleId)
+  articleDetail.value = await getWorkDetail(articleId)
   console.log(articleDetail.value)
   liked_statement.value = await getArticleLike(articleId)
 }
-onMounted(() => {
-  getArticleDetail(articleId)
+const publishDate = ref('')
+
+onMounted(async () => {
+  await getArticleDetail(articleId)
+  // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
+  console.log(articleDetail.value)
 })
 // 文章数据
 const articleData = ref({
