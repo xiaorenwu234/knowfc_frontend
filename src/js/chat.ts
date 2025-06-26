@@ -1,6 +1,6 @@
 import instance from '@/js/axios.ts'
-import { getUserId } from '@/js/User.ts'
-import { list } from 'postcss'
+import {getUserId} from '@/js/User.ts'
+import {list} from 'postcss'
 
 export const getChatList = async (): Promise<any[]> => {
   const url = '/message/chat-list'
@@ -64,24 +64,47 @@ export const sendChatMessage = (content: string, receiverId: number) => {
   const url = '/message/send'
 
   instance.post(url, formData, {})
-      .then((res) => {
-        console.log('Message sent successfully:', res.data)
-      })
-      .catch((err) => {
-        console.error('Error sending message:', err)
-      })
+    .then((res) => {
+      console.log('Message sent successfully:', res.data)
+    })
+    .catch((err) => {
+      console.error('Error sending message:', err)
+    })
 }
 
 export const getUnreadCount = async (): Promise<number> => {
-  const url  = '/message/unread-count'
-  try{
-    const res = await instance.get(url, {params:{
-      'userId': getUserId().toString(),
-      }})
+  const url = '/message/unread-count'
+  try {
+    const res = await instance.get(url, {
+      params: {
+        'userId': getUserId().toString(),
+      }
+    })
     return res.data.data || 0
-  }
-  catch(err) {
+  } catch (err) {
     console.error('获取未读消息数量失败:', err)
     return 0
+  }
+}
+
+
+export const getSpecificContact = async (contactId: number): Promise<any> => {
+  const url = '/message/chat-with-user'
+
+  console.log(getUserId().toString())
+  console.log(contactId.toString())
+
+  try {
+    const response = await instance.get(url, {
+      params: {
+        'userId': getUserId().toString(),
+        'otherUserId': contactId.toString(),
+      }
+    })
+    return response.data[0] || {}
+  }
+  catch (error) {
+    console.error('获取特定联系人失败:', error)
+    return {}
   }
 }

@@ -18,10 +18,10 @@ export const useUserStore = defineStore(
       avatar: '',
       userType: 0,
       status: 0,
-      createdAt: ''
+      createdAt: '',
     }
 
-    const detail = ref<User>(empty)
+    const detail = ref<User>({ ...empty })
 
     const setUserName = (name: string) => {
       detail.value.username = name
@@ -41,6 +41,7 @@ export const useUserStore = defineStore(
 
     const clearDetail = () => {
       detail.value = { ...empty }
+      console.log('User detail cleared')
     }
 
     return { detail, setUserName, setId, setAvatar, setDetail, clearDetail }

@@ -8,10 +8,10 @@ const submitChange = async () => {
   const [result, message] = await changeUserInfo(userDetail.value)
   if (result) {
     notify('success', '修改个人信息成功')
-    showForm.value=false;
+    showForm.value = false
   } else {
     notify('error', '修改个人信息失败', message)
-    showForm.value=false;
+    showForm.value = false
   }
 }
 
