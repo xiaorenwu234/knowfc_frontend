@@ -735,7 +735,7 @@ const submitPaper = () => {
     alert('请上传PDF文件')
     return
   }
-    
+
   uploadPaper(JSON.stringify({
     ...paperForm.value,
     authors: filteredAuthors,
@@ -800,7 +800,7 @@ const hideAllForms = () => {
   resetPaperForm() // 重置论文表单
 }
 const handleBatchFile = async (e) => {
-  if (!isLogin.value) {
+  if (!computedIsLogin.value) {
     // 统一风格弹窗提醒
     window.$message
       ? window.$message.warning('请先登录后再进行批量导入')

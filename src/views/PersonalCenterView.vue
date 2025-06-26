@@ -245,7 +245,7 @@ const submitCreate = async () => {
             </button>
           </div>
           <div class="flex w-full flex-wrap">
-            <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
+            <div v-for="project in projects" :key="project.id" class="w-1/2">
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
                   <div class="flex">
@@ -266,7 +266,7 @@ const submitCreate = async () => {
           {{ ownerReference + '参与的科研项目' }}
         </div>
         <div class="flex w-full flex-wrap mt-4">
-          <div v-for="project in participatedProjects" :key="project.id" class="w-1/2 pr-3 pt-2">
+          <div v-for="project in participatedProjects" :key="project.id" class="w-1/2">
             <div class="border-[2px] rounded-xl h-full">
               <div class="p-4">
                 <h3 class="text-base font-semibold text-blue-600">{{ project.name }}</h3>

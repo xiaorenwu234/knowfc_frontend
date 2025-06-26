@@ -259,11 +259,11 @@
               {{ liked_statement ? '已点赞' : '点赞文章' }}
             </button>
 
-            <button
-              class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
-            >
-              收藏文章
-            </button>
+<!--            <button-->
+<!--              class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"-->
+<!--            >-->
+<!--              收藏文章-->
+<!--            </button>-->
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
               @click="toggleCommentEditor"
