@@ -224,26 +224,25 @@ export const searchUsers = async (params: SearchParams): Promise<SearchResponse>
 }
 
 export const changeUserInfo = async (
-  degree: string,
-  title: string,
-  institution: string,
-  bio: string,
-  researchArea: string,
+  user:User
 ): Promise<[boolean, string]> => {
+  console.log(user)
   const formData = new FormData()
-  formData.append('id', getUserId())
-  formData.append('username', getUserName())
-  formData.append('bio', bio)
-  formData.append('researchArea', researchArea)
-  formData.append('degree', degree)
-  formData.append('title', title)
-  formData.append('institution', institution)
+  formData.append('id', user.id.toString())
+  formData.append('username', user.username)
+  formData.append('bio', user.bio)
+  formData.append('researchArea', user.researchArea)
+  formData.append('degree', user.degree)
+  formData.append('title', user.title)
+  formData.append('institution', user.institution)
   const url = '/users/update-info'
   try {
     const response = await instance.post(url, formData)
     console.log('User info updated successfully:', response.data)
     if (response.data.code === 200) {
       const store = userStore()
+      console.log(response.data)
+      setUserDetail(user)
       return [true, '用户信息更新成功'] as [boolean, string]
     } else {
       return [false, response.data.message] as [boolean, string]

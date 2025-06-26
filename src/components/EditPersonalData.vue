@@ -1,12 +1,40 @@
 <script setup lang="ts">
-import {changeUserInfo, getUserName} from "@/js/User.ts";
-import {onMounted} from "vue";
+import { changeUserInfo, getUserDetail, getUserName, type User } from '@/js/User.ts'
+import { onMounted, ref } from 'vue'
+import { notify } from '@/js/toast.ts'
 
 const showForm = defineModel('showForm')
 const submitChange = async () => {
-  await changeUserInfo()
+  const [result, message] = await changeUserInfo(userDetail.value)
+  if (result) {
+    notify('success', '修改个人信息成功')
+    showForm.value=false;
+  } else {
+    notify('error', '修改个人信息失败', message)
+    showForm.value=false;
+  }
 }
 
+const userDetail = ref<User>({
+  id: 0,
+  email: '',
+  username: '',
+  password: '',
+  degree: '',
+  title: '',
+  institution: '',
+  researchArea: '',
+  bio: '',
+  avatar: '',
+  userType: 0,
+  status: 0,
+  createdAt: '',
+})
+
+onMounted(() => {
+  userDetail.value = getUserDetail()
+  console.log(userDetail.value)
+})
 </script>
 
 <template>
@@ -32,35 +60,61 @@ const submitChange = async () => {
             <label class="label">
               <span class="label-text text-base font-medium">用户名</span>
             </label>
-            <input type="text" disabled class="input input-bordered w-full" :placeholder="getUserName()"/>
+            <input
+              type="text"
+              disabled
+              class="input input-bordered w-full"
+              :placeholder="userDetail.username"
+            />
           </div>
 
           <div class="form-control w-full">
             <label class="label">
               <span class="label-text text-base font-medium">邮箱</span>
             </label>
-            <input type="text" class="input input-bordered w-full" disabled />
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              disabled
+              :placeholder="userDetail.email"
+            />
           </div>
 
           <div class="form-control w-full">
             <label class="label">
               <span class="label-text text-base font-medium">工作单位</span>
             </label>
-            <input type="text" class="input input-bordered w-full" placeholder="请输入工作单位" />
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              placeholder="请输入工作单位"
+              v-model="userDetail.institution"
+            />
           </div>
 
           <div class="form-control w-full">
             <label class="label">
               <span class="label-text text-base font-medium">职称</span>
             </label>
-            <input type="text" class="input input-bordered w-full" placeholder="请输入职称" />
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              placeholder="请输入职称"
+              v-model="userDetail.title"
+            />
           </div>
 
           <div class="form-control w-full">
             <label class="label">
               <span class="label-text text-base font-medium">个人简介</span>
             </label>
-            <textarea class="input input-bordered w-full h-32" placeholder="请输入个人简介" rows="4"></textarea>          </div>
+            <textarea
+              class="input input-bordered w-full h-32"
+              placeholder="请输入个人简介"
+              rows="4"
+              v-model="userDetail.bio"
+            ></textarea>
+          </div>
         </div>
         <div
           class="card-actions justify-end mt-8 pt-4 border-t border-base-300 bottom-0 bg-base-100"
