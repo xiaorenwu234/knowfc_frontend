@@ -1,6 +1,5 @@
 import instance from '@/js/axios.ts'
 import { useUserStore } from '@/stores/user'
-const store = useUserStore()
 
 // Interfaces for the search response
 interface Author {
@@ -78,6 +77,7 @@ export interface SearchParams {
 export const getUserId = () => {
   // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
   // const userId = userInfo.id
+  const store = useUserStore()
   return store.id
 }
 
@@ -86,6 +86,9 @@ export const login = async (username: string, password: string): Promise<[boolea
   formData.append('username', username)
   formData.append('password', password)
   const url = '/users/login'
+  const store = useUserStore()
+  store.setUserName('')
+  store.setId(0)
 
   return instance
     .post(url, formData)
@@ -153,10 +156,10 @@ export const sendVerificationCode = async (email: string): Promise<[boolean, str
 
 export const searchUsers = async (params: SearchParams): Promise<SearchResponse> => {
   const url = '/users/search'
-  
+
   // Convert params to URLSearchParams for GET request
   const searchParams = new URLSearchParams()
-  
+
   if (params.keyword) {
     searchParams.append('keyword', params.keyword)
   }
