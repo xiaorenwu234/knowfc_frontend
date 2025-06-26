@@ -126,7 +126,7 @@ let eventSource = null
 
 const eventTypes = [
   { label: '全部', value: '全部' },
-  { label: '项目邀请', value: '项目邀请' },
+  { label: '项目邀请处理', value: '项目邀请处理' },
   { label: '项目申请', value: '项目申请' },
   { label: '成果被评论', value: '成果被评论' },
   { label: '用户关注', value: '用户关注' },
@@ -161,13 +161,20 @@ async function fetchNotifiList() {
     const res = await axios.get(buildApiUrl(url))
     console.log('获取通知列表:', res.data) // 调试输出
     // 这里根据你的实际返回结构调整
-    if (res.data && res.data.code === 200 && Array.isArray(res.data.data?.content)) {
-      notifiList.value = res.data.data.content
-      // 如果有分页信息，可以这样取
-      totalPages.value = res.data.data.totalPages || 1
-    } else {
-      notifiList.value = []
-      totalPages.value = 1
+    if (res.data && res.data.code === 200) {
+      const result = res.data.data
+      if (Array.isArray(result)) {
+        // 如果是数组，说明是类型过滤接口的结构
+        notifiList.value = result
+        totalPages.value = 1 // 你可以自己计算分页
+      } else if (Array.isArray(result?.content)) {
+        // 如果是分页结构（content 内嵌），说明是“全部”接口
+        notifiList.value = result.content
+        totalPages.value = result.totalPages || 1
+      } else {
+        notifiList.value = []
+        totalPages.value = 1
+      }
     }
   } catch (e) {
     notifiList.value = []
@@ -243,7 +250,7 @@ async function cleanupOldNotifications() {
 // 获取通知标题
 function getNotifTitle(item) {
   if (item.eventType === '系统通知' && item.notifBody?.title) return item.notifBody.title
-  if (item.eventType === '项目邀请' && item.notifBody?.projectName) return `项目邀请：${item.notifBody.projectName}`
+  if (item.eventType === '项目邀请处理' && item.notifBody?.projectName) return `项目邀请：${item.notifBody.projectName}`
   if (item.eventType === '项目申请' && item.notifBody?.projectName) return `项目申请：${item.notifBody.projectName}`
   if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle) return `评论：${item.notifBody.resourceTitle}`
   if (item.eventType === '用户关注') return '新关注'
@@ -262,7 +269,7 @@ function handleTitleClick(item) {
     window.open(item.notifBody.actionUrl, '_blank')
     return
   }
-  if ((item.eventType === '项目邀请' || item.eventType === '项目申请') && item.notifBody?.projectId) {
+  if ((item.eventType === '项目邀请处理' || item.eventType === '项目申请') && item.notifBody?.projectId) {
     router.push({ path: `/project/${item.notifBody.projectId}` })
     return
   }
