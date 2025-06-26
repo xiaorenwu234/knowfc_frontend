@@ -14,7 +14,7 @@
         <div class="flex flex-col grow gap-1">
           <div class="flex">
             <RouterLink
-              :to="`/personal-center?id=${person.id}`"
+              :to="`/personal-center/${person.id}`"
               class="text-xl font-bold hover:underline cursor-pointer"
               >{{ person.username }}</RouterLink
             >

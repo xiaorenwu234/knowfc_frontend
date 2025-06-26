@@ -2,11 +2,11 @@ import instance from '@/js/axios.ts'
 
 export const uploadPaper = async (workInfo: any, pdfDocument: File): Promise<boolean> => {
     const url = '/works/upload'
-    
     try {
       // 创建FormData对象
       const formData = new FormData()
-      
+      console.log('上传论文信息:', workInfo)
+      console.log('提交的数据包含PDF文件:', pdfDocument)
       // 将JSON对象转换为字符串，并添加到formData
       formData.append('workInfo', new Blob([JSON.stringify(workInfo)], {
         type: 'application/json'

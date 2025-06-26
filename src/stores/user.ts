@@ -6,6 +6,7 @@ export const useUserStore = defineStore(
   () => {
     const userName = ref('')
     const id = ref(0)
+    const avatar = ref('')
 
     const setUserName = (name: string) => {
       userName.value = name
@@ -15,7 +16,11 @@ export const useUserStore = defineStore(
       id.value = userId
     }
 
-    return { userName, id, setUserName, setId }
+    const setAvatar = (avatarUrl: string) => {
+      avatar.value = avatarUrl
+    }
+
+    return { userName, id, avatar, setUserName, setId, setAvatar }
   },
   { persist: true },
 )

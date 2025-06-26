@@ -17,7 +17,7 @@
       @mouseleave="leaveHead()"
     >
       <RouterLink v-if="computedIsLogin" :to="personalCenterPath">
-        <img :src="headSrc" class="image-full" alt="头像" />
+        <img :src="getAvatar()" class="image-full" alt="头像" />
       </RouterLink>
       <RouterLink v-else to="/signin">
         <img src="../assets/default-avatar.png" class="image-full" alt="默认头像" />
@@ -623,7 +623,7 @@
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/index.js'
 import { uploadPaper } from '@/js/Upload'
-import { getUserId } from '@/js/User.js'
+import { getAvatar, getUserId } from '@/js/User.js'
 import { getUnreadCount } from '@/js/chat.js'
 
 // 投稿类型选择菜单
@@ -698,13 +698,14 @@ const removeField = (index) => {
 // 重置论文表单
 const resetPaperForm = () => {
   paperForm.value = {
-    type: '',
-    source: '',
     title: '',
-    authors: [{ name: '', affiliation: '' }],
+    type: '',
     abstractContent: '',
+    userId: parseInt(getUserId()),
+    source: '',
     keywords: [''],
-    fieldIds: [0],
+    fieldIds: [''],
+    authors: [{ name: '', affiliation: '' }]
   }
   // 重置PDF文档
   pdfDocument.value = null
@@ -735,32 +736,13 @@ const submitPaper = () => {
     return
   }
 
-  // 这里处理提交逻辑，包含PDF文件
-  const formData = new FormData()
-  formData.append('pdfFile', pdfDocument.value)
-  formData.append(
-    'workInfo',
-    JSON.stringify({
-      ...paperForm.value,
-      authors: filteredAuthors,
-      keywords: filteredKeywords,
-      fieldIds: filteredFieldIds,
-    }),
-  )
-
-  console.log(
-    '提交的表单数据:',
-    JSON.stringify({
-      ...paperForm.value,
-      authors: filteredAuthors,
-      keywords: filteredKeywords,
-      fieldIds: filteredFieldIds,
-    }),
-  )
-  console.log('提交的数据包含PDF文件:', pdfDocument.value)
-
-  uploadPaper(formData)
-    .then((response) => {
+  uploadPaper(JSON.stringify({
+    ...paperForm.value,
+    authors: filteredAuthors,
+    keywords: filteredKeywords,
+    fieldIds: filteredFieldIds
+  }), pdfDocument.value)
+    .then(response => {
       console.log('论文提交成功:', response)
       resetPaperForm() // 提交成功后重置表单
       alert('论文提交成功！')
@@ -818,7 +800,7 @@ const hideAllForms = () => {
   resetPaperForm() // 重置论文表单
 }
 const handleBatchFile = async (e) => {
-  if (!isLogin.value) {
+  if (!computedIsLogin.value) {
     // 统一风格弹窗提醒
     window.$message
       ? window.$message.warning('请先登录后再进行批量导入')
