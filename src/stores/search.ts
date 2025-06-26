@@ -12,6 +12,8 @@ export const useSearchStore = defineStore('search', () => {
             journal: '',
             year: '',
             page: '',
+            field: [''],
+            institution: ''
         }
     })
     
@@ -27,5 +29,13 @@ export const useSearchStore = defineStore('search', () => {
         searchQuery.value.constraints = constraints
     }
 
-    return { searchQuery, setType, setContent, setConstraints }
+    function setField(field: string[]) {
+        searchQuery.value.constraints.field = field
+    }
+
+    function setInstitution(institution: string) {
+        searchQuery.value.constraints.institution = institution
+    }
+
+    return { searchQuery, setType, setContent, setConstraints, setField, setInstitution }
 })
