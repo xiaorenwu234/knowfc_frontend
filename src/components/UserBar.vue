@@ -604,13 +604,14 @@ const removeField = (index) => {
 // 重置论文表单
 const resetPaperForm = () => {
   paperForm.value = {
-    type: '',
-    source: '',
     title: '',
-    authors: [{ name: '', affiliation: '' }],
+    type: '',
     abstractContent: '',
+    userId: parseInt(getUserId()),
+    source: '',
     keywords: [''],
-    fieldIds: [0],
+    fieldIds: [''],
+    authors: [{ name: '', affiliation: '' }]
   }
   // 重置PDF文档
   pdfDocument.value = null
@@ -640,26 +641,13 @@ const submitPaper = () => {
     alert('请上传PDF文件')
     return
   }
-  
-  // 这里处理提交逻辑，包含PDF文件
-  const formData = new FormData()
-  formData.append('pdfFile', pdfDocument.value)
-  formData.append('workInfo', JSON.stringify({
+    
+  uploadPaper(JSON.stringify({
     ...paperForm.value,
     authors: filteredAuthors,
     keywords: filteredKeywords,
     fieldIds: filteredFieldIds
-  }))
-  
-  console.log('提交的表单数据:', JSON.stringify({
-    ...paperForm.value,
-    authors: filteredAuthors,
-    keywords: filteredKeywords,
-    fieldIds: filteredFieldIds
-  }))
-  console.log('提交的数据包含PDF文件:', pdfDocument.value)
-  
-  uploadPaper(formData)
+  }), pdfDocument.value)
     .then(response => {
       console.log('论文提交成功:', response)
       resetPaperForm() // 提交成功后重置表单

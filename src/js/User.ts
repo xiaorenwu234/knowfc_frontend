@@ -89,7 +89,7 @@ export const getUserId = () => {
   // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
   // const userId = userInfo.id
   // const store = useUserStore()
-  return userStore().id
+  return 2
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
