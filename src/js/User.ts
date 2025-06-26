@@ -99,23 +99,23 @@ export const getUserDetail = () => {
   return userStore().detail
 }
 
+export const setUserDetail = (user: User) => {
+  userStore().setDetail(user)
+}
+
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
   const formData = new FormData()
   formData.append('username', username)
   formData.append('password', password)
   const url = '/users/login'
   const store = userStore()
-  store.setUserName('')
-  store.setId(0)
-  store.setAvatar('')
+  store.clearDetail()
 
   return instance
     .post(url, formData)
     .then((res) => {
       console.log('Login successful:', res.data)
-      store.setUserName(res.data.data.username)
-      store.setId(res.data.data.id)
-      store.setAvatar(res.data.data.avatar || '')
+      store.setDetail(res.data.data)
       if (res.data.code == 200) {
         localStorage.setItem('user', JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
@@ -131,8 +131,7 @@ export const login = async (username: string, password: string): Promise<[boolea
 
 export const logout = () => {
   const store = userStore()
-  store.setUserName('')
-  store.setId(0)
+  store.clearDetail()
 }
 
 export const signup = async (

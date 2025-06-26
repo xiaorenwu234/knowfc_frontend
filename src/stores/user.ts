@@ -5,7 +5,7 @@ import { ref } from 'vue'
 export const useUserStore = defineStore(
   'user',
   () => {
-    const detail = ref<User>({
+    const empty: User = {
       id: 0,
       email: '',
       username: '',
@@ -19,7 +19,9 @@ export const useUserStore = defineStore(
       userType: 0,
       status: 0,
       createdAt: ''
-    })
+    }
+
+    const detail = ref<User>(empty)
 
     const setUserName = (name: string) => {
       detail.value.username = name
@@ -37,7 +39,11 @@ export const useUserStore = defineStore(
       detail.value = user
     }
 
-    return { detail, setUserName, setId, setAvatar, setDetail }
+    const clearDetail = () => {
+      detail.value = { ...empty }
+    }
+
+    return { detail, setUserName, setId, setAvatar, setDetail, clearDetail }
   },
   { persist: true },
 )
