@@ -22,53 +22,72 @@
     <div v-if="loading" class="text-gray-400 text-center py-10">加载中...</div>
     <div v-else-if="notifiList.length === 0" class="text-gray-400 text-center py-10">暂无通知</div>
     <div v-else>
-      <ul>
-        <li v-for="item in notifiList" :key="item.id"
-          class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
-          :style="{ opacity: item.readStatus ? 0.7 : 1 }" @click="handleRead(item)">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
-              <span class="font-medium text-gray-800 cursor-pointer hover:underline"
-                @click.stop="handleTitleClick(item)">
-                {{ getNotifTitle(item) }}
-              </span>
+      <div class="overflow-y-auto rounded-xl" style="max-height: 600px; min-height: 500px;">
+        <ul>
+          <li v-for="item in notifiList" :key="item.id"
+            class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
+            :style="{ opacity: item.readStatus ? 0.7 : 1 }"
+            @click="item.eventType !== '项目申请' ? handleRead(item) : null">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="font-medium text-gray-800 cursor-pointer hover:underline"
+                  @click.stop="handleTitleClick(item)">
+                  {{ getNotifTitle(item) }}
+                </span>
+              </div>
+              <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
             </div>
-            <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
-          </div>
-          <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
-          <!-- 项目邀请操作 -->
-          <div v-if="item.eventType === '项目邀请' && !item.readStatus" class="mt-3 flex gap-2">
-            <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
-              @click.stop="acceptInvite(item)">同意</button>
-            <button class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
-              @click.stop="rejectInvite(item)">拒绝</button>
-          </div>
-          <!-- 系统通知带链接 -->
-          <div v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl" class="mt-3">
-            <a :href="item.notifBody.actionUrl" target="_blank" class="text-blue-600 hover:underline text-sm">查看详情</a>
-          </div>
-        </li>
-      </ul>
-      <!-- 分页控件 -->
-      <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 mt-8 select-none">
-        <button
-          class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-          :disabled="currentPage === 1" @click="changePage(currentPage - 1)" aria-label="上一页">
-          <span>&lt;</span>
-        </button>
-        <span v-for="page in totalPages" :key="page">
-          <button class="w-8 h-8 mx-1 flex items-center justify-center rounded-full transition border" :class="currentPage === page
-            ? 'bg-gray-700 text-white border-gray-700 shadow'
-            : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'" @click="changePage(page)">{{ page
-            }}</button>
-        </span>
-        <button
-          class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-          :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" aria-label="下一页">
-          <span>&gt;</span>
-        </button>
+            <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
+            <!-- 项目邀请操作 -->
+            <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
+              <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
+                @click.stop="openConfirm('accept', item)">同意</button>
+              <button class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
+                @click.stop="openConfirm('reject', item)">拒绝</button>
+            </div>
+            <!-- 系统通知带链接 -->
+            <div v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl" class="mt-3">
+              <a :href="item.notifBody.actionUrl" target="_blank" class="text-blue-600 hover:underline text-sm">查看详情</a>
+            </div>
+            <!-- 确认弹窗 -->
+            <div v-if="showConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+                <div class="text-lg font-bold mb-4 text-gray-800">
+                  {{ confirmType === 'accept' ? '确认同意该项目邀请？' : '确认拒绝该项目邀请？' }}
+                </div>
+                <div class="flex justify-end gap-3">
+                  <button @click="closeConfirm"
+                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">取消</button>
+                  <button @click="handleConfirm(item)"
+                    class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">确定</button>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
+      <!-- 分页控件 -->
+      <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 mt-15 select-none">
+        <div class="flex justify-center items-center gap-2 mt-20 select-none">
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+            :disabled="currentPage === 0" @click="changePage(currentPage - 1)" aria-label="上一页">
+            <span>&lt;</span>
+          </button>
+          <button v-for="page in totalPages" :key="page" @click="changePage(page - 1)"
+            :class="currentPage === (page - 1) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'"
+            class="w-8 h-8 flex items-center justify-center rounded-full border transition">
+            {{ page }}
+          </button>
+          <button
+            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+            :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)" aria-label="下一页">
+            <span>&gt;</span>
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -78,15 +97,31 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { buildApiUrl } from '@/config/api'
+import { watch } from 'vue'
+
 
 const loading = ref(true)
 const notifiList = ref([])
 const unreadCount = ref(0)
-const currentPage = ref(1)
-const pageSize = ref(10)
+const currentPage = ref(0)
+const pageSize = ref(4)
 const totalPages = ref(1)
 const filterType = ref('全部')
 const router = useRouter()
+const showConfirm = ref(false)
+const confirmType = ref('') // 'accept' 或 'reject'
+const confirmItem = ref(null)
+
+function openConfirm(type, item) {
+  confirmType.value = type
+  confirmItem.value = item
+  showConfirm.value = true
+}
+function closeConfirm() {
+  showConfirm.value = false
+  confirmType.value = ''
+  confirmItem.value = null
+}
 let eventSource = null
 
 const eventTypes = [
@@ -103,7 +138,6 @@ function formatTime(time) {
   if (!time) return ''
   return new Date(time).toLocaleString()
 }
-
 // 获取当前用户ID
 function getUserId() {
   const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -113,109 +147,39 @@ function getUserId() {
 // 获取通知列表（分页、类型筛选）
 async function fetchNotifiList() {
   loading.value = true
-  // const userId = getUserId()
-  // if (!userId) {
-  //   notifiList.value = []
-  //   loading.value = false
-  //   return
-  // }
-  // try {
-  //   let url = `/notification/list/${userId}?page=${currentPage.value}&size=${pageSize.value}`
-  //   if (filterType.value !== '全部') {
-  //     url = `/notification/type/${userId}/${encodeURIComponent(filterType.value)}?page=${currentPage.value}&size=${pageSize.value}`
-  //   }
-  //   const res = await axios.get(buildApiUrl(url))
-  //   console.log('获取通知列表', res)
-  //   if (res.data && res.data.code === 0 && Array.isArray(res.data.data?.records)) {
-  //     notifiList.value = res.data.data.records
-  //     totalPages.value = res.data.data.pages || 1
-  //   } else {
-  //     notifiList.value = []
-  //     totalPages.value = 1
-  //   }
-  // } catch (e) {
-  //   notifiList.value = []
-  //   totalPages.value = 1
-  // }
-  // ====== 模拟数据 start ======
-  const allData = [
-    {
-      id: 1,
-      eventType: '系统通知',
-      readStatus: false,
-      createTime: '2025-06-26T10:00:00',
-      notifText: '',
-      notifBody: {
-        title: '系统升级通知',
-        content: '平台将于本周末升级维护，请提前保存数据。',
-        actionUrl: 'https://www.example.com/notice'
-      }
-    },
-    {
-      id: 2,
-      eventType: '项目邀请',
-      readStatus: false,
-      createTime: '2025-06-25T15:30:00',
-      notifText: '',
-      notifBody: {
-        projectName: 'AI科研协作平台',
-        projectId: 1
-      }
-    },
-    {
-      id: 3,
-      eventType: '项目申请',
-      readStatus: true,
-      createTime: '2025-06-24T09:20:00',
-      notifText: '',
-      notifBody: {
-        projectName: '大数据分析项目',
-        projectId: 2
-      }
-    },
-    {
-      id: 4,
-      eventType: '成果被评论',
-      readStatus: false,
-      createTime: '2025-06-23T18:00:00',
-      notifText: '',
-      notifBody: {
-        resourceTitle: 'AI论文：智能推荐系统',
-        resourceType: 'paper',
-        resourceId: 101
-      }
-    },
-    {
-      id: 5,
-      eventType: '用户关注',
-      readStatus: true,
-      createTime: '2025-06-22T12:00:00',
-      notifText: '',
-      senderId: 7,
-      notifBody: {}
-    },
-    {
-      id: 6,
-      eventType: '问题收到回答',
-      readStatus: false,
-      createTime: '2025-06-21T14:30:00',
-      notifText: '',
-      notifBody: {
-        questionTitle: '如何优化深度学习模型？',
-        questionId: 201
-      }
-    }
-  ]
-    // 分类筛选
-  let filtered = allData
-  if (filterType.value !== '全部') {
-    filtered = allData.filter(item => item.eventType === filterType.value)
+  const userId = getUserId()
+  if (!userId) {
+    notifiList.value = []
+    loading.value = false
+    return
   }
-  notifiList.value = filtered
+  try {
+    let url = `/notification/list/${userId}?page=${currentPage.value}&size=${pageSize.value}`
+    if (filterType.value !== '全部') {
+      url = `/notification/type/${userId}/${encodeURIComponent(filterType.value)}?page=${currentPage.value}&size=${pageSize.value}`
+    }
+    const res = await axios.get(buildApiUrl(url))
+    console.log('获取通知列表:', res.data) // 调试输出
+    // 这里根据你的实际返回结构调整
+    if (res.data && res.data.code === 200 && Array.isArray(res.data.data?.content)) {
+      notifiList.value = res.data.data.content
+      // 如果有分页信息，可以这样取
+      totalPages.value = res.data.data.totalPages || 1
+    } else {
+      notifiList.value = []
+      totalPages.value = 1
+    }
+  } catch (e) {
+    notifiList.value = []
+    totalPages.value = 1
+  }
   loading.value = false
   fetchUnreadCount()
 }
-
+// 监听分页和分类变化，自动刷新
+watch([currentPage, filterType], () => {
+  fetchNotifiList()
+})
 // 获取未读数
 async function fetchUnreadCount() {
   const userId = getUserId()
@@ -250,9 +214,8 @@ onBeforeUnmount(() => {
 
 // 分页切换
 function changePage(page) {
-  if (page < 1 || page > totalPages.value) return
+  if (page < 0 || page >= totalPages.value) return
   currentPage.value = page
-  fetchNotifiList()
 }
 
 // 标记单条已读
@@ -323,15 +286,49 @@ function handleTitleClick(item) {
   }
 }
 
-// 同意项目邀请
-async function acceptInvite(item) {
-  await axios.post(buildApiUrl('/project/invite/accept'), { notifId: item.id })
-  fetchNotifiList()
+async function handleConfirm(item) {
+  if (!confirmItem.value) return
+
+  const inviterId = confirmItem.value.senderId
+
+  const inviteeId = confirmItem.value.receiverId
+
+  const projectId = confirmItem.value.notifBody?.projectId
+  const isAccepted = confirmType.value === 'accept'
+
+  if (!inviterId || !inviteeId || !projectId) {
+    console.error('缺少必要字段')
+    return
+  }
+
+  const payload = {
+    inviterId,
+    inviteeId,
+    projectId,
+    isAccepted: isAccepted.toString()
+  }
+
+  try {
+    await axios.post(buildApiUrl('/project/handleInvite'), payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      transformRequest: [(data) =>
+        Object.entries(data)
+          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+          .join('&')
+      ]
+    })
+
+    // 设置状态为已读并关闭弹窗
+    handleRead(item);
+    closeConfirm()
+    fetchNotifiList()
+  } catch (error) {
+    console.error('处理邀请失败：', error)
+    alert('操作失败，请稍后再试')
+  }
 }
 
-// 拒绝项目邀请
-async function rejectInvite(item) {
-  await axios.post(buildApiUrl('/project/invite/reject'), { notifId: item.id })
-  fetchNotifiList()
-}
+
 </script>

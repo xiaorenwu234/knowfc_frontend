@@ -39,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 import WorkCard from './WorkCard.vue'
 import PersonCard from './PersonCard.vue'

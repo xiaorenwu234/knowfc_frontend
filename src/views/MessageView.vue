@@ -176,7 +176,8 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
 import {getChatDetail, getChatList, readMessages, sendChatMessage} from '@/js/chat.ts'
 import { getUserId } from '@/js/User.ts'
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const MAX_MESSAGE_LENGTH = 100
 
 const contactPersonList = ref([])
@@ -288,11 +289,21 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize()
   contactPersonList.value = await getChatList()
-  console.log(contactPersonList.value)
-  if (contactPersonList.value.length > 0 && !isMobileView.value) {
+  // 自动选中并发送消息
+  const userId = route.query.userId
+  const msg = route.query.msg
+  if (userId) {
+    const contact = contactPersonList.value.find(c => String(c.chatWithUserId) === String(userId))
+    if (contact) {
+      await selectContact(contact)
+      if (msg) {
+        newMessage.value = msg
+        sendMessage()
+      }
+    }
+  } else if (contactPersonList.value.length > 0 && !isMobileView.value) {
     await selectContact(contactPersonList.value[0])
   }
-  console.log(activeContact.value)
 })
 
 onBeforeUnmount(() => {
