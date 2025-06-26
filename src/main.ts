@@ -7,6 +7,7 @@ import './style.css'
 
 import App from './App.vue'
 import router from './router'
+import { logout } from './js/User'
 
 const app = createApp(App)
 
@@ -27,5 +28,7 @@ app.use(Vue3Toasity, {
     minHeight: '36px',
   },
 })
+
+logout()
 
 app.mount('#app')
