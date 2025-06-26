@@ -17,7 +17,7 @@
       @mouseleave="leaveHead()"
     >
       <RouterLink v-if="computedIsLogin" :to="personalCenterPath">
-        <img :src="headSrc" class="image-full" alt="头像" />
+        <img :src="getAvatar()" class="image-full" alt="头像" />
       </RouterLink>
       <RouterLink v-else to="/signin">
         <img src="../assets/default-avatar.png" class="image-full" alt="默认头像" />
@@ -623,7 +623,7 @@
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/index.js'
 import { uploadPaper } from '@/js/Upload'
-import { getUserId } from '@/js/User.js'
+import { getAvatar, getUserId } from '@/js/User.js'
 import { getUnreadCount } from '@/js/chat.js'
 
 // 投稿类型选择菜单
@@ -735,7 +735,7 @@ const submitPaper = () => {
     alert('请上传PDF文件')
     return
   }
-    
+
   uploadPaper(JSON.stringify({
     ...paperForm.value,
     authors: filteredAuthors,

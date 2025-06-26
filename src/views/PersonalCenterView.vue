@@ -121,6 +121,25 @@ const getParticipatedProjects = async () => {
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
 const followList = ref()
+
+const updateAvatar = async (avatar: File) => {
+  const formData = new FormData()
+    formData.append('avatar', avatar)
+    try {
+      const response = await axios.post('/users/update-info', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      if (response.data.code === 200) {
+        notify('success', '头像更新成功')
+        fetchUserInfo() // 刷新用户信息
+      } else {
+        notify('error', '头像更新失败', response.data.msg)
+      }
+    } catch (error) {
+      notify('error', '网络错误', error?.toString())
+    }
+}
+
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
@@ -199,7 +218,7 @@ const submitCreate = async () => {
         <div class="w-full sm:flex sm:justify-center">
           <img
             class="w-[140px] aspect-square sm:w-[calc(100%-50px)] rounded-full border-2 mx-auto sm:mx-0 mt-4"
-            src="/image.png"
+            :src="userInfo?.avatar || '/image.png'"
             alt="头像"
           />
         </div>
@@ -248,11 +267,14 @@ const submitCreate = async () => {
             <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
-                  <div class="flex">
-                    <h3 class="text-base font-semibold text-blue-600"><RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink></h3>
-                  </div>
+                  <h3 class="text-base font-semibold text-blue-600">
+                    <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
+                  </h3>
                   <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
-                  <p class="text-gray-600 text-sm mt-4">合作条件：{{ project.cooperationTerms }}</p>
+                  <p class="text-gray-600 text-sm mt-4">
+                    <span class="badge badge-outline mr-2">合作条件</span>
+                    {{ project.cooperationTerms }}
+                  </p>
                 </div>
                 <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
                   <button class="btn" @click="openModal(project.id)">申请加入项目</button>
@@ -269,9 +291,14 @@ const submitCreate = async () => {
           <div v-for="project in participatedProjects" :key="project.id" class="w-1/2 pr-3 pt-2">
             <div class="border-[2px] rounded-xl h-full">
               <div class="p-4">
-                <h3 class="text-base font-semibold text-blue-600">{{ project.name }}</h3>
+                <h3 class="text-base font-semibold text-blue-600">
+                  <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
+                </h3>
                 <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
-                <p class="text-gray-600 text-sm mt-4">合作条件：{{ project.cooperationTerms }}</p>
+                <p class="text-gray-600 text-sm mt-4">
+                  <span class="badge badge-outline mr-2">合作条件</span>
+                  {{ project.cooperationTerms }}
+                </p>
               </div>
               <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
                 <button class="btn" @click="openModal(project.id)">申请加入项目</button>
