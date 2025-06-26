@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import router from '@/router'
-import {sendVerificationCode, signup} from "@/js/User.ts";
-import {notify} from "@/js/toast.ts";
+import { sendVerificationCode, signup } from '@/js/User.ts'
+import { notify } from '@/js/toast.ts'
 
 const showCountDown = ref(false)
 const countDownValue = ref(59)
 const hasSent = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref('')
-
 
 const startCountDown = () => {
   if (showCountDown.value) return
@@ -36,32 +35,37 @@ const verificationCode = ref('')
 const handleRegister = async () => {
   // 表单验证
   if (!username.value.trim()) {
-    notify("error","请输入用户名")
+    notify('error', '请输入用户名')
     return
   }
   if (!email.value.trim()) {
-    notify("error","请输入合法邮箱")
+    notify('error', '请输入合法邮箱')
     return
   }
   if (!verificationCode.value.trim()) {
-    notify("error","请输入验证码")
+    notify('error', '请输入验证码')
     return
   }
   if (!password.value.trim()) {
-    notify("error","请输入密码")
+    notify('error', '请输入密码')
     return
   }
   if (password.value !== confirmPassword.value) {
-    notify("error","两次输入的密码不一致")
+    notify('error', '两次输入的密码不一致')
     return
   }
 
-  const [success,message] = await signup(username.value, password.value, email.value, verificationCode.value)
-  if(success){
-    notify("success", '注册成功，请登录')
+  const [success, message] = await signup(
+    username.value,
+    password.value,
+    email.value,
+    verificationCode.value,
+  )
+  if (success) {
+    notify('success', '注册成功，请登录')
     router.push('signin')
   } else {
-    notify("error", message || '注册失败，请稍后重试')
+    notify('error', message || '注册失败，请稍后重试')
     errorMessage.value = message || '注册失败，请稍后重试'
   }
 }
@@ -73,11 +77,11 @@ const handleVerifyCode = async () => {
   }
 
   const [success, message] = await sendVerificationCode(email.value)
-  if(success){
-    notify("success",'登录成功')
+  if (success) {
+    notify('success', '验证码发送成功')
     startCountDown()
   } else {
-    notify("error", message || '发送验证码失败，请稍后重试')
+    notify('error', message || '发送验证码失败，请稍后重试')
     errorMessage.value = message || '发送验证码失败，请稍后重试'
   }
 }
@@ -159,12 +163,9 @@ const handleVerifyCode = async () => {
           />
           <div class="verification-button-container">
             <span class="countdown" v-if="showCountDown">
-              <span
-                :style="`--value: ${countDownValue}`"
-                aria-live="polite"
-                aria-label="59"
-                >{{ countDownValue }}</span
-              >
+              <span :style="`--value: ${countDownValue}`" aria-live="polite" aria-label="59">{{
+                countDownValue
+              }}</span>
             </span>
             <span class="countdown-text" v-if="showCountDown"> 秒后重新发送 </span>
             <div class="button" @click="handleVerifyCode" v-else>
@@ -199,12 +200,7 @@ const handleVerifyCode = async () => {
           {{ errorMessage }}
         </div>
 
-        <button
-          class="submit"
-          type="button"
-          @click="handleRegister"
-          :disabled="isLoading"
-        >
+        <button class="submit" type="button" @click="handleRegister" :disabled="isLoading">
           {{ isLoading ? '注册中...' : '注 册' }}
         </button>
         <div @click="router.push('signin')" class="text-blue-500 hover:underline jump">
@@ -314,14 +310,14 @@ const handleVerifyCode = async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-  "Lucida Sans", Arial, sans-serif;
+  font-family:
+    'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   white-space: nowrap;
   transition: all 0.25s ease;
 }
 
 .verification-button-container .button:before {
-  content: "";
+  content: '';
   position: absolute;
   left: calc((var(--input-px) / 2) * -1);
   top: 0;
@@ -337,15 +333,15 @@ const handleVerifyCode = async () => {
 
 .verification-button-container .countdown {
   color: #4d4d4d;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-  "Lucida Sans", Arial, sans-serif;
+  font-family:
+    'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   white-space: nowrap;
 }
 
 .verification-button-container .countdown-text {
   color: #4d4d4d;
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-  "Lucida Sans", Arial, sans-serif;
+  font-family:
+    'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   white-space: nowrap;
 }
 </style>
