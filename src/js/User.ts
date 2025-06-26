@@ -1,14 +1,11 @@
-import { ref } from 'vue'
 import instance from '@/js/axios.ts'
-import { local } from 'd3'
-
-const userName = ref('')
-const id = ref(0)
+import { useUserStore } from '@/stores/user'
+const store = useUserStore()
 
 export const getUserId = () => {
   // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
   // const userId = userInfo.id
-  return id.value
+  return store.id
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
@@ -21,8 +18,8 @@ export const login = async (username: string, password: string): Promise<[boolea
     .post(url, formData)
     .then((res) => {
       console.log('Login successful:', res.data)
-      userName.value = res.data.username
-      id.value = res.data.id
+      store.setUserName(res.data.username)
+      store.setId(res.data.id)
       if (res.data.code == 200) {
         localStorage.setItem('user',JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
