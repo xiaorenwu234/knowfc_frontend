@@ -88,7 +88,7 @@
           />
           <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
-        <div v-else class="text-gray-500">请选择联系人</div>
+        <div v-else class="text-gray-500 h-2">请选择联系人</div>
       </div>
 
       <!-- 消息显示区域 -->
@@ -174,7 +174,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
-import { getChatDetail, getChatList, readMessages } from '@/js/chat.ts'
+import {getChatDetail, getChatList, readMessages, sendChatMessage} from '@/js/chat.ts'
 import { getUserId } from '@/js/User.ts'
 import { useRoute } from 'vue-router'
 const route = useRoute()
@@ -267,6 +267,8 @@ const sendMessage = () => {
     sendDate: new Date(),
     isMe: true,
   }
+
+  sendChatMessage(newMessage.value, activeContact.value.chatWithUserId)
 
   messages.value.push(msg)
   // 更新联系人的最后一条消息

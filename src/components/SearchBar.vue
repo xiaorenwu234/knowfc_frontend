@@ -1,7 +1,7 @@
 <template>
     <div ref="searchBar" class="flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto"
         :class="[isNearTop ? 'max-w-80' : 'max-w-3xl']"
-        @focusin="isFocused = true" @focusout="isFocused = false; showAdvancedSearch = false;">
+        @focusin="isFocused = true" @focusout="isFocused = false;">
         <!-- 搜索框 -->
         <label class="input input-bordered flex items-center gap-2 rounded-full focus-within:shadow-2xl  focus-within:shadow-blue-400 transition-all bg-opacity-60 backdrop-blur-sm" >
             <input
@@ -55,25 +55,7 @@
             leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 -translate-y-4"
         >
-            <div v-show="showAdvancedSearch && isFocused" class="flex flex-col gap-4 bg-white/70 backdrop-blur-lg rounded-3xl p-4" >
-                <!-- 时间范围选择 -->
-                <div class="flex flex-col gap-2">
-                    <label class="text-sm font-medium">时间范围</label>
-                    <div class="flex flex-wrap gap-2" @mousedown.prevent>
-                        <input
-                            type="date"
-                            class="input input-bordered grow"
-                            v-model="dateRange.start"
-                        />
-                        <span class="self-center">至</span>
-                        <input
-                            type="date"
-                            class="input input-bordered grow"
-                            v-model="dateRange.end"
-                        />
-                    </div>
-                </div>
-
+            <div v-show="showAdvancedSearch" class="flex flex-col gap-4 bg-white/70 backdrop-blur-lg rounded-3xl p-4" >
                 <!-- 类型选择 -->
                 <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium">类型选择</label>
@@ -93,6 +75,24 @@
                     </div>
                 </div>
 
+                <!-- 时间范围选择 -->
+                <div v-if="selectedType === 'works'" class="flex flex-col gap-2">
+                    <label class="text-sm font-medium">时间范围</label>
+                    <div class="flex flex-wrap gap-2" @mousedown.prevent>
+                        <input
+                            type="date"
+                            class="input input-bordered grow"
+                            v-model="dateRange.start"
+                        />
+                        <span class="self-center">至</span>
+                        <input
+                            type="date"
+                            class="input input-bordered grow"
+                            v-model="dateRange.end"
+                        />
+                    </div>
+                </div>
+
                 <!-- 学科领域选择 -->
                 <div class="flex flex-col gap-2">
                     <label class="text-sm font-medium">学科领域</label>
@@ -108,6 +108,17 @@
                         </label>
                     </div>
                 </div>
+
+                <!-- 所属机构选择 -->
+                <div v-if="selectedType === 'users'" class="flex flex-col gap-2" @mousedown.stop>
+                    <label class="text-sm font-medium">所属机构</label>
+                    <input
+                        type="text"
+                        class="input input-bordered w-full"
+                        placeholder="输入所属机构"
+                        v-model="selectedInstitution"
+                    />
+                </div>
             </div>
         </Transition>
     </div>
@@ -116,6 +127,9 @@
 <script setup>
 import { useSearchStore } from '@/stores/search'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const searchBar = ref()
 const searchInput = ref()
@@ -123,6 +137,8 @@ const searchInput = ref()
 const doSearch = () => {
     searchStore.setContent(searchQuery.value)
     searchStore.setType(selectedType.value)
+    searchStore.setField(selectedSubjects.value)
+    searchStore.setInstitution(selectedInstitution.value)
 
     // 清除搜索内容
     searchQuery.value = ''
@@ -131,14 +147,17 @@ const doSearch = () => {
         start: '',
         end: ''
     }
-    selectedType.value = ''
     selectedSubjects.value = []
+    selectedInstitution.value = ''
     // 关闭高级搜索面板
     showAdvancedSearch.value = false
 
     searchInput.value.blur()
 
-    searchStore.doSearch = true
+    searchStore.searchQuery.doSearch = true
+
+    // 跳转到搜索结果页面
+    router.push(`/search`)
 }
 
 // 高级搜索
@@ -197,16 +216,17 @@ const selectedType = ref('works')
 
 // 学科领域选项
 const subjects = [
-    { label: '数学', value: 'math' },
-    { label: '物理', value: 'physics' },
-    { label: '化学', value: 'chemistry' },
-    { label: '生物', value: 'biology' },
-    { label: '计算机', value: 'computer' },
-    { label: '文学', value: 'literature' },
-    { label: '历史', value: 'history' },
-    { label: '地理', value: 'geography' }
+    { label: 'LLM', value: 'LLM' },
+    { label: 'Database', value: 'Database' },
+    { label: 'Software Engineering', value: 'Software Engineering' },
+    { label: 'Data Mining', value: 'Data Mining' },
+    { label: 'Operating System', value: 'Operating System' },
+    { label: 'AI for Education', value: 'AI for Education' },
 ]
 
 // 选中的学科领域
 const selectedSubjects = ref([])
+
+// 选中的所属机构
+const selectedInstitution = ref('')
 </script>

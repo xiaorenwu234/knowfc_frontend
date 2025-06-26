@@ -116,7 +116,8 @@
   import Vditor from 'vditor'
   import 'vditor/dist/index.css'
   import { getQuestionDetail, getAnswers, submitAnswerTo, searchProblem } from '@/js/Problem'
-import { useRoute } from 'vue-router'
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
   
   const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
   const userName = userInfo.username
@@ -139,7 +140,7 @@ import { useRoute } from 'vue-router'
   const vditorContainer = ref(null)
 
 
-  const questionId = 2 // 假设路由参数名为 id
+  const questionId = route.query.id // 假设路由参数名为 id
 
   // 渲染 Markdown 内容
   const setAnswerRef = (el, answerId) => {

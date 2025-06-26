@@ -22,9 +22,10 @@
                     :ref="el => setContentRef(el, question.id)" 
                     :data-content="question.content"
                     :class="[
-                      'text-gray-700 leading-relaxed transition-all duration-300',
+                      'text-gray-700 leading-relaxed transition-all duration-300 cursor-pointer hover:bg-gray-50 rounded p-2',
                       (!expandedQuestions.has(question.id) && questionsNeedExpand.has(question.id))  ? 'content-collapsed' : 'content-expanded'
                     ]"
+                    @click="navigateToQuestion(question.id)"
                   ></div>
                 </div>
                 
@@ -145,13 +146,15 @@
   import 'vditor/dist/index.css'
   import { searchProblem } from '@/js/Problem'
   import { useSearchStore } from '@/stores/search'
+  import { useRouter } from 'vue-router'
   const searchStore = useSearchStore()
+  const router = useRouter()
   
   // 响应式数据
   const showPublishDialog = ref(false)
-const contentRefs = ref(new Map())
-const expandedQuestions = ref(new Set())
-const questionsNeedExpand = ref(new Set())
+  const contentRefs = ref(new Map())
+  const expandedQuestions = ref(new Set())
+  const questionsNeedExpand = ref(new Set())
   
   // 问题数据
   const questions = ref([])
@@ -239,15 +242,7 @@ const checkIfNeedExpand = (questionId, element) => {
         alert('请输入问题描述')
         return
       }
-      
-      // 添加新问题到列表
-      const newId = Math.max(...questions.value.map(q => q.id)) + 1
-      questions.value.unshift({
-        id: newId,
-        title: newQuestion.value.title,
-        content: newQuestion.value.content,
-      })
-      
+            
       // 重置表单
       newQuestion.value = { title: '', content: ''}
       
@@ -273,6 +268,10 @@ const checkIfNeedExpand = (questionId, element) => {
   }
 
   initSearch()
+
+  const navigateToQuestion = (questionId) => {
+    router.push(`/problem?id=${questionId}`)
+  }
 
     // 生命周期
     onMounted(async () => {
