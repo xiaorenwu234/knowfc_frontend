@@ -238,7 +238,7 @@ const submitCreate = async () => {
             {{ ownerReference + '创建的科研项目' }}
             <button
               v-if="ownerReference == '我'"
-              class="ml-4 btn btn-primary"
+              class="ml-4 btn-sm mb-2 btn btn-primary"
               @click="openCreateModal"
             >
               创建项目
