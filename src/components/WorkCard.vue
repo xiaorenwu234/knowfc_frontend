@@ -26,7 +26,7 @@
 
       <div class="flex">
         <div>
-          {{ new Intl.DateTimeFormat('zh-CN').format(work.date) }}
+          {{ work.date }}
         </div>
         <div class="divider divider-horizontal"></div>
         <div>
@@ -64,7 +64,7 @@
         <div class="divider divider-horizontal"></div>
         <div class="flex items-center gap-1">
           <i class="icon-[mdi--comment]"></i>
-          {{ work.comments || 0 }}
+          {{ work.comments.length || 0 }}
         </div>
       </div>
     </div>
