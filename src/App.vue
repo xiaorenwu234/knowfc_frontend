@@ -1,21 +1,13 @@
 <script setup lang="ts">
 import DockBar from './components/DockBar.vue';
 import Header from './components/Header.vue'
-import { ref } from 'vue'
-const hideOthers = ref(false)
-const isNormal = ref(true)
-const isLogin = ref(false)
-const isCreatorView = ref(false)
 </script>
 
 <template>
-  <!-- 顶栏 -->
-  <div class="h-24 w-full fixed top-0 z-50" v-if="!hideOthers">
-    <Header />
-  </div>
+  <Header class="h-24 w-full fixed top-0 z-50"/>
 
   <!-- Dock栏 -->
-  <div v-if="!hideOthers" class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
+  <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
     <DockBar />
   </div>
 
@@ -26,9 +18,6 @@ const isCreatorView = ref(false)
 </template>
 
 <style scoped>
-.gradient-bg {
-  background: linear-gradient(135deg, #f0f2ff 0%, #fff1f9 100%);
-}
 .bg-container {
   background-image: url('/mountain.jpg');
   background-position: center;

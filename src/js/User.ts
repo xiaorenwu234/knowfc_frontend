@@ -1,7 +1,5 @@
 import instance from '@/js/axios.ts'
 import { useUserStore } from '@/stores/user'
-import type { Store } from 'pinia'
-import type { Ref } from 'vue'
 
 // Interfaces for the search response
 interface Author {
@@ -76,7 +74,7 @@ export interface SearchParams {
   sortBy?: 'relevance' | 'createdAt'
 }
 
-let store: Store;
+let store: ReturnType<typeof useUserStore>
 let userStore = () => {
   if (!store) {
     store = useUserStore()
@@ -86,10 +84,15 @@ let userStore = () => {
 }
 
 export const getUserId = () => {
-  // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
-  // const userId = userInfo.id
-  // const store = useUserStore()
-  return 2
+  return userStore().id
+}
+
+export const getUserName = () => {
+  return userStore().userName
+}
+
+export const getAvatar = () => {
+  return userStore().avatar
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
@@ -100,6 +103,7 @@ export const login = async (username: string, password: string): Promise<[boolea
   const store = userStore()
   store.setUserName('')
   store.setId(0)
+  store.setAvatar('')
 
   return instance
     .post(url, formData)
@@ -107,8 +111,9 @@ export const login = async (username: string, password: string): Promise<[boolea
       console.log('Login successful:', res.data)
       store.setUserName(res.data.username)
       store.setId(res.data.data.id)
+      store.setAvatar(res.data.data.avatar || '')
       if (res.data.code == 200) {
-        localStorage.setItem('user',JSON.stringify(res.data.data))
+        localStorage.setItem('user', JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
       } else {
         return [false, res.data.message] as [boolean, string]
@@ -120,7 +125,18 @@ export const login = async (username: string, password: string): Promise<[boolea
     })
 }
 
-export const signup = async (username: string, password: string, email: string, verificationCode: string): Promise<[boolean, string]> => {
+export const logout = () => {
+  const store = userStore()
+  store.setUserName('')
+  store.setId(0)
+}
+
+export const signup = async (
+  username: string,
+  password: string,
+  email: string,
+  verificationCode: string,
+): Promise<[boolean, string]> => {
   const url = '/users/register'
   const formData = new FormData()
   formData.append('username', username)
@@ -178,7 +194,7 @@ export const searchUsers = async (params: SearchParams): Promise<SearchResponse>
     searchParams.append('institution', params.institution)
   }
   if (params.fields && params.fields.length > 0) {
-    params.fields.forEach(field => {
+    params.fields.forEach((field) => {
       searchParams.append('fields', field)
     })
   }

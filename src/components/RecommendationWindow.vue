@@ -47,7 +47,7 @@ import type { Person } from '@/js/Person'
 
 const categories = ['文章', '同仁', '热点']
 
-const works: Work[] = [
+const works: Array<Work | null> = [
   {
     id: '1',
     title: 'Understanding the Impact of AI on Coffee Production',
@@ -82,9 +82,11 @@ const works: Work[] = [
     likes: 95,
     comments: 30,
   },
+  null,
+  null,
 ]
 
-const persons: Person[] = [
+const persons: Array<Person | null> = [
   {
     id: 1,
     email: 'lyq2026@outlook.com',
@@ -107,5 +109,7 @@ const persons: Person[] = [
     bio: 'Specializes in food quality assessment using AI.',
     avatar: 'https://knowfc.oss-cn-beijing.aliyuncs.com/avatar/3d.jpg',
   },
+  null,
+  null,
 ]
 </script>

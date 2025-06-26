@@ -1,9 +1,9 @@
 <template>
-  <div class="flex w-screen h-screen bg-gray-100 overflow-hidden">
+  <div class="flex w-screen h-screen bg-gray-100 overflow-hidden z-[52]">
     <!-- 侧边栏部分保持不变 -->
     <div
       ref="sidebar"
-      class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"
+      class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out min-w-20"
       :style="{
         width: isMobileView ? '40%' : sidebarWidth + 'px',
         transform: isMobileView && isCollapsed ? 'translateX(-100%)' : 'translateX(0)',
@@ -11,9 +11,11 @@
         zIndex: isMobileView ? 10 : 'auto',
         height: '100%',
       }"
+      style="min-width: 330px"
     >
       <div class="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-lg font-semibold">联系人</h2>
+        <Search class="z-[100]"></Search>
         <button @click="toggleCollapse" class="md:hidden p-1 rounded-md hover:bg-gray-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +82,7 @@
             />
           </svg>
         </button>
-        <div v-if="activeContact" class="flex items-center">
+        <div v-if="activeContact" class="flex items-center h-11">
           <img
             class="w-8 h-8 rounded-full aspect-square flex items-center justify-center mr-2"
             :src="activeContact.chatWithAvatar"
@@ -88,7 +90,9 @@
           />
           <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
-        <div v-else class="text-gray-500 h-2">请选择联系人</div>
+        <div v-else class="h-11 font-medium text-lg flex">
+          <div class="m-auto">请选择联系人</div>
+        </div>
       </div>
 
       <!-- 消息显示区域 -->
@@ -116,7 +120,7 @@
               {{ activeContact.chatWithUsername }}
             </p>
             <div
-              class="inline-block px-4 py-2 rounded-lg"
+              class="inline-block px-4 py-2 rounded-lg whitespace-pre-wrap"
               :class="{
                 'bg-blue-500 text-white': message.isMe,
                 'bg-white border border-gray-200': !message.isMe,
@@ -134,9 +138,10 @@
 
           <template v-if="message.isMe">
             <img
-              class="w-10 h-10  rounded-full flex items-center justify-center ml-2 shrink-0" :src = "message.senderAvatar" alt="头像"
+              class="w-10 h-10 rounded-full flex items-center justify-center ml-2 shrink-0"
+              :src="message.senderAvatar"
+              alt="头像"
             />
-
           </template>
         </div>
       </div>
@@ -155,6 +160,7 @@
             class="flex-1 border border-gray-300 rounded-l-md px-4 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-500 overflow-hidden"
             rows="1"
             :maxlength="MAX_MESSAGE_LENGTH"
+            @keydown="handleKeydown"
           ></textarea>
           <button
             @click="sendMessage"
@@ -174,10 +180,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
-import {getChatDetail, getChatList, readMessages, sendChatMessage} from '@/js/chat.ts'
-import { getUserId } from '@/js/User.ts'
+import { getChatDetail, getChatList, readMessages, sendChatMessage } from '@/js/chat.ts'
+import { getAvatar, getUserId } from '@/js/User.ts'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+import Search from '@/components/Search.vue'
+
 const MAX_MESSAGE_LENGTH = 100
 
 const contactPersonList = ref([])
@@ -226,7 +234,7 @@ const startResize = (e) => {
   const startWidth = sidebarWidth.value
 
   const onMouseMove = (e) => {
-    sidebarWidth.value = Math.min(Math.max(200, startWidth + e.clientX - startX), 400)
+    sidebarWidth.value = Math.min(Math.max(300, startWidth + e.clientX - startX), 500)
   }
 
   const onMouseUp = () => {
@@ -247,6 +255,7 @@ const selectContact = async (contact) => {
   readMessages(contact.chatWithUserId, getUserId())
   // 加载聊天消息
   messages.value = await getChatDetail(contact.chatWithUserId)
+  console.log(messages.value)
 
   console.log(messages.value)
 
@@ -259,6 +268,8 @@ const selectContact = async (contact) => {
   })
 }
 
+const senderAvatar = getAvatar()
+
 const sendMessage = () => {
   if (!newMessage.value.trim() || !activeContact.value) return
 
@@ -266,6 +277,7 @@ const sendMessage = () => {
     content: newMessage.value,
     sendDate: new Date(),
     isMe: true,
+    senderAvatar,
   }
 
   sendChatMessage(newMessage.value, activeContact.value.chatWithUserId)
@@ -293,7 +305,7 @@ onMounted(async () => {
   const userId = route.query.userId
   const msg = route.query.msg
   if (userId) {
-    const contact = contactPersonList.value.find(c => String(c.chatWithUserId) === String(userId))
+    const contact = contactPersonList.value.find((c) => String(c.chatWithUserId) === String(userId))
     if (contact) {
       await selectContact(contact)
       if (msg) {
@@ -304,11 +316,19 @@ onMounted(async () => {
   } else if (contactPersonList.value.length > 0 && !isMobileView.value) {
     await selectContact(contactPersonList.value[0])
   }
+  console.log(activeContact.value)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
 })
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    sendMessage()
+  }
+}
 </script>
 
 <style>

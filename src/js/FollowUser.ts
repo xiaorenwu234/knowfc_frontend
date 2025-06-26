@@ -47,3 +47,27 @@ export const unfollowUser = async (authorId: string): Promise<Boolean> => {
     return false
   }
 }
+
+export const getFollowList = async (page:Number):Promise<any[]> => {
+  const url = '/follow/list'
+  const userId = getUserId()
+  try {
+    const response = await instance.post(url, {
+      params: {
+        userId: userId,
+        page: page,
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('获取成功')
+      console.log(response.data.data)
+      return response.data.data
+    } else {
+      console.error('获取失败:', response.data.message)
+      return [];
+    }
+  } catch (err) {
+    console.error('获取操作失败', err)
+    return [];
+  }
+}

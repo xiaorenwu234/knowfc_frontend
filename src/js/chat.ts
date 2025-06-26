@@ -24,8 +24,8 @@ export const getChatDetail = async (
   try {
     const res = await instance.get(url, {
       params: {
-        userId1: 1,
-        userId2: 2,
+        userId1: getUserId(),
+        userId2: chatId.toString(),
         page: 0,
         size: 100,
       },
