@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue'
 import {searchUsers} from "@/js/User.ts";
+import {getSpecificContact} from "@/js/chat.ts";
 
 const showDropdown = ref(false)
 const searchQuery = ref('')
@@ -19,29 +20,25 @@ watch(searchQuery, async (newQuery: string) => {
   }
 })
 
-const addUser = (contactId: number) => {
+const addUser = async (contactId: number) => {
   let flag=false
   let personIndex=0
-  for (let i = 0; i < contactPersonList.value.length(); i++) {
-    if (contactPersonList[i].chatWithUserId	 === contactId) {
+  for (let i = 0; i < contactPersonList.value.length; i++) {
+    if (contactPersonList.value[i].chatWithUserId	 === contactId) {
       flag = true
       personIndex = i
       break
     }
   }
   if(flag){
-
+    activeContact.value = contactPersonList.value[personIndex]
   }
   else{
-    const newContact = ref({
-      "chatWithUserId": 2,
-      "chatWithUsername": "李四",
-      "chatWithAvatar": "http://example.com/avatar2.jpg",
-      "lastMessage": "你好，最近怎么样？",
-      "lastMessageTime": "",
-      "unreadCount": 0
-    })
-
+    const newContact = await getSpecificContact(contactId)
+    contactPersonList.value.unshift(await getSpecificContact(contactId))
+    console.log(newContact)
+    activeContact.value = newContact
+    console.log(contactPersonList.value)
   }
 }
 </script>
