@@ -13,7 +13,7 @@ import Header from './components/Header.vue'
 
   <!-- 主体 -->
   <div class="flex-1 min-h-screen bg-container">
-      <RouterView></RouterView>
+      <RouterView :key="$route.fullPath"></RouterView>
   </div>
 </template>
 

@@ -4,9 +4,9 @@ import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import router from '@/router'
-import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
+import { checkFollowStatus, followUser, getFollowList, unfollowUser,IFollowUserListItem } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
 import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
@@ -14,13 +14,13 @@ import type { ProjectSummary } from '@/js/ProjectSummary'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   }
 }
 
@@ -67,7 +67,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: getUserId(),
-      content: reason.value,
+      content: reason.value
     })
     closeModal()
     alert('申请已提交成功！')
@@ -86,6 +86,8 @@ const handleFollow = async () => {
 }
 const showFollowModal = ref(false)
 const showFollow = () => {
+  getFollowList(userIdOnDisplay).then((res)=>followList.value=res)
+  console.log(followList.value)
   showFollowModal.value = true
 }
 const handleCloseFollowModal = () => {
@@ -120,34 +122,35 @@ const getParticipatedProjects = async () => {
 
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
-const followList = ref()
+const followList = ref<IFollowUserListItem[]>()
 
 const updateAvatar = async (avatar: File) => {
   const formData = new FormData()
-    formData.append('avatar', avatar)
-    try {
-      const response = await axios.post('/users/update-info', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      if (response.data.code === 200) {
-        notify('success', '头像更新成功')
-        fetchUserInfo() // 刷新用户信息
-      } else {
-        notify('error', '头像更新失败', response.data.msg)
-      }
-    } catch (error) {
-      notify('error', '网络错误', error?.toString())
+  formData.append('avatar', avatar)
+  try {
+    const response = await axios.post('/users/update-info', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    if (response.data.code === 200) {
+      notify('success', '头像更新成功')
+      fetchUserInfo() // 刷新用户信息
+    } else {
+      notify('error', '头像更新失败', response.data.msg)
     }
+  } catch (error) {
+    notify('error', '网络错误', error?.toString())
+  }
 }
 
-onMounted(() => {
+onMounted(async () => {
   window.addEventListener('resize', updateWindowSize)
-  fetchUserInfo()
+  await fetchUserInfo()
   ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
-  getOwnerProjects()
-  getParticipatedProjects()
-  followList.value = getFollowList(0)
-  //return code 500
+  await getOwnerProjects()
+  await getParticipatedProjects()
+  followList.value = await getFollowList(userIdOnDisplay)
+  console.log(followList.value)
+  following.value = await checkFollowStatus(userIdOnDisplay)
 })
 
 onUnmounted(() => {
@@ -159,7 +162,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: '',
+  cooperationTerms: ''
 })
 const createError = ref('')
 
@@ -194,7 +197,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -227,9 +230,9 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-<!--          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">-->
-<!--            关注列表-->
-<!--          </button>-->
+          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
+            关注列表
+          </button>
           <button
             v-if="ownerReference != 'Ta'"
             class="btn w-full mx-auto mt-6"
@@ -240,14 +243,14 @@ const submitCreate = async () => {
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
             退出登录
           </button>
-<!--          <button-->
-<!--            v-if="ownerReference == 'Ta'"-->
-<!--            class="btn mx-auto mt-6 w-24"-->
-<!--            :class="following ? '' : 'btn-primary'"-->
-<!--            @click="handleFollow"-->
-<!--          >-->
-<!--            {{ following ? '取关' : '关注' }}-->
-<!--          </button>-->
+          <button
+            v-if="ownerReference == 'Ta'"
+            class="btn mx-auto mt-6 w-24"
+            :class="following ? '' : 'btn-primary'"
+            @click="handleFollow"
+          >
+            {{ following ? '取关' : '关注' }}
+          </button>
         </div>
       </div>
 
@@ -395,11 +398,26 @@ const submitCreate = async () => {
   >
     <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
       <h3 class="text-lg font-bold mb-4">关注列表</h3>
-      <div class="flex flex-col">
+
+      <div v-if="followList?.length === 0">
         <div>暂无关注</div>
-        <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
       </div>
+
+      <div v-else class="space-y-4">
+        <RouterLink v-for="(user, index) in followList" :key="user.id" class="flex items-center space-x-4" :to="`/personal-center/${user.id}`">
+          <img :src="user.avatar" alt="User Avatar" class="w-12 h-12 rounded-full" />
+
+          <div class="flex-1">
+            <h4 class="font-semibold">{{ user.username }}</h4>
+            <p class="text-sm text-gray-600">{{ user.title }} at {{ user.institution }}</p>
+            <p class="text-sm text-gray-500">{{ user.researchArea }}</p>
+          </div>
+        </RouterLink>
+      </div>
+
+      <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
     </div>
+
   </div>
 </template>
 
