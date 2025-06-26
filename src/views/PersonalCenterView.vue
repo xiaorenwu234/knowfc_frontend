@@ -87,7 +87,7 @@ const handleFollow = async () => {
 
 const getOwnerProjects = async () => {
   try {
-    const res = await instance.get(`/project/getOwnerProjectByUserId/${getUserId()}`)
+    const res = await instance.get(`/project/getOwnerProjectByUserId/${userIdOnDisplay}`)
     if (res.data && res.data.code === 200) {
       projects.value = res.data.data
     } else {
@@ -100,7 +100,7 @@ const getOwnerProjects = async () => {
 
 const getParticipatedProjects = async () => {
   try {
-    const res = await instance.get(`/project/getParticipatedProjectsByUserId/${getUserId()}`)
+    const res = await instance.get(`/project/getParticipatedProjectsByUserId/${userIdOnDisplay}`)
     if (res.data && res.data.code === 200) {
       participatedProjects.value = res.data.data
     } else {
