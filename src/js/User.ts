@@ -79,9 +79,9 @@ export interface SearchParams {
 }
 
 export const getUserId = () => {
-  const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
-  const userId = userInfo.id
-  return userId
+  // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
+  // const userId = userInfo.id
+  return id.value
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
