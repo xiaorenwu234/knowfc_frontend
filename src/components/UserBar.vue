@@ -8,14 +8,18 @@
         <img :src="headSrc" class="image-full" alt="头像">
       </RouterLink>
       <RouterLink v-if="!isLogin" to="/signin">
-        <img src="../assets/default-avatar.png" class="image-full" alt="头像">
+        <img src="../assets/default-avatar.png" class="image-full" alt="默认头像">
       </RouterLink>
     </div>
+
     <!-- 消息 -->
+
     <div ref="message" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
-      <button @click="goToNotify()" class="w-full h-full">
+      <div class="w-3 h-3 bg-red-500 absolute translate-x-3 -translate-y-0.5 z-[60] rounded-full" v-if="unReadCount!==0"></div>
+      <button @click="goToNotify()" class="w-full h-full z-[54]">
         <icon class="icon-[material-symbols--notifications-outline] w-full h-full" />
       </button>
+
     </div>
     <!-- 书架 -->
     <div ref="shelf" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
@@ -477,9 +481,11 @@
 </div>
 </template>
 
-<script setup>
-import { onMounted, ref } from 'vue'
+<script setup lang="js">
+import {computed, onMounted, ref} from 'vue'
 import router from '@/router/index.js'
+import {getUserId} from "@/js/User.js";
+import {getUnreadCount} from "@/js/chat.js";
 
 // 投稿类型选择菜单
 const showUploadTypeMenu = ref(false)
@@ -488,7 +494,6 @@ const showUploadTypeMenu = ref(false)
 const showPaperForm = ref(false)
 const showPatentForm = ref(false)
 const showDatasetForm = ref(false)
-const isLogin = ref(false)
 const personalCenterPath = ref('')
 const showBatchForm = ref(false)
 const batchLoading = ref(false)
@@ -497,8 +502,7 @@ const batchColumns = ref([])
 const batchResult = ref(null)
 
 router.beforeEach((to, from, next) => {
-  isLogin.value = localStorage.getItem('user') != null;
-  if(isLogin.value)
+  if(computedIsLogin.value)
     personalCenterPath.value = "/personal-center/"+JSON.parse(localStorage.getItem('user')).id;
   next();
 });
@@ -593,6 +597,10 @@ const doBatchImport = async () => {
   }, 1200)
 }
 
+const computedIsLogin = computed(() => {
+  return getUserId() !== ''
+})
+
 const closeBatchResult = () => {
   batchResult.value = null
   hideAllForms()
@@ -606,7 +614,7 @@ const goToList = () => {
 }
 
 const goToNotify = () => {
-  if (isLogin.value && personalCenterPath.value) {
+  if (computedIsLogin.value && personalCenterPath.value) {
     const user = JSON.parse(localStorage.getItem('user'))
     router.push(`/personal-notify/${user.id}`)
   } else {
@@ -615,6 +623,12 @@ const goToNotify = () => {
       : alert('请先登录后查看通知')
   }
 }
+
+const unReadCount = ref(0)
+
+onMounted(async ()=>{
+  unReadCount.value = await getUnreadCount()
+})
 </script>
 
 <style scoped>
