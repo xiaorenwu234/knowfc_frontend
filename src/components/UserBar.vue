@@ -736,12 +736,12 @@ const submitPaper = () => {
     return
   }
 
-  uploadPaper(JSON.stringify({
+  uploadPaper({
     ...paperForm.value,
     authors: filteredAuthors,
     keywords: filteredKeywords,
-    fieldIds: filteredFieldIds
-  }), pdfDocument.value)
+    fieldIds: filteredFieldIds  
+    }, pdfDocument.value)
     .then(response => {
       console.log('论文提交成功:', response)
       resetPaperForm() // 提交成功后重置表单
