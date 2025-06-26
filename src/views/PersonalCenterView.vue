@@ -6,7 +6,7 @@ import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
+import { checkFollowStatus, followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
 import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
@@ -146,8 +146,8 @@ onMounted(() => {
   ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
   getOwnerProjects()
   getParticipatedProjects()
-  followList.value = getFollowList(0)
-  //return code 500
+  checkFollowStatus(userIdOnDisplay).then((res)=>{following.value=res})
+  getFollowList(userIdOnDisplay).then((res)=>{followList.value=res})
 })
 
 onUnmounted(() => {
@@ -227,9 +227,9 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-<!--          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">-->
-<!--            关注列表-->
-<!--          </button>-->
+          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
+            关注列表
+          </button>
           <button
             v-if="ownerReference != 'Ta'"
             class="btn w-full mx-auto mt-6"
@@ -240,14 +240,14 @@ const submitCreate = async () => {
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
             退出登录
           </button>
-<!--          <button-->
-<!--            v-if="ownerReference == 'Ta'"-->
-<!--            class="btn mx-auto mt-6 w-24"-->
-<!--            :class="following ? '' : 'btn-primary'"-->
-<!--            @click="handleFollow"-->
-<!--          >-->
-<!--            {{ following ? '取关' : '关注' }}-->
-<!--          </button>-->
+          <button
+            v-if="ownerReference == 'Ta'"
+            class="btn mx-auto mt-6 w-24"
+            :class="following ? '' : 'btn-primary'"
+            @click="handleFollow"
+          >
+            {{ following ? '取关' : '关注' }}
+          </button>
         </div>
       </div>
 
@@ -396,7 +396,17 @@ const submitCreate = async () => {
     <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
       <h3 class="text-lg font-bold mb-4">关注列表</h3>
       <div class="flex flex-col">
-        <div>暂无关注</div>
+        <div v-if="followList.length > 0">
+          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in followList" :key="user.id" class="flex items-center mb-4">
+            <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
+            <div>
+              <p class="font-semibold">{{ user.username }}</p>
+              <p class="text-sm text-gray-500">{{ user.title }} at {{ user.institution }}</p>
+              <p class="text-xs text-gray-400">{{ user.researchArea }}</p>
+            </div>
+          </RouterLink>
+        </div>
+        <div v-else>暂无关注</div>
         <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
       </div>
     </div>
