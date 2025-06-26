@@ -503,7 +503,7 @@ const batchResult = ref(null)
 
 router.beforeEach((to, from, next) => {
   if(computedIsLogin.value)
-    personalCenterPath.value = "/personal-center/"+JSON.parse(localStorage.getItem('user')).id;
+    personalCenterPath.value = "/personal-center/"+JSON.parse(localStorage.getItem('user'))?.id;
   next();
 });
 
