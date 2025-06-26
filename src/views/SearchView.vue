@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
 import SearchBar from '@/components/SearchBar.vue'
 import { useSearchStore } from '@/stores/search'
@@ -24,17 +24,27 @@ const router = useRouter()
 const searchStore = useSearchStore()
 
 watch(searchStore, async () => {
-  if (searchStore.doSearch) {
+  if (searchStore.searchQuery.doSearch) {
     await handleSearch()
-    searchStore.doSearch = false
+    searchStore.searchQuery.doSearch = false
   }
 })
 
 const handleSearch = async () => {
   hasSearched.value = true
-
   
   // 根据routerType跳转到不同的路由
   await router.push(`/search/${searchStore.searchQuery.type}`)
 }
+
+function initSearch() {
+  if (searchStore.searchQuery.doSearch == true) {
+    hasSearched.value = true
+    handleSearch()
+  }
+}
+
+onMounted(() => {
+  initSearch()
+})
 </script> 

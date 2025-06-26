@@ -88,7 +88,7 @@
           />
           <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
-        <div v-else class="text-gray-500">请选择联系人</div>
+        <div v-else class="text-gray-500 h-2">请选择联系人</div>
       </div>
 
       <!-- 消息显示区域 -->
@@ -174,9 +174,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import '@/js/chat.ts'
-import { getChatDetail, getChatList, readMessages } from '@/js/chat.ts'
+import {getChatDetail, getChatList, readMessages, sendChatMessage} from '@/js/chat.ts'
 import { getUserId } from '@/js/User.ts'
-
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const MAX_MESSAGE_LENGTH = 100
 
 const contactPersonList = ref([])
@@ -267,6 +268,8 @@ const sendMessage = () => {
     isMe: true,
   }
 
+  sendChatMessage(newMessage.value, activeContact.value.chatWithUserId)
+
   messages.value.push(msg)
   // 更新联系人的最后一条消息
   if (activeContact.value) {
@@ -286,11 +289,21 @@ onMounted(async () => {
   window.addEventListener('resize', handleResize)
   handleResize()
   contactPersonList.value = await getChatList()
-  console.log(contactPersonList.value)
-  if (contactPersonList.value.length > 0 && !isMobileView.value) {
+  // 自动选中并发送消息
+  const userId = route.query.userId
+  const msg = route.query.msg
+  if (userId) {
+    const contact = contactPersonList.value.find(c => String(c.chatWithUserId) === String(userId))
+    if (contact) {
+      await selectContact(contact)
+      if (msg) {
+        newMessage.value = msg
+        sendMessage()
+      }
+    }
+  } else if (contactPersonList.value.length > 0 && !isMobileView.value) {
     await selectContact(contactPersonList.value[0])
   }
-  console.log(activeContact.value)
 })
 
 onBeforeUnmount(() => {

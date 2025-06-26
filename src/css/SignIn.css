@@ -350,10 +350,9 @@ svg#monkey
   color: #111;
 }
 
-.blind-check:checked ~ .form .input[type="text"] {
+.blind-check:checked ~ .form .input#password-input {
   -webkit-text-security: disc;
 }
-
 
 .card label.blind_inputx {
   -webkit-user-select: none;
@@ -401,7 +400,6 @@ svg#monkey
   display: block;
 }
 
-
 .card div.count:before{
   content: "";
   position: absolute;
@@ -412,12 +410,10 @@ svg#monkey
   background: #8f8f8f;
 }
 
-
 form .jump {
   margin-top:10px;
   margin-bottom:-20px;
 }
-
 
 .background-image1 {
   width: 900px;

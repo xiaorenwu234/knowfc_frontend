@@ -44,13 +44,44 @@ export const getChatDetail = async (
 export const readMessages = (receiverId: number, senderId: number) => {
   const url = '/message/mark-read'
   const formData = new FormData()
-  formData.append('receiverId', receiverId)
-  formData.append('senderId', senderId)
+  formData.append('receiverId', receiverId.toString())
+  formData.append('senderId', senderId.toString())
+  instance
+    .post(url, formData, {})
+    .then((res) => {
+      console.log(res.data)
+    })
+    .catch((err) => {
+      console.error('Error marking messages as read:', err)
+    })
+}
+
+export const sendChatMessage = (content: string, receiverId: number) => {
+  const formData = new FormData()
+  formData.append('content', content)
+  formData.append('senderId', getUserId())
+  formData.append('receiverId', receiverId.toString())
+  const url = '/message/send'
+
   instance.post(url, formData, {})
       .then((res) => {
-        console.log(res.data)
+        console.log('Message sent successfully:', res.data)
       })
       .catch((err) => {
-        console.error('Error marking messages as read:', err)
+        console.error('Error sending message:', err)
       })
+}
+
+export const getUnreadCount = async (): Promise<number> => {
+  const url  = '/message/unread-count'
+  try{
+    const res = await instance.get(url, {params:{
+      'userId': getUserId().toString(),
+      }})
+    return res.data.data || 0
+  }
+  catch(err) {
+    console.error('获取未读消息数量失败:', err)
+    return 0
+  }
 }
