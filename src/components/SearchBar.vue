@@ -127,6 +127,9 @@
 <script setup>
 import { useSearchStore } from '@/stores/search'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const searchBar = ref()
 const searchInput = ref()
@@ -152,6 +155,9 @@ const doSearch = () => {
     searchInput.value.blur()
 
     searchStore.searchQuery.doSearch = true
+
+    // 跳转到搜索结果页面
+    router.push(`/search`)
 }
 
 // 高级搜索
@@ -210,14 +216,12 @@ const selectedType = ref('works')
 
 // 学科领域选项
 const subjects = [
-    { label: '数学', value: 'math' },
-    { label: '物理', value: 'physics' },
-    { label: '化学', value: 'chemistry' },
-    { label: '生物', value: 'biology' },
-    { label: '计算机', value: 'computer' },
-    { label: '文学', value: 'literature' },
-    { label: '历史', value: 'history' },
-    { label: '地理', value: 'geography' }
+    { label: 'LLM', value: 'LLM' },
+    { label: 'Database', value: 'Database' },
+    { label: 'Software Engineering', value: 'Software Engineering' },
+    { label: 'Data Mining', value: 'Data Mining' },
+    { label: 'Operating System', value: 'Operating System' },
+    { label: 'AI for Education', value: 'AI for Education' },
 ]
 
 // 选中的学科领域

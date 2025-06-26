@@ -1,7 +1,7 @@
 <template>
-  <div class="card shadow-xl">
+  <div class="card shadow-xl bg-white">
     <div class="card-body flex-row gap-8 items-center">
-      <img :src="person.avatar" class="h-24 w-24 rounded-full" />
+      <img :src="person.avatar || '/default-avatar.png'" class="h-24 w-24 rounded-full" />
       <div class="flex flex-col grow gap-1">
         <div class="flex">
           <RouterLink
