@@ -73,123 +73,167 @@
   </div>
 
   <!-- 论文上传模态框 -->
-  <div v-if="showPaperForm"
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
-       @click.self="hideAllForms">
-    <div class="card  bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden" >
-      <div class="card-body p-8 overflow-y-auto scrollbar-hide">
-        <!-- 关闭按钮 -->
-        <button @click="hideAllForms"
-                class="absolute top-6 right-6 btn btn-ghost btn-sm btn-circle z-10">
-          <icon class="icon-[material-symbols--close] w-5 h-5" />
-        </button>
+<div v-if="showPaperForm"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+     @click.self="hideAllForms">
+  <div class="card  bg-base-100 w-[600px] max-w-[90vw] max-h-[85vh] shadow-xl overflow-hidden" >
+    <div class="card-body p-8 overflow-y-auto scrollbar-hide">
+      <!-- 关闭按钮 -->
+      <button @click="hideAllForms"
+              class="absolute top-6 right-6 btn btn-ghost btn-sm btn-circle z-10">
+        <icon class="icon-[material-symbols--close] w-5 h-5" />
+      </button>
 
-        <!-- 标题 -->
-        <h2 class="card-title text-2xl mb-8 pr-8">填写论文详细信息</h2>
+      <!-- 标题 -->
+      <h2 class="card-title text-2xl mb-8 pr-8">填写论文详细信息</h2>
 
-        <!-- 表单内容 -->
-        <div class="space-y-6">
-          <!-- 文章来源 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">文章来源</span>
-            </label>
-            <input type="text"
-                   class="input input-bordered w-full"
-                   list="browsers"
-                   placeholder="请选择文章来源" />
-            <datalist id="browsers">
-              <option value="期刊"></option>
-              <option value="会议"></option>
-            </datalist>
-          </div>
+      <!-- 表单内容 -->
+      <div class="space-y-6">
+        <!-- 文章来源 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">文章来源</span>
+          </label>
+          <input type="text"
+                 v-model="paperForm.type"
+                 class="input input-bordered w-full"
+                 list="browsers"
+                 placeholder="请选择文章来源" />
+          <datalist id="browsers">
+            <option value="期刊"></option>
+            <option value="会议"></option>
+          </datalist>
+        </div>
 
-          <!-- 刊物名称 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">刊物名称</span>
-            </label>
-            <input type="text"
-                   class="input input-bordered w-full"
-                   placeholder="请输入刊物名称" />
-          </div>
+        <!-- 刊物名称 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">刊物名称</span>
+          </label>
+          <input type="text"
+                 v-model="paperForm.source"
+                 class="input input-bordered w-full"
+                 placeholder="请输入刊物名称" />
+        </div>
 
-          <!-- 文章标题 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">论文标题</span>
-            </label>
-            <input type="text"
-                   class="input input-bordered w-full"
-                   placeholder="请输入论文标题" />
-          </div>
+        <!-- 文章标题 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">论文标题</span>
+          </label>
+          <input type="text"
+                 v-model="paperForm.title"
+                 class="input input-bordered w-full"
+                 placeholder="请输入论文标题" />
+        </div>
 
-          <!-- 作者信息 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">作者</span>
-            </label>
-            <textarea class="textarea textarea-bordered h-20"
-                      placeholder="请输入作者信息，多个作者用逗号分隔"></textarea>
-          </div>
-
-          <!-- 摘要 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">摘要</span>
-            </label>
-            <textarea class="textarea textarea-bordered h-32"
-                      placeholder="请输入论文摘要"></textarea>
-          </div>
-
-          <!-- 关键词 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">关键词</span>
-            </label>
-            <input type="text"
-                   class="input input-bordered w-full"
-                   placeholder="请输入关键词，用逗号分隔" />
-          </div>
-
-          <!-- 发布日期 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">发布日期</span>
-            </label>
-            <input type="date"
-                   class="input input-bordered w-full" />
-          </div>
-
-          <!-- 期刊影响因子 -->
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">期刊影响因子</span>
-            </label>
-            <input type="number"
-                   step="0.001"
-                   class="input input-bordered w-full"
-                   placeholder="请输入影响因子" />
-          </div>
-
-          <div class="form-control w-full">
-            <label class="label">
-              <span class="label-text text-base font-medium">上传PDF文件</span>
-            </label>
-            <input type="file"
-                   accept=".pdf"
-                   class="file-input file-input-bordered w-full" />
+        <!-- 作者信息 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">作者</span>
+          </label>
+          <div class="space-y-2">
+            <div v-for="(author, index) in paperForm.authors" :key="index" class="flex items-center space-x-2">
+              <input type="text"
+                     v-model="paperForm.authors[index].name"
+                     class="input input-bordered flex-1"
+                     :placeholder="`作者 ${index + 1}`" />
+              <button v-if="paperForm.authors.length > 1"
+                      @click="removeAuthor(index)"
+                      class="btn btn-ghost btn-sm btn-circle text-red-500">
+                <icon class="icon-[material-symbols--close] w-4 h-4" />
+              </button>
+            </div>
+            <button @click="addAuthor"
+                    class="btn btn-ghost btn-sm text-blue-600">
+              <icon class="icon-[material-symbols--add] w-4 h-4 mr-1" />
+              添加作者
+            </button>
           </div>
         </div>
 
-        <!-- 底部按钮 -->
-        <div class="card-actions justify-end mt-8 pt-4 border-t border-base-300 bottom-0 bg-base-100">
-          <button class="btn btn-ghost" @click="hideAllForms">取消</button>
-          <button class="btn btn-primary">提交</button>
+        <!-- 摘要 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">摘要</span>
+          </label>
+          <textarea v-model="paperForm.abstractContent"
+                    class="textarea textarea-bordered h-32"
+                    placeholder="请输入论文摘要"></textarea>
         </div>
+
+        <!-- 关键词 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">关键词</span>
+          </label>
+          <div class="space-y-2">
+            <div v-for="(keyword, index) in paperForm.keywords" :key="index" class="flex items-center space-x-2">
+              <input type="text"
+                     v-model="paperForm.keywords[index]"
+                     class="input input-bordered flex-1"
+                     :placeholder="`关键词 ${index + 1}`" />
+              <button v-if="paperForm.keywords.length > 1"
+                      @click="removeKeyword(index)"
+                      class="btn btn-ghost btn-sm btn-circle text-red-500">
+                <icon class="icon-[material-symbols--close] w-4 h-4" />
+              </button>
+            </div>
+            <button @click="addKeyword"
+                    class="btn btn-ghost btn-sm text-blue-600">
+              <icon class="icon-[material-symbols--add] w-4 h-4 mr-1" />
+              添加关键词
+            </button>
+          </div>
+        </div>
+
+        <!-- 领域 -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">领域</span>
+          </label>
+          <div class="space-y-2">
+            <div v-for="(field, index) in paperForm.fieldIds" :key="index" class="flex items-center space-x-2">
+              <input type="text"
+                     v-model="paperForm.fieldIds[index]"
+                     class="input input-bordered flex-1"
+                     :placeholder="`领域 ${index + 1}`" />
+              <button v-if="paperForm.fieldIds.length > 1"
+                      @click="removeField(index)"
+                      class="btn btn-ghost btn-sm btn-circle text-red-500">
+                <icon class="icon-[material-symbols--close] w-4 h-4" />
+              </button>
+            </div>
+            <button @click="addField"
+                    class="btn btn-ghost btn-sm text-blue-600">
+              <icon class="icon-[material-symbols--add] w-4 h-4 mr-1" />
+              添加领域
+            </button>
+          </div>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text text-base font-medium">上传PDF文件</span>
+          </label>
+          <input type="file"
+                 accept=".pdf"
+                 @change="handlePdfUpload"
+                 class="file-input file-input-bordered w-full" />
+          <div v-if="pdfDocument" class="text-sm text-green-600 mt-1">
+            已选择: {{ pdfDocument.name }}
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部按钮 -->
+      <div class="card-actions justify-end mt-8 pt-4 border-t border-base-300 bottom-0 bg-base-100">
+        <button class="btn btn-ghost" @click="hideAllForms">取消</button>
+        <button class="btn btn-primary" @click="submitPaper">提交</button>
       </div>
     </div>
   </div>
+</div>
 
   <!-- 专利上传模态框 -->
   <div v-if="showPatentForm"
@@ -484,6 +528,7 @@
 <script setup lang="js">
 import {computed, onMounted, ref} from 'vue'
 import router from '@/router/index.js'
+import { uploadPaper } from '@/js/Upload'
 import {getUserId} from "@/js/User.js";
 import {getUnreadCount} from "@/js/chat.js";
 
@@ -501,6 +546,131 @@ const batchPreview = ref([])
 const batchColumns = ref([])
 const batchResult = ref(null)
 
+// PDF文档变量
+const pdfDocument = ref(null)
+
+// 论文表单数据
+const paperForm = ref({
+  title: '',
+  type: '',
+  abstractContent: '',
+  userId: parseInt(getUserId()),
+  source: '',
+  keywords: [''],
+  fieldIds: [''],
+  authors: [{ name: '', affiliation: '' }]
+})
+
+// 处理PDF文件上传
+const handlePdfUpload = (event) => {
+  const file = event.target.files[0]
+  if (file && file.type === 'application/pdf') {
+    pdfDocument.value = file
+    console.log('PDF文件已保存:', file.name)
+  } else {
+    alert('请选择PDF格式的文件')
+    event.target.value = '' // 清空文件输入
+    pdfDocument.value = null
+  }
+}
+
+// 作者相关方法
+const addAuthor = () => {
+  paperForm.value.authors.push({ name: '', affiliation: '' })
+}
+
+const removeAuthor = (index) => {
+  paperForm.value.authors.splice(index, 1)
+}
+
+// 关键词相关方法
+const addKeyword = () => {
+  paperForm.value.keywords.push('')
+}
+
+const removeKeyword = (index) => {
+  paperForm.value.keywords.splice(index, 1)
+}
+
+// 领域相关方法
+const addField = () => {
+  paperForm.value.fieldIds.push('')
+}
+
+const removeField = (index) => {
+  paperForm.value.fieldIds.splice(index, 1)
+}
+
+// 重置论文表单
+const resetPaperForm = () => {
+  paperForm.value = {
+    type: '',
+    source: '',
+    title: '',
+    authors: [{ name: '', affiliation: '' }],
+    abstractContent: '',
+    keywords: [''],
+    fieldIds: [0],
+  }
+  // 重置PDF文档
+  pdfDocument.value = null
+}
+
+// 提交论文表单
+const submitPaper = () => {
+  // 过滤空值
+  const filteredAuthors = paperForm.value.authors.filter(author => author.name.trim())
+  const filteredKeywords = paperForm.value.keywords.filter(keyword => keyword.trim())
+  // 过滤并转换为整数
+  const filteredFieldIds = paperForm.value.fieldIds
+    .map(field => parseInt(field))
+    .filter(field => !isNaN(field) && field > 0)
+  
+  if (!paperForm.value.title.trim()) {
+    alert('请输入论文标题')
+    return
+  }
+  
+  if (filteredAuthors.length === 0) {
+    alert('请至少添加一个作者')
+    return
+  }
+
+  if (!pdfDocument.value) {
+    alert('请上传PDF文件')
+    return
+  }
+  
+  // 这里处理提交逻辑，包含PDF文件
+  const formData = new FormData()
+  formData.append('pdfFile', pdfDocument.value)
+  formData.append('workInfo', JSON.stringify({
+    ...paperForm.value,
+    authors: filteredAuthors,
+    keywords: filteredKeywords,
+    fieldIds: filteredFieldIds
+  }))
+  
+  console.log('提交的表单数据:', JSON.stringify({
+    ...paperForm.value,
+    authors: filteredAuthors,
+    keywords: filteredKeywords,
+    fieldIds: filteredFieldIds
+  }))
+  console.log('提交的数据包含PDF文件:', pdfDocument.value)
+  
+  uploadPaper(formData)
+    .then(response => {
+      console.log('论文提交成功:', response)
+      resetPaperForm() // 提交成功后重置表单
+      alert('论文提交成功！')
+      hideAllForms()
+    })
+    .catch(error => {
+      console.error('论文提交失败:', error)
+      alert('论文提交失败，请稍后再试。')
+    })
+}
 router.beforeEach((to, from, next) => {
   if(computedIsLogin.value)
     personalCenterPath.value = "/personal-center/"+JSON.parse(localStorage.getItem('user'))?.id;
@@ -545,8 +715,8 @@ const hideAllForms = () => {
   batchPreview.value = []
   batchColumns.value = []
   batchLoading.value = false
+  resetPaperForm() // 重置论文表单
 }
-
 const handleBatchFile = async (e) => {
   if (!isLogin.value) {
     // 统一风格弹窗提醒

@@ -1,5 +1,7 @@
 import instance from '@/js/axios.ts'
 import { useUserStore } from '@/stores/user'
+import type { Store } from 'pinia'
+import type { Ref } from 'vue'
 
 // Interfaces for the search response
 interface Author {
@@ -74,11 +76,20 @@ export interface SearchParams {
   sortBy?: 'relevance' | 'createdAt'
 }
 
+let store: Store;
+let userStore = () => {
+  if (!store) {
+    store = useUserStore()
+    userStore = () => store
+  }
+  return store
+}
+
 export const getUserId = () => {
   // const userInfo = JSON.parse(localStorage.getItem('user') || '{}')
   // const userId = userInfo.id
-  const store = useUserStore()
-  return store.id
+  // const store = useUserStore()
+  return userStore().id
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
@@ -86,7 +97,7 @@ export const login = async (username: string, password: string): Promise<[boolea
   formData.append('username', username)
   formData.append('password', password)
   const url = '/users/login'
-  const store = useUserStore()
+  const store = userStore()
   store.setUserName('')
   store.setId(0)
 
@@ -95,7 +106,7 @@ export const login = async (username: string, password: string): Promise<[boolea
     .then((res) => {
       console.log('Login successful:', res.data)
       store.setUserName(res.data.username)
-      store.setId(res.data.id)
+      store.setId(res.data.data.id)
       if (res.data.code == 200) {
         localStorage.setItem('user',JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
