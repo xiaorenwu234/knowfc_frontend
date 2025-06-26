@@ -1,4 +1,4 @@
-<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
@@ -6,7 +6,7 @@ import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { followUser, unfollowUser } from '@/js/FollowUser.ts'
+import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
 import { getUserId } from '@/js/User'
 import { notify } from '@/js/toast'
@@ -14,13 +14,13 @@ import type { ProjectSummary } from '@/js/ProjectSummary'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   }
 }
 
@@ -67,7 +67,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: JSON.parse(localStorage.getItem('user') || '').id,
-      content: reason.value,
+      content: reason.value
     })
     closeModal()
     alert('申请已提交成功！')
@@ -83,6 +83,13 @@ const handleFollow = async () => {
   else await followUser(userIdOnDisplay)
 
   following.value = !following.value
+}
+const showFollowModal = ref(false)
+const showFollow = () => {
+  showFollowModal.value = true
+}
+const handleCloseFollowModal = () => {
+  showFollowModal.value = false
 }
 
 const getOwnerProjects = async () => {
@@ -113,7 +120,7 @@ const getParticipatedProjects = async () => {
 
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
-
+const followList = ref()
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
@@ -121,6 +128,7 @@ onMounted(() => {
     userIdOnDisplay == JSON.parse(localStorage.getItem('user') || '').id ? '我' : 'Ta'
   getOwnerProjects()
   getParticipatedProjects()
+  followList.value = getFollowList(0)
 })
 
 onUnmounted(() => {
@@ -132,7 +140,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: '',
+  cooperationTerms: ''
 })
 const createError = ref('')
 
@@ -167,7 +175,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', user.id)
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -200,7 +208,11 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto" @click="showForm = true">
+          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
+            关注列表
+          </button>
+          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6"
+                  @click="showForm = true">
             修改个人信息
           </button>
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
@@ -346,6 +358,18 @@ const submitCreate = async () => {
         >
           确定
         </button>
+      </div>
+    </div>
+  </div>
+  <div
+    v-if="showFollowModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+      <h3 class="text-lg font-bold mb-4">关注列表</h3>
+      <div class="flex flex-col">
+        <div>暂无关注</div>
+        <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
       </div>
     </div>
   </div>
