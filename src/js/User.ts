@@ -84,15 +84,23 @@ let userStore = () => {
 }
 
 export const getUserId = () => {
-  return userStore().id
+  return userStore().detail.id
 }
 
 export const getUserName = () => {
-  return userStore().userName
+  return userStore().detail.username
 }
 
 export const getAvatar = () => {
-  return userStore().avatar
+  return userStore().detail.avatar
+}
+
+export const getUserDetail = () => {
+  return userStore().detail
+}
+
+export const setUserDetail = (user: User) => {
+  userStore().setDetail(user)
 }
 
 export const login = async (username: string, password: string): Promise<[boolean, string]> => {
@@ -101,17 +109,13 @@ export const login = async (username: string, password: string): Promise<[boolea
   formData.append('password', password)
   const url = '/users/login'
   const store = userStore()
-  store.setUserName('')
-  store.setId(0)
-  store.setAvatar('')
+  store.clearDetail()
 
   return instance
     .post(url, formData)
     .then((res) => {
       console.log('Login successful:', res.data)
-      store.setUserName(res.data.username)
-      store.setId(res.data.data.id)
-      store.setAvatar(res.data.data.avatar || '')
+      store.setDetail(res.data.data)
       if (res.data.code == 200) {
         localStorage.setItem('user', JSON.stringify(res.data.data))
         return [true, '登录成功'] as [boolean, string]
@@ -127,8 +131,7 @@ export const login = async (username: string, password: string): Promise<[boolea
 
 export const logout = () => {
   const store = userStore()
-  store.setUserName('')
-  store.setId(0)
+  store.clearDetail()
 }
 
 export const signup = async (
@@ -218,4 +221,35 @@ export const searchUsers = async (params: SearchParams): Promise<SearchResponse>
       console.error('Error during search:', err)
       throw err
     })
+}
+
+export const changeUserInfo = async (
+  degree: string,
+  title: string,
+  institution: string,
+  bio: string,
+  researchArea: string,
+): Promise<[boolean, string]> => {
+  const formData = new FormData()
+  formData.append('id', getUserId())
+  formData.append('username', getUserName())
+  formData.append('bio', bio)
+  formData.append('researchArea', researchArea)
+  formData.append('degree', degree)
+  formData.append('title', title)
+  formData.append('institution', institution)
+  const url = '/users/update-info'
+  try {
+    const response = await instance.post(url, formData)
+    console.log('User info updated successfully:', response.data)
+    if (response.data.code === 200) {
+      const store = userStore()
+      return [true, '用户信息更新成功'] as [boolean, string]
+    } else {
+      return [false, response.data.message] as [boolean, string]
+    }
+  } catch (err) {
+    console.error('Error updating user info:', err)
+    return [false, '用户信息更新失败'] as [boolean, string]
+  }
 }
