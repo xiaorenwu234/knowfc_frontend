@@ -249,7 +249,7 @@ const submitCreate = async () => {
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
                   <div class="flex">
-                    <h3 class="text-base font-semibold text-blue-600">{{ project.name }}</h3>
+                    <h3 class="text-base font-semibold text-blue-600"><RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink></h3>
                   </div>
                   <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
                   <p class="text-gray-600 text-sm mt-4">合作条件：{{ project.cooperationTerms }}</p>
