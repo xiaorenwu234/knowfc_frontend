@@ -250,11 +250,12 @@
 
           <!-- 下载和操作按钮 -->
           <div class="mt-6 space-y-3">
-            <a :href="articleDetail.pdf_url"
+            <button 
+              
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
-              查看 PDF
-            </a>
+              <a :href="articleDetail.pdf_url">查看 PDF</a>
+            </button>
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
               :class="{ 'bg-orange-50 border-orange-700 text-orange-700': liked_statement }"
