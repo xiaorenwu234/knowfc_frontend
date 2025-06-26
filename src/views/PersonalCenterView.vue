@@ -28,8 +28,31 @@ const handleQuit = () => {
   logout()
   router.push('/')
 }
-
+const userId = getUserId()
+const messages = ref([])
 const ownerReference = ref('Ta')
+onMounted(async () => {
+  try {
+    const res = await axios.get(buildApiUrl(`/users/${userId}/works`))
+
+    if (res.data.code === 200 && Array.isArray(res.data.data)) {
+      console.log('加载论文', res.data)  
+      messages.value = res.data.data.map(item => {
+        return {
+          time: item.publish_date || '未知时间',
+          title: item.title || '无标题',
+          content: item.abstractContent || '',
+          user: item.users?.[0]?.username || '匿名作者',
+          avatar: item.users?.[0]?.avatar || '默认头像地址'
+        }
+      })
+    }
+  } catch (err) {
+    console.error('加载论文失败', err)
+  }
+})
+
+
 const userInfo = ref(null)
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
@@ -94,13 +117,18 @@ const handleCloseFollowModal = () => {
 
 const getOwnerProjects = async () => {
   try {
+    // 使用instance对象发起GET请求，获取当前用户的项目列表
     const res = await instance.get(`/project/getOwnerProjectByUserId/${userIdOnDisplay}`)
+    // 判断响应的数据是否存在且状态码为200
     if (res.data && res.data.code === 200) {
+      // 将获取到的项目数据赋值给projects.value
       projects.value = res.data.data
     } else {
+      // 如果状态码不为200，则显示错误信息
       notify('error', '获取项目失败', res.data.msg)
     }
   } catch (error) {
+    // 捕获异常，显示网络错误信息
     notify('error', '网络错误', error?.toString())
   }
 }
@@ -309,7 +337,7 @@ const submitCreate = async () => {
 
         <div>
           <div class="font-bold text-xl mt-4">{{ ownerReference + '的论文' }}</div>
-          <ArticlesTimeLine class="mt-2"></ArticlesTimeLine>
+          <ArticlesTimeLine :messages="messages" class="mt-2" />
         </div>
       </div>
     </div>
