@@ -69,11 +69,6 @@ const router = createRouter({
       component: () => import('../views/ProblemView.vue'),
     },
     {
-      path: '/ProblemSquare',
-      name: 'ProblemSquare',
-      component: () => import('../views/ProblemSquareView.vue'),
-    },
-    {
       path: '/personal-notify/:id',
       name: 'personal-notify',
       component: () => import('../views/NotifiView.vue'),
