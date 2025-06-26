@@ -26,8 +26,8 @@
         v-for="type in eventTypes"
         :key="type.value"
         @click="
-          filterType = type.value
-          currentPage = 1
+          filterType = type.value,
+          currentPage = 1,
           fetchNotifiList()
         "
         :class="[
