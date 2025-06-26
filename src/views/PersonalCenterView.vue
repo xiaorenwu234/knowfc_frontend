@@ -128,6 +128,7 @@ onMounted(() => {
   getOwnerProjects()
   getParticipatedProjects()
   followList.value = getFollowList(0)
+  //return code 500
 })
 
 onUnmounted(() => {
