@@ -24,9 +24,9 @@ const router = useRouter()
 const searchStore = useSearchStore()
 
 watch(searchStore, async () => {
-  if (searchStore.doSearch) {
+  if (searchStore.searchQuery.doSearch) {
     await handleSearch()
-    searchStore.doSearch = false
+    searchStore.searchQuery.doSearch = false
   }
 })
 

@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useSearchStore } from '@/stores/search'
 import WorkCard from '@/components/WorkCard.vue'
 import { searchWorks, type Work } from '@/js/Work'
@@ -158,4 +158,12 @@ const initSearch = async () => {
 }
 
 initSearch()
+
+watch(searchStore.searchQuery, () => {
+  console.log("in watch")
+  if (searchStore.searchQuery.doSearch) {
+    console.log('searchStore.searchQuery', searchStore.searchQuery)
+    initSearch()
+  }
+})
 </script> 
