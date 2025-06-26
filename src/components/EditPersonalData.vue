@@ -1,5 +1,12 @@
 <script setup lang="ts">
+import {changeUserInfo, getUserName} from "@/js/User.ts";
+import {onMounted} from "vue";
+
 const showForm = defineModel('showForm')
+const submitChange = async () => {
+  await changeUserInfo()
+}
+
 </script>
 
 <template>
@@ -25,7 +32,7 @@ const showForm = defineModel('showForm')
             <label class="label">
               <span class="label-text text-base font-medium">用户名</span>
             </label>
-            <input type="text" disabled class="input input-bordered w-full" />
+            <input type="text" disabled class="input input-bordered w-full" :placeholder="getUserName()"/>
           </div>
 
           <div class="form-control w-full">
@@ -59,7 +66,7 @@ const showForm = defineModel('showForm')
           class="card-actions justify-end mt-8 pt-4 border-t border-base-300 bottom-0 bg-base-100"
         >
           <button class="btn w-20" @click="showForm = false">取消</button>
-          <button class="btn btn-primary text-white w-20">修改</button>
+          <button class="btn btn-primary text-white w-20" @click="submitChange">修改</button>
         </div>
       </div>
     </div>

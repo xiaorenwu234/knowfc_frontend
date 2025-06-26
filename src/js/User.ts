@@ -109,7 +109,7 @@ export const login = async (username: string, password: string): Promise<[boolea
     .post(url, formData)
     .then((res) => {
       console.log('Login successful:', res.data)
-      store.setUserName(res.data.username)
+      store.setUserName(res.data.data.username)
       store.setId(res.data.data.id)
       store.setAvatar(res.data.data.avatar || '')
       if (res.data.code == 200) {
@@ -218,4 +218,35 @@ export const searchUsers = async (params: SearchParams): Promise<SearchResponse>
       console.error('Error during search:', err)
       throw err
     })
+}
+
+export const changeUserInfo = async (
+  degree: string,
+  title: string,
+  institution: string,
+  bio: string,
+  researchArea: string,
+): Promise<[boolean, string]> => {
+  const formData = new FormData()
+  formData.append('id', getUserId())
+  formData.append('username', getUserName())
+  formData.append('bio', bio)
+  formData.append('researchArea', researchArea)
+  formData.append('degree', degree)
+  formData.append('title', title)
+  formData.append('institution', institution)
+  const url = '/users/update-info'
+  try {
+    const response = await instance.post(url, formData)
+    console.log('User info updated successfully:', response.data)
+    if (response.data.code === 200) {
+      const store = userStore()
+      return [true, '用户信息更新成功'] as [boolean, string]
+    } else {
+      return [false, response.data.message] as [boolean, string]
+    }
+  } catch (err) {
+    console.error('Error updating user info:', err)
+    return [false, '用户信息更新失败'] as [boolean, string]
+  }
 }

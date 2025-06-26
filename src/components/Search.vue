@@ -1,8 +1,63 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import {ref, watch} from 'vue'
+import {searchUsers} from "@/js/User.ts";
+
+const showDropdown = ref(false)
+const searchQuery = ref('')
+const searchResults = ref([])
+const contactPersonList = defineModel('contactPersonList')
+const activeContact=defineModel('activeContact')
+watch(searchQuery, async (newQuery: string) => {
+  if (newQuery.trim() === '') {
+    showDropdown.value = false
+  } else {
+    const params = {
+      keyword: newQuery,
+    }
+    searchResults.value = (await searchUsers(params)).data.content
+    showDropdown.value = true
+  }
+})
+
+const addUser = (contactId: number) => {
+  let flag=false
+  let personIndex=0
+  for (let i = 0; i < contactPersonList.value.length(); i++) {
+    if (contactPersonList[i].chatWithUserId	 === contactId) {
+      flag = true
+      personIndex = i
+      break
+    }
+  }
+  if(flag){
+
+  }
+  else{
+    const newContact = ref({
+      "chatWithUserId": 2,
+      "chatWithUsername": "李四",
+      "chatWithAvatar": "http://example.com/avatar2.jpg",
+      "lastMessage": "你好，最近怎么样？",
+      "lastMessageTime": "",
+      "unreadCount": 0
+    })
+
+  }
+}
+</script>
 
 <template>
-  <input type="text" class="search-input" placeholder="搜索联系人" />
+  <div class="dropdown dropdown-bottom">
+    <input type="text" class="search-input" placeholder="搜索联系人" v-model="searchQuery">
 
+    <ul
+      tabindex="0"
+      class="dropdown-content menu bg-base-100 rounded-box z-1 w-[230px] p-2 shadow-sm border"
+      v-if="showDropdown"
+    >
+      <li v-for="(searchResult, index) in searchResults" :key="index" @click="addUser(searchResult.id)"><a>{{searchResult.username}}</a></li>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
