@@ -3,36 +3,65 @@
     <div class="flex items-center justify-between mb-6 mt-20">
       <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
       <div class="flex items-center gap-3">
-        <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount }} 条</span>
-        <button class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
-          @click="markAllAsRead" :disabled="notifiList.length === 0">全部已读</button>
-        <button class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
-          @click="cleanupOldNotifications">清理历史</button>
+        <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold"
+          >未读 {{ unreadCount }} 条</span
+        >
+        <button
+          class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+          @click="markAllAsRead"
+          :disabled="notifiList.length === 0"
+        >
+          全部已读
+        </button>
+        <button
+          class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
+          @click="cleanupOldNotifications"
+        >
+          清理历史
+        </button>
       </div>
     </div>
     <div class="mb-4 flex flex-wrap gap-2">
-      <button v-for="type in eventTypes" :key="type.value"
-        @click="filterType = type.value; currentPage = 1; fetchNotifiList()" :class="[
+      <button
+        v-for="type in eventTypes"
+        :key="type.value"
+        @click="
+          filterType = type.value
+          currentPage = 1
+          fetchNotifiList()
+        "
+        :class="[
           'px-3 py-1 rounded-full text-sm border transition',
           filterType === type.value
             ? 'bg-blue-700 text-white border-blue-700'
-            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-        ]">{{ type.label }}</button>
+            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100',
+        ]"
+      >
+        {{ type.label }}
+      </button>
     </div>
     <div v-if="loading" class="text-gray-400 text-center py-10">加载中...</div>
     <div v-else-if="notifiList.length === 0" class="text-gray-400 text-center py-10">暂无通知</div>
     <div v-else>
-      <div class="overflow-y-auto rounded-xl" style="max-height: 600px; min-height: 500px;">
+      <div class="overflow-y-auto rounded-xl" style="max-height: 600px; min-height: 500px">
         <ul>
-          <li v-for="item in notifiList" :key="item.id"
+          <li
+            v-for="item in notifiList"
+            :key="item.id"
             class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
             :style="{ opacity: item.readStatus ? 0.7 : 1 }"
-            @click="item.eventType !== '项目申请' ? handleRead(item) : null">
+            @click="item.eventType !== '项目申请' ? handleRead(item) : null"
+          >
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-2">
-                <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
-                <span class="font-medium text-gray-800 cursor-pointer hover:underline"
-                  @click.stop="handleTitleClick(item)">
+                <span
+                  v-if="!item.readStatus"
+                  class="inline-block w-2 h-2 bg-blue-400 rounded-full"
+                ></span>
+                <span
+                  class="font-medium text-gray-800 cursor-pointer hover:underline"
+                  @click.stop="handleTitleClick(item)"
+                >
                   {{ getNotifTitle(item) }}
                 </span>
               </div>
@@ -41,26 +70,53 @@
             <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
             <!-- 项目邀请操作 -->
             <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
-              <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
-                @click.stop="openConfirm('accept', item)">同意</button>
-              <button class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
-                @click.stop="openConfirm('reject', item)">拒绝</button>
+              <button
+                class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
+                @click.stop="openConfirm('accept', item)"
+              >
+                同意
+              </button>
+              <button
+                class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
+                @click.stop="openConfirm('reject', item)"
+              >
+                拒绝
+              </button>
             </div>
             <!-- 系统通知带链接 -->
-            <div v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl" class="mt-3">
-              <a :href="item.notifBody.actionUrl" target="_blank" class="text-blue-600 hover:underline text-sm">查看详情</a>
+            <div
+              v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl"
+              class="mt-3"
+            >
+              <a
+                :href="item.notifBody.actionUrl"
+                target="_blank"
+                class="text-blue-600 hover:underline text-sm"
+                >查看详情</a
+              >
             </div>
             <!-- 确认弹窗 -->
-            <div v-if="showConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div
+              v-if="showConfirm"
+              class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+            >
               <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
                 <div class="text-lg font-bold mb-4 text-gray-800">
                   {{ confirmType === 'accept' ? '确认同意该项目邀请？' : '确认拒绝该项目邀请？' }}
                 </div>
                 <div class="flex justify-end gap-3">
-                  <button @click="closeConfirm"
-                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">取消</button>
-                  <button @click="handleConfirm(item)"
-                    class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">确定</button>
+                  <button
+                    @click="closeConfirm"
+                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700"
+                  >
+                    取消
+                  </button>
+                  <button
+                    @click="handleConfirm(item)"
+                    class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    确定
+                  </button>
                 </div>
               </div>
             </div>
@@ -72,33 +128,45 @@
         <div class="flex justify-center items-center gap-2 mt-20 select-none">
           <button
             class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === 0" @click="changePage(currentPage - 1)" aria-label="上一页">
+            :disabled="currentPage === 0"
+            @click="changePage(currentPage - 1)"
+            aria-label="上一页"
+          >
             <span>&lt;</span>
           </button>
-          <button v-for="page in totalPages" :key="page" @click="changePage(page - 1)"
-            :class="currentPage === (page - 1) ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'"
-            class="w-8 h-8 flex items-center justify-center rounded-full border transition">
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            @click="changePage(page - 1)"
+            :class="
+              currentPage === page - 1
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+            "
+            class="w-8 h-8 flex items-center justify-center rounded-full border transition"
+          >
             {{ page }}
           </button>
           <button
             class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)" aria-label="下一页">
+            :disabled="currentPage === totalPages - 1"
+            @click="changePage(currentPage + 1)"
+            aria-label="下一页"
+          >
             <span>&gt;</span>
           </button>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { buildApiUrl } from '@/config/api'
-import { watch } from 'vue'
-
+import { getUserId } from '@/js/User'
 
 const loading = ref(true)
 const notifiList = ref([])
@@ -131,17 +199,12 @@ const eventTypes = [
   { label: '成果被评论', value: '成果被评论' },
   { label: '用户关注', value: '用户关注' },
   { label: '系统通知', value: '系统通知' },
-  { label: '问题收到回答', value: '问题收到回答' }
+  { label: '问题收到回答', value: '问题收到回答' },
 ]
 
 function formatTime(time) {
   if (!time) return ''
   return new Date(time).toLocaleString()
-}
-// 获取当前用户ID
-function getUserId() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
-  return user.id
 }
 
 // 获取通知列表（分页、类型筛选）
@@ -250,11 +313,15 @@ async function cleanupOldNotifications() {
 // 获取通知标题
 function getNotifTitle(item) {
   if (item.eventType === '系统通知' && item.notifBody?.title) return item.notifBody.title
-  if (item.eventType === '项目邀请处理' && item.notifBody?.projectName) return `项目邀请：${item.notifBody.projectName}`
-  if (item.eventType === '项目申请' && item.notifBody?.projectName) return `项目申请：${item.notifBody.projectName}`
-  if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle) return `评论：${item.notifBody.resourceTitle}`
+  if (item.eventType === '项目邀请处理' && item.notifBody?.projectName)
+    return `项目邀请：${item.notifBody.projectName}`
+  if (item.eventType === '项目申请' && item.notifBody?.projectName)
+    return `项目申请：${item.notifBody.projectName}`
+  if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle)
+    return `评论：${item.notifBody.resourceTitle}`
   if (item.eventType === '用户关注') return '新关注'
-  if (item.eventType === '问题收到回答' && item.notifBody?.questionTitle) return `回答：${item.notifBody.questionTitle}`
+  if (item.eventType === '问题收到回答' && item.notifBody?.questionTitle)
+    return `回答：${item.notifBody.questionTitle}`
   return item.eventType || '通知'
 }
 
@@ -269,11 +336,18 @@ function handleTitleClick(item) {
     window.open(item.notifBody.actionUrl, '_blank')
     return
   }
-  if ((item.eventType === '项目邀请处理' || item.eventType === '项目申请') && item.notifBody?.projectId) {
+  if (
+    (item.eventType === '项目邀请处理' || item.eventType === '项目申请') &&
+    item.notifBody?.projectId
+  ) {
     router.push({ path: `/project/${item.notifBody.projectId}` })
     return
   }
-  if (item.eventType === '成果被评论' && item.notifBody?.resourceType && item.notifBody?.resourceId) {
+  if (
+    item.eventType === '成果被评论' &&
+    item.notifBody?.resourceType &&
+    item.notifBody?.resourceId
+  ) {
     if (item.notifBody.resourceType === 'paper') {
       router.push({ path: '/article-detail', query: { id: item.notifBody.resourceId } })
     } else if (item.notifBody.resourceType === 'project') {
@@ -312,23 +386,24 @@ async function handleConfirm(item) {
     inviterId,
     inviteeId,
     projectId,
-    isAccepted: isAccepted.toString()
+    isAccepted: isAccepted.toString(),
   }
 
   try {
     await axios.post(buildApiUrl('/project/handleInvite'), payload, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      transformRequest: [(data) =>
-        Object.entries(data)
-          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-          .join('&')
-      ]
+      transformRequest: [
+        (data) =>
+          Object.entries(data)
+            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+            .join('&'),
+      ],
     })
 
     // 设置状态为已读并关闭弹窗
-    handleRead(item);
+    handleRead(item)
     closeConfirm()
     fetchNotifiList()
   } catch (error) {
@@ -336,6 +411,4 @@ async function handleConfirm(item) {
     alert('操作失败，请稍后再试')
   }
 }
-
-
 </script>

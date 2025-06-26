@@ -31,7 +31,7 @@
           <div class="text-gray-500 my-1 text-justify line-clamp-3">
             {{ person.bio || '暂无个人简介' }}
           </div>
-          <div class="flex">
+          <div class="flex flex-wrap gap-y-1">
             <div class="flex items-center gap-1">
               <i class="icon-[mdi--office-building]"></i>
               {{ person.institution || '暂无所属机构' }}

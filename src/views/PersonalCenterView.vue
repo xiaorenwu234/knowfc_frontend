@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
@@ -8,24 +8,24 @@ import { useRoute } from 'vue-router'
 import router from '@/router'
 import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
-import { getUserId } from '@/js/User'
+import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   }
 }
 
 const handleQuit = () => {
-  localStorage.removeItem('user')
+  logout()
   router.push('/')
 }
 
@@ -66,8 +66,8 @@ const submit = async () => {
   try {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
-      applicantId: JSON.parse(localStorage.getItem('user') || '').id,
-      content: reason.value
+      applicantId: getUserId(),
+      content: reason.value,
     })
     closeModal()
     alert('申请已提交成功！')
@@ -124,8 +124,7 @@ const followList = ref()
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
-  ownerReference.value =
-    userIdOnDisplay == JSON.parse(localStorage.getItem('user') || '').id ? '我' : 'Ta'
+  ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
   getOwnerProjects()
   getParticipatedProjects()
   followList.value = getFollowList(0)
@@ -140,7 +139,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: ''
+  cooperationTerms: '',
 })
 const createError = ref('')
 
@@ -164,8 +163,8 @@ const submitCreate = async () => {
     return
   }
   try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    if (!user.id) {
+    const id = getUserId()
+    if (!id) {
       createError.value = '请先登录'
       return
     }
@@ -173,9 +172,9 @@ const submitCreate = async () => {
     formData.append('name', createForm.value.name)
     formData.append('projectInfo', createForm.value.projectInfo)
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
-    formData.append('ownerId', user.id)
+    formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -211,12 +210,15 @@ const submitCreate = async () => {
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
             关注列表
           </button>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6"
-                  @click="showForm = true">
+          <button
+            v-if="ownerReference != 'Ta'"
+            class="btn w-full mx-auto mt-6"
+            @click="showForm = true"
+          >
             修改个人信息
           </button>
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
-            退出登陆
+            退出登录
           </button>
           <button
             v-if="ownerReference == 'Ta'"
@@ -242,13 +244,11 @@ const submitCreate = async () => {
             </button>
           </div>
           <div class="flex w-full flex-wrap">
-
             <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
                   <div class="flex">
                     <h3 class="text-base font-semibold text-blue-600">{{ project.name }}</h3>
-
                   </div>
                   <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
                   <p class="text-gray-600 text-sm mt-4">合作条件：{{ project.cooperationTerms }}</p>
