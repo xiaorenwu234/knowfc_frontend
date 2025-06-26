@@ -47,3 +47,26 @@ export const unfollowUser = async (authorId: string): Promise<Boolean> => {
     return false
   }
 }
+
+export const getFollowList = async (page:Number):Promise<any[]> => {
+  const url = '/follow/list'
+  const userId = getUserId()
+  try {
+    const response = await instance.post(url, {
+      params: {
+        userId: userId,
+        page: page,
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('取消关注成功')
+      return response.data.data
+    } else {
+      console.error('取消关注失败:', response.data.message)
+      return [];
+    }
+  } catch (err) {
+    console.error('取消关注操作失败', err)
+    return [];
+  }
+}

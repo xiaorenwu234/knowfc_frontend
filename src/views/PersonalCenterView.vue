@@ -1,14 +1,14 @@
-<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { followUser, unfollowUser } from '@/js/FollowUser.ts'
+import { followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
-import { getUserId } from '@/js/User'
+import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
 
@@ -25,7 +25,7 @@ const updateWindowSize = () => {
 }
 
 const handleQuit = () => {
-  localStorage.removeItem('user')
+  logout()
   router.push('/')
 }
 
@@ -66,7 +66,7 @@ const submit = async () => {
   try {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
-      applicantId: JSON.parse(localStorage.getItem('user') || '').id,
+      applicantId: getUserId(),
       content: reason.value,
     })
     closeModal()
@@ -83,6 +83,13 @@ const handleFollow = async () => {
   else await followUser(userIdOnDisplay)
 
   following.value = !following.value
+}
+const showFollowModal = ref(false)
+const showFollow = () => {
+  showFollowModal.value = true
+}
+const handleCloseFollowModal = () => {
+  showFollowModal.value = false
 }
 
 const getOwnerProjects = async () => {
@@ -113,14 +120,14 @@ const getParticipatedProjects = async () => {
 
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
-
+const followList = ref()
 onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
-  ownerReference.value =
-    userIdOnDisplay == JSON.parse(localStorage.getItem('user') || '').id ? '我' : 'Ta'
+  ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
   getOwnerProjects()
   getParticipatedProjects()
+  followList.value = getFollowList(0)
 })
 
 onUnmounted(() => {
@@ -156,8 +163,8 @@ const submitCreate = async () => {
     return
   }
   try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    if (!user.id) {
+    const id = getUserId()
+    if (!id) {
       createError.value = '请先登录'
       return
     }
@@ -165,7 +172,7 @@ const submitCreate = async () => {
     formData.append('name', createForm.value.name)
     formData.append('projectInfo', createForm.value.projectInfo)
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
-    formData.append('ownerId', user.id)
+    formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
@@ -200,11 +207,18 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto" @click="showForm = true">
+          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
+            关注列表
+          </button>
+          <button
+            v-if="ownerReference != 'Ta'"
+            class="btn w-full mx-auto mt-6"
+            @click="showForm = true"
+          >
             修改个人信息
           </button>
           <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="handleQuit">
-            退出登陆
+            退出登录
           </button>
           <button
             v-if="ownerReference == 'Ta'"
@@ -230,13 +244,11 @@ const submitCreate = async () => {
             </button>
           </div>
           <div class="flex w-full flex-wrap">
-
             <div v-for="project in projects" :key="project.id" class="w-1/2 pr-3 pt-2">
               <div class="border-[2px] rounded-xl h-full">
                 <div class="p-4">
                   <div class="flex">
                     <h3 class="text-base font-semibold text-blue-600">{{ project.name }}</h3>
-
                   </div>
                   <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
                   <p class="text-gray-600 text-sm mt-4">合作条件：{{ project.cooperationTerms }}</p>
@@ -346,6 +358,18 @@ const submitCreate = async () => {
         >
           确定
         </button>
+      </div>
+    </div>
+  </div>
+  <div
+    v-if="showFollowModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+      <h3 class="text-lg font-bold mb-4">关注列表</h3>
+      <div class="flex flex-col">
+        <div>暂无关注</div>
+        <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
       </div>
     </div>
   </div>

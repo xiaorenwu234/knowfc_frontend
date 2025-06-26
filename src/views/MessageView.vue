@@ -1,9 +1,9 @@
 <template>
-  <div class="flex w-screen h-screen bg-gray-100 overflow-hidden">
+  <div class="flex w-screen h-screen bg-gray-100 overflow-hidden z-[52]">
     <!-- 侧边栏部分保持不变 -->
     <div
       ref="sidebar"
-      class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out"
+      class="relative bg-white border-r border-gray-200 transition-all duration-300 ease-in-out min-w-20"
       :style="{
         width: isMobileView ? '40%' : sidebarWidth + 'px',
         transform: isMobileView && isCollapsed ? 'translateX(-100%)' : 'translateX(0)',
@@ -11,9 +11,11 @@
         zIndex: isMobileView ? 10 : 'auto',
         height: '100%',
       }"
+      style="min-width: 330px;"
     >
       <div class="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-lg font-semibold">联系人</h2>
+        <Search class="z-[100]"></Search>
         <button @click="toggleCollapse" class="md:hidden p-1 rounded-md hover:bg-gray-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +82,7 @@
             />
           </svg>
         </button>
-        <div v-if="activeContact" class="flex items-center">
+        <div v-if="activeContact" class="flex items-center h-11">
           <img
             class="w-8 h-8 rounded-full aspect-square flex items-center justify-center mr-2"
             :src="activeContact.chatWithAvatar"
@@ -88,7 +90,7 @@
           />
           <h2 class="font-medium">{{ activeContact.chatWithUsername }}</h2>
         </div>
-        <div v-else class="text-gray-500 h-2">请选择联系人</div>
+        <div v-else class="h-11 font-medium text-lg flex"><div class="m-auto">请选择联系人</div></div>
       </div>
 
       <!-- 消息显示区域 -->
@@ -178,6 +180,8 @@ import {getChatDetail, getChatList, readMessages, sendChatMessage} from '@/js/ch
 import { getUserId } from '@/js/User.ts'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+import Search from "@/components/Search.vue";
+
 const MAX_MESSAGE_LENGTH = 100
 
 const contactPersonList = ref([])
@@ -226,7 +230,7 @@ const startResize = (e) => {
   const startWidth = sidebarWidth.value
 
   const onMouseMove = (e) => {
-    sidebarWidth.value = Math.min(Math.max(200, startWidth + e.clientX - startX), 400)
+    sidebarWidth.value = Math.min(Math.max(300, startWidth + e.clientX - startX), 500)
   }
 
   const onMouseUp = () => {
@@ -247,6 +251,7 @@ const selectContact = async (contact) => {
   readMessages(contact.chatWithUserId, getUserId())
   // 加载聊天消息
   messages.value = await getChatDetail(contact.chatWithUserId)
+  console.log(messages.value)
 
   console.log(messages.value)
 
@@ -304,6 +309,7 @@ onMounted(async () => {
   } else if (contactPersonList.value.length > 0 && !isMobileView.value) {
     await selectContact(contactPersonList.value[0])
   }
+  console.log(activeContact.value)
 })
 
 onBeforeUnmount(() => {
