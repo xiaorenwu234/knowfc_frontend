@@ -251,6 +251,7 @@ const selectContact = async (contact) => {
   readMessages(contact.chatWithUserId, getUserId())
   // 加载聊天消息
   messages.value = await getChatDetail(contact.chatWithUserId)
+  console.log(messages.value)
 
   console.log(messages.value)
 
