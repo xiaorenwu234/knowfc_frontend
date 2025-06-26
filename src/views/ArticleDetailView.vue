@@ -71,10 +71,10 @@
           <img
             :src="articleData.coverImage"
             alt="Journal Cover"
-            class="w-32 h-48 object-cover rounded shadow-lg mb-3"
+            class="w-32 h-40 object-cover rounded shadow-lg mb-3"
           />
           <div class="text-lg text-left opacity-90 max-w-80">
-            <div class="font-semibold mb-1">{{ articleData.journal }}</div>
+            <div class="font-semibold mb-1">{{ articleDetail.source }}</div>
           </div>
         </div>
       </div>
@@ -85,19 +85,15 @@
       <div class="w-full md:w-2/3 bg-white shadow-sm p-16">
         <!-- 作者信息 -->
         <div class="mb-6">
-          <h3 class="text-lg font-semibold mb-3">作者：</h3>
           <div class="flex items-center gap-4 text-sm text-gray-600">
+            <span class="text-lg font-semibold text-gray-800">
+              作者：{{ articleDetail.authors ? articleDetail.authors.map(author => author.name).join(', ') : '暂无作者信息' }}
+            </span>
             <div class="flex items-center gap-2">
               <span class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
                 <span class="text-white text-xs">✓</span>
               </span>
-              <span>被引用量</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                <span class="text-white text-xs">△</span>
-              </span>
-              <span>fwci指数</span>
+              <span>被引用量：11</span>
             </div>
           </div>
         </div>
@@ -352,7 +348,7 @@ const articleData = ref({
   publishDate: '07 December 2024',
   year: '2024',
   journal: 'International Journal of Data Science and Analytics',
-  coverImage: 'image.png',
+  coverImage: 'brand-logomark-primary-large.jpg',
   abstract:
     '本文探讨了AI在文本数据中的贡献识别问题，提出了一种新的方法来区分AI生成的内容和AI辅助编辑的内容...',
   citations: '无',
