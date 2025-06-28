@@ -64,12 +64,14 @@ const showModal = ref(false)
 const reason = ref('')
 const errorMessage = ref('')
 const projectId = ref()
-const categories = [
-  `${ownerReference.value}创建的科研项目`,
-  `${ownerReference.value}参与的科研项目`,
-  `${ownerReference.value}的科研成果`,
-  `${ownerReference.value}的科研人员网络`,
-]
+const categories = computed(() => {
+  return [
+    `${ownerReference.value}创建的科研项目`,
+    `${ownerReference.value}参与的科研项目`,
+    `${ownerReference.value}的论文`,
+    `${ownerReference.value}的科研人员网络`,
+  ]
+})
 
 const openModal = (pId: number) => {
   showModal.value = true
