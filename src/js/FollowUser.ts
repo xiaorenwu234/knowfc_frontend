@@ -71,3 +71,26 @@ export const getFollowList = async (page:Number):Promise<any[]> => {
     return [];
   }
 }
+
+export const checkFollowStatus = async (authorId: string): Promise<Boolean> => {
+  const url = '/follow/check'
+  const userId = getUserId()
+  try {
+    const response = await instance.post(url, {
+      params: {
+        followingId: authorId,
+        followerId: userId
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('获取关注状态成功')
+      return response.data.data
+    } else {
+      console.error('获取关注状态失败:', response.data.message)
+      return false
+    }
+  } catch (err) {
+    console.error('获取关注状态操作失败', err)
+    return false
+  }
+}

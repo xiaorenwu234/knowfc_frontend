@@ -319,6 +319,10 @@ onMounted(async () => {
   console.log(activeContact.value)
 })
 
+watch(activeContact.value, () => {
+  selectContact(activeContact.value)
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
 })

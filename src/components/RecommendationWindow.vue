@@ -59,9 +59,9 @@ const works: Array<Work | null> = [
     keywords: ['AI', 'Coffee', 'Agriculture'],
     abstract:
       'This paper explores how AI technologies are transforming coffee production processes, enhancing yield and quality. It discusses the integration of machine learning algorithms in crop management and quality assessment. The findings suggest significant improvements in efficiency and sustainability. The study highlights the potential of AI to revolutionize traditional agricultural practices, particularly in the coffee industry.',
-    date: new Date('2023-10-01'),
+    date: '2023/10/01',
     type: 'arxiv',
-    source: 'unknown',
+    source: 'CIKM2025',
     likes: 120,
     comments: 45,
   },
@@ -76,9 +76,9 @@ const works: Array<Work | null> = [
     keywords: ['AI', 'Coffee Quality', 'Food Science'],
     abstract:
       'This study investigates the use of AI in assessing coffee quality, focusing on sensory analysis and machine learning techniques. It highlights how AI can predict flavor profiles and optimize roasting parameters, leading to better quality control in coffee production. The results indicate a promising future for AI applications in the coffee industry.',
-    date: new Date('2023-09-15'),
+    date: '2023/09/15',
     type: 'arxiv',
-    source: 'unknown',
+    source: 'ACL2024',
     likes: 95,
     comments: 30,
   },
