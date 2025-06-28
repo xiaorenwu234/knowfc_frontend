@@ -161,7 +161,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -239,7 +239,7 @@ async function fetchNotifiList() {
         totalPages.value = 1
       }
     }
-  } catch (e) {
+  } catch {
     notifiList.value = []
     totalPages.value = 1
   }

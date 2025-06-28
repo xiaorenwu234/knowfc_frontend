@@ -8,11 +8,6 @@ interface Author {
   affiliation: string
 }
 
-interface Field {
-  id: number
-  name: string
-}
-
 export interface User {
   id: number
   email: string
@@ -240,8 +235,6 @@ export const changeUserInfo = async (
     const response = await instance.post(url, formData)
     console.log('User info updated successfully:', response.data)
     if (response.data.code === 200) {
-      const store = userStore()
-      console.log(response.data)
       setUserDetail(user)
       return [true, '用户信息更新成功'] as [boolean, string]
     } else {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import VueCropper from 'vue-cropperjs'
@@ -7,22 +7,17 @@ import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { getUserId, logout, setUserDetail, type User } from '@/ts/User'
 import {
   checkFollowStatus,
   followUser,
+  getFollowList,
   getFanCount,
   getFanList,
   getFollowCount,
-  getFollowList,
   unfollowUser,
-} from '@/js/FollowUser.ts'
-import instance from '@/js/axios'
-import { getUserId, logout, setUserDetail, type User } from '@/js/User'
-import { notify } from '@/js/toast'
-import type { ProjectSummary } from '@/js/ProjectSummary'
-import { checkFollowStatus, followUser, getFollowList, unfollowUser } from '@/ts/FollowUser.ts'
+} from '@/ts/FollowUser.ts'
 import instance from '@/ts/axios'
-import { getUserId, logout } from '@/ts/User'
 import { notify } from '@/ts/toast'
 import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
