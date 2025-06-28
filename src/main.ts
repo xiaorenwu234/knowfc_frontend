@@ -7,6 +7,7 @@ import './style.css'
 
 import App from './App.vue'
 import router from './router'
+import "vis/dist/vis.css";
 
 const app = createApp(App)
 

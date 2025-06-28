@@ -12,7 +12,7 @@
     <div
       ref="head"
       type="button"
-      class="h-11 w-11 rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation"
+      class="h-11 w-11 aspect-square rounded-full overflow-hidden inline-flex items-center justify-center text-gray-700 origin-top drop-shadow-xl z-[52] normalAnimation"
       @mouseenter="showUserMenu = true"
       @mouseleave="leaveHead()"
     >
@@ -740,7 +740,7 @@ const submitPaper = () => {
     ...paperForm.value,
     authors: filteredAuthors,
     keywords: filteredKeywords,
-    fieldIds: filteredFieldIds  
+    fieldIds: filteredFieldIds
     }, pdfDocument.value)
     .then(response => {
       console.log('论文提交成功:', response)
