@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DockBar from './components/DockBar.vue';
 import Header from './components/Header.vue'
+import UserGraph from './views/UserGraph.vue'
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import Header from './components/Header.vue'
   <div class="flex-1 min-h-screen bg-container">
       <RouterView :key="$route.fullPath"></RouterView>
   </div>
+<!--  <UserGraph></UserGraph>-->
 </template>
 
 <style scoped>
