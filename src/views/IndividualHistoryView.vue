@@ -72,9 +72,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getHistory } from '@/ts/History.ts'
 import { getUserId } from '@/ts/User.ts'
 
+const router = useRouter()
 // 历史记录数据
 const historyData = ref([])
 
@@ -91,12 +93,14 @@ const loadHistory = async () => {
     if (response.data && Array.isArray(response.data)) {
       historyData.value = response.data.map(item => ({
         id: item.id,
-        type: 'article', // 默认类型，可以根据需要调整
+        type: item.type, // 默认类型，可以根据需要调整
+        workId: item.workId,
         title: item.workTitle,
         authors: Array.isArray(item.authors) ? item.authors.join(', ') : (item.authors || '未知作者'),
         isCollected: item.isCollected || false
       }))
     }
+    console.log(historyData.value)
   } catch (error) {
     console.error('加载历史记录失败:', error)
   }
@@ -124,7 +128,7 @@ const getTypeLabel = (type) => {
 
 const viewArticle = (item) => {
   // 跳转到文章详情页
-  console.log('查看文章:', item)
+  router.push(`/article-detail?id=${item.workId}`)
 }
 
 const toggleCollect = (item) => {
