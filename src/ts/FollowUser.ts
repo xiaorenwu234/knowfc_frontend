@@ -1,5 +1,5 @@
-import { getUserId } from '@/js/User.ts'
-import instance from '@/js/axios.ts'
+import { getUserId } from '@/ts/User.ts'
+import instance from '@/ts/axios.ts'
 
 export const followUser = async (authorId: string): Promise<boolean> => {
   const url = '/follow/user'

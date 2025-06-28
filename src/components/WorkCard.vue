@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Work } from '@/js/Work'
+import type { Work } from '@/ts/Work'
 import { onMounted, useTemplateRef } from 'vue'
 import { RouterLink } from 'vue-router'
 

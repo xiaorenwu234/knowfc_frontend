@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import router from '@/router'
-import { sendVerificationCode, signup } from '@/js/User.ts'
-import { notify } from '@/js/toast.ts'
+import { sendVerificationCode, signup } from '@/ts/User.ts'
+import { notify } from '@/ts/toast.ts'
 
 const showCountDown = ref(false)
 const countDownValue = ref(59)

@@ -1,4 +1,4 @@
-import instance from '@/js/axios.ts'
+import instance from '@/ts/axios.ts'
 
 export interface Work {
   id: string;
@@ -76,7 +76,7 @@ export async function searchWorks(title: string): Promise<Work[]> {
         title
       }
     });
-    
+
     if (data.code !== 200) {
       throw new Error(`API Error: ${data.msg}`);
     }

@@ -1,4 +1,4 @@
-import type { User } from '@/js/User'
+import type { User } from '@/ts/User'
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 

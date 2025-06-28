@@ -1,4 +1,4 @@
-import instance from '@/js/axios.ts'
+import instance from '@/ts/axios.ts'
 import { useUserStore } from '@/stores/user'
 
 // Interfaces for the search response

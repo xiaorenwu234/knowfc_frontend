@@ -20,6 +20,11 @@ import instance from '@/js/axios'
 import { getUserId, logout, setUserDetail, type User } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
+import { checkFollowStatus, followUser, getFollowList, unfollowUser } from '@/ts/FollowUser.ts'
+import instance from '@/ts/axios'
+import { getUserId, logout } from '@/ts/User'
+import { notify } from '@/ts/toast'
+import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
 import UserGraph from '@/views/UserGraph.vue'
 
@@ -62,7 +67,7 @@ const projectId = ref()
 const categories = [
   `${ownerReference.value}创建的科研项目`,
   `${ownerReference.value}参与的科研项目`,
-  `${ownerReference.value}的论文`,
+  `${ownerReference.value}的科研成果`,
   `${ownerReference.value}的科研人员网络`,
 ]
 
@@ -383,7 +388,7 @@ const submitCreate = async () => {
           </button>
         </div>
       </div>
-      <div class="flex-1 mt-4 bg-white px-2 py-2 rounded-2xl min-h-screen">
+      <div class="flex-1 mt-4 bg-white px-2 py-2 rounded-2xl">
         <TabGroup>
           <TabList class="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
             <Tab v-for="category in categories" as="template" :key="category" v-slot="{ selected }">
@@ -412,7 +417,7 @@ const submitCreate = async () => {
             >
               <template v-if="idx === 0">
                 <div class="flex w-full flex-wrap">
-                  <div v-for="project in projects" :key="project.id" class="w-1/2">
+                  <div v-for="project in projects" :key="project.id" class="w-1/2 p-2">
                     <div class="border-[2px] rounded-xl h-full">
                       <div class="p-4">
                         <h3 class="text-base font-semibold text-blue-600">
@@ -442,7 +447,7 @@ const submitCreate = async () => {
               </template>
               <template v-else-if="idx === 1">
                 <div class="flex w-full flex-wrap mt-4">
-                  <div v-for="project in participatedProjects" :key="project.id" class="w-1/2">
+                  <div v-for="project in participatedProjects" :key="project.id" class="w-1/2 p-2">
                     <div class="border-[2px] rounded-xl h-full">
                       <div class="p-4">
                         <h3 class="text-base font-semibold text-blue-600">

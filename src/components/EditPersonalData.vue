@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { changeUserInfo, getUserDetail, getUserName, type User } from '@/js/User.ts'
+import { changeUserInfo, getUserDetail, getUserName, type User } from '@/ts/User.ts'
 import { onMounted, ref } from 'vue'
-import { notify } from '@/js/toast.ts'
+import { notify } from '@/ts/toast.ts'
 
 const showForm = defineModel('showForm')
 const submitChange = async () => {

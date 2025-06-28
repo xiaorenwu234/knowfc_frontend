@@ -1,9 +1,9 @@
-import instance from '@/js/axios.ts'
-import { getUserId } from '@/js/User.ts'
+import instance from '@/ts/axios.ts'
+import { getUserId } from '@/ts/User.ts'
 
 export const getQuestionDetail = async (questionId: string): Promise<any> => {
     const url = `/question/${questionId}`
-  
+
     try {
       const response = await instance.get(url)
       if (response.data.code === 200) {
@@ -18,7 +18,7 @@ export const getQuestionDetail = async (questionId: string): Promise<any> => {
 
   export const getAnswers = async (questionId: string): Promise<any[]> => {
     const url = `/answer/question/${questionId}`
-  
+
     try {
       const response = await instance.get(url)
       if (response.data.code === 200) {
@@ -65,13 +65,13 @@ export const searchProblem = async (keyword: string): Promise<any[]> => {
     formData.append('keyword', keyword)
     formData.append('page', '0')
     formData.append('size', '10')
-    
+
     // 将 FormData 转换为 URLSearchParams
     const params = new URLSearchParams()
     for (const [key, value] of formData.entries()) {
       params.append(key, value.toString())
     }
-    
+
     try {
       const response = await instance.get(`${url}?${params.toString()}`)
       console.log('搜索问题结果:', response.data)

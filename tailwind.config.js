@@ -3,7 +3,7 @@ const { addDynamicIconSelectors } = require("@iconify/tailwind");
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./src/**/*.{vue,ts,ts,jsx,tsx}",
   ],
   theme: {
   },

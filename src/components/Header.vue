@@ -15,7 +15,7 @@ import Logo from './Logo.vue'
 import UserBar from './UserBar.vue'
 import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { hideHeader } from '@/js/hidePaths.js'
+import { hideHeader } from '@/ts/hidePaths.js'
 
 const route = useRoute()
 const pureWhite = ['']

@@ -35,11 +35,11 @@
             </h3>
             <div v-show="showContentType" class="space-y-2">
               <label v-for="type in contentTypes" :key="type.id" class="flex items-center gap-2">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   :checked="type.checked"
                   @change="toggleContentType(type.id)"
-                  class="checkbox checkbox-sm" 
+                  class="checkbox checkbox-sm"
                 />
                 <span class="text-sm">{{ type.name }} ({{ type.count }})</span>
               </label>
@@ -53,27 +53,27 @@
             <h3 class="font-semibold mb-3">发布日期</h3>
             <div class="space-y-2">
               <label v-for="period in datePeriods" :key="period.id" class="flex items-center gap-2">
-                <input 
-                  type="radio" 
+                <input
+                  type="radio"
                   :checked="period.id === selectedDatePeriod"
                   @change="selectedDatePeriod = period.id"
                   name="date-period"
-                  class="radio radio-sm" 
+                  class="radio radio-sm"
                 />
                 <span class="text-sm">{{ period.name }}</span>
               </label>
               <div v-if="selectedDatePeriod === 'custom'" class="mt-2 space-y-2">
                 <div class="grid grid-cols-2 gap-2">
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     v-model="customDateRange.start"
-                    placeholder="起始年份" 
+                    placeholder="起始年份"
                     class="input input-bordered input-sm"
                   />
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     v-model="customDateRange.end"
-                    placeholder="结束年份" 
+                    placeholder="结束年份"
                     class="input input-bordered input-sm"
                   />
                 </div>
@@ -85,9 +85,9 @@
 
       <!-- 右侧搜索结果 -->
       <div class="md:col-span-3 space-y-6">
-        <WorkCard 
-          v-for="work in searchResults" 
-          :key="work.id" 
+        <WorkCard
+          v-for="work in searchResults"
+          :key="work.id"
           :work="work"
           class="card bg-base-100 shadow hover:shadow-lg transition-shadow"
         />
@@ -100,7 +100,7 @@
 import { ref, computed, watch } from 'vue'
 import { useSearchStore } from '@/stores/search'
 import WorkCard from '@/components/WorkCard.vue'
-import { searchWorks, type Work } from '@/js/Work'
+import { searchWorks, type Work } from '@/ts/Work'
 
 // 搜索相关
 const searchType = ref('article')
@@ -166,4 +166,4 @@ watch(searchStore.searchQuery, () => {
     initSearch()
   }
 })
-</script> 
+</script>

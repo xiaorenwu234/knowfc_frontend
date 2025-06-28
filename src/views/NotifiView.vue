@@ -166,7 +166,7 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { buildApiUrl } from '@/config/api'
-import { getUserId } from '@/js/User'
+import { getUserId } from '@/ts/User'
 
 const loading = ref(true)
 const notifiList = ref([])

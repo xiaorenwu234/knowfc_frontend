@@ -37,9 +37,9 @@
     </div>
     <!-- 书架 -->
     <div ref="shelf" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
-      <RouterLink to="/Bookshelf/BookshelfIndex" class="w-full h-full">
+      <div class="w-full h-full" @click="showForm = !showForm">
         <icon class="icon-[mi--favorite] w-full h-full" />
-      </RouterLink>
+      </div>
     </div>
     <!-- 历史 -->
     <div ref="history" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
@@ -199,19 +199,22 @@
       <button class="btn btn-ghost w-full mt-2" @click="closeBatchResult">关闭</button>
     </div>
   </div>
+  <FavoritesView v-model:showForm="showForm"></FavoritesView>
 </template>
 
-<script setup lang="js">
+<script setup>
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/index.js'
-import { getUserId } from '@/js/User.js'
-import { getUnreadCount } from '@/js/chat.js'
 import { useUserStore } from '@/stores/user'
+import { getUserId } from '@/ts/User.js'
+import { getUnreadCount } from '@/ts/chat.js'
+import FavoritesView from "@/views/FavoritesView.vue";
 
 const personalCenterPath = ref('')
 
 // 投稿类型选择菜单
 const showUploadTypeMenu = ref(false)
+const showForm = ref(false)
 
 router.beforeEach((to, from, next) => {
   if (computedIsLogin.value) personalCenterPath.value = '/personal-center/' + getUserId()
