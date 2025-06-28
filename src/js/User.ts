@@ -84,7 +84,6 @@ let userStore = () => {
 }
 
 export const getUserId = () => {
-  console.log(userStore().detail)
   return userStore().detail.id
 }
 

@@ -2,32 +2,36 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
+import VueCropper from 'vue-cropperjs'
+import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
 import {
   checkFollowStatus,
-  followUser, getFanCount,
-  getFanList, getFollowCount,
+  followUser,
+  getFanCount,
+  getFanList,
+  getFollowCount,
   getFollowList,
-  unfollowUser
+  unfollowUser,
 } from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
-import { getUserId, logout } from '@/js/User'
+import { getUserId, logout, setUserDetail, type User } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
-import UserGraph from "@/views/UserGraph.vue";
+import UserGraph from '@/views/UserGraph.vue'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   }
 }
 
@@ -37,7 +41,7 @@ const handleQuit = () => {
 }
 
 const ownerReference = ref('Ta')
-const userInfo = ref(null)
+const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
@@ -83,7 +87,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: getUserId(),
-      content: reason.value
+      content: reason.value,
     })
     closeModal()
     alert('申请已提交成功！')
@@ -103,7 +107,6 @@ const handleFollow = async () => {
 const showFollowModal = ref(false)
 const showFollow = () => {
   showFollowModal.value = true
-
 }
 const handleCloseFollowModal = () => {
   showFollowModal.value = false
@@ -148,16 +151,46 @@ const participatedProjects = ref<ProjectSummary[]>()
 const followList = ref()
 const fanList = ref()
 
+const cropperRef = ref()
+const imageUrl = ref('')
+const showCropper = ref(false)
+
+const onSelectImage = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  imageUrl.value = URL.createObjectURL(file)
+  showCropper.value = true
+}
+
+const cancelCrop = () => {
+  showCropper.value = false
+  imageUrl.value = ''
+}
+
+const confirmCrop = () => {
+  const canvas = cropperRef.value.getCroppedCanvas({ width: 300, height: 300 })
+  canvas.toBlob(async (blob: Blob | null) => {
+    if (!blob) return
+    const uuid = crypto.randomUUID()
+    const filename = `${uuid}.jpg`
+    const file = new File([blob], filename, { type: 'image/jpeg' })
+    await updateAvatar(file)
+    cancelCrop()
+  }, 'image/jpeg')
+}
+
 const updateAvatar = async (avatar: File) => {
   const formData = new FormData()
+  formData.append('id', getUserId().toString())
   formData.append('avatar', avatar)
   try {
-    const response = await axios.post('/users/update-info', formData, {
+    const response = await instance.post('/users/update-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (response.data.code === 200) {
       notify('success', '头像更新成功')
-      fetchUserInfo()
+      await fetchUserInfo()
+      setUserDetail({ ...(userInfo.value as User) })
     } else {
       notify('error', '头像更新失败', response.data.msg)
     }
@@ -198,7 +231,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: ''
+  cooperationTerms: '',
 })
 const createError = ref('')
 
@@ -233,7 +266,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -242,7 +275,7 @@ const submitCreate = async () => {
     } else {
       createError.value = res.data.msg || '创建失败'
     }
-  } catch (e) {
+  } catch {
     createError.value = '网络错误'
   }
 }
@@ -255,11 +288,55 @@ const submitCreate = async () => {
         class="flex sm:flex-col items-center sm:items-start sm:w-[28%] sm:min-h-[250px] gap-4 sm:gap-0"
       >
         <div class="w-full sm:flex sm:justify-center">
-          <img
-            class="w-[140px] aspect-square sm:w-[calc(100%-50px)] rounded-full border-2 mx-auto sm:mx-0 mt-4"
-            :src="userInfo?.avatar || '/image.png'"
-            alt="头像"
-          />
+          <div
+            class="relative group w-[140px] aspect-square sm:w-[calc(100%-50px)] mx-auto sm:mx-0 mt-4"
+          >
+            <img
+              class="w-full h-full rounded-full border-2 object-cover"
+              :src="userInfo?.avatar"
+              alt="头像"
+            />
+
+            <label
+              v-if="ownerReference == '我'"
+              for="avatarUpload"
+              class="absolute inset-0 bg-black/50 text-white text-sm flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+            >
+              更换头像
+            </label>
+
+            <input
+              v-if="ownerReference == '我'"
+              id="avatarUpload"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="onSelectImage"
+            />
+          </div>
+
+          <div
+            v-if="showCropper"
+            class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+          >
+            <div class="bg-white p-4 rounded shadow-lg w-[90vw] max-w-[400px] max-h-[90vh]">
+              <div class="text-lg font-bold mb-2">裁剪头像</div>
+              <VueCropper
+                ref="cropperRef"
+                :src="imageUrl"
+                :aspect-ratio="1"
+                :view-mode="1"
+                :auto-crop-area="1"
+                style="height: 300px; width: 100%"
+              />
+              <div class="mt-4 flex justify-end gap-2">
+                <button class="px-4 py-1 bg-gray-300 rounded" @click="cancelCrop">取消</button>
+                <button class="px-4 py-1 bg-blue-600 text-white rounded" @click="confirmCrop">
+                  确定
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col sm:block sm:my-[25px] w-full sm:w-auto mx-auto">
@@ -268,16 +345,20 @@ const submitCreate = async () => {
           </div>
           <div class="w-full flex gap-2">
             <div class="w-1/2 pr-1">
-              <button class="btn w-full mx-auto mt-6"
-                      :style="{width: 'calc(50%-1px)'}"
-                      @click="showFollow">
+              <button
+                class="btn w-full mx-auto mt-6"
+                :style="{ width: 'calc(50%-1px)' }"
+                @click="showFollow"
+              >
                 关注数 {{ followCount }}
               </button>
             </div>
             <div class="w-1/2 pl-1">
-              <button class="btn w-full mx-auto mt-6"
-                      :style="{width: 'calc(50%-1px)'}"
-                      @click="showFan">
+              <button
+                class="btn w-full mx-auto mt-6"
+                :style="{ width: 'calc(50%-1px)' }"
+                @click="showFan"
+              >
                 粉丝数 {{ fanCount }}
               </button>
             </div>
@@ -501,8 +582,12 @@ const submitCreate = async () => {
       <h3 class="text-lg font-bold mb-4">粉丝列表</h3>
       <div class="flex flex-col">
         <div v-if="fanList.length > 0">
-          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in fanList" :key="user.id"
-                      class="flex items-center mb-4">
+          <RouterLink
+            :to="`/personal-center/${user.id}`"
+            v-for="user in fanList"
+            :key="user.id"
+            class="flex items-center mb-4"
+          >
             <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
             <div>
               <p class="font-semibold">{{ user.username }}</p>
@@ -518,5 +603,4 @@ const submitCreate = async () => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

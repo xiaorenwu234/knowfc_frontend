@@ -1,6 +1,6 @@
 import type { User } from '@/js/User'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
 export const useUserStore = defineStore(
   'user',
@@ -21,26 +21,26 @@ export const useUserStore = defineStore(
       createdAt: '',
     }
 
-    const detail = ref<User>({ ...empty })
+    const detail = reactive<User>({ ...empty })
 
     const setUserName = (name: string) => {
-      detail.value.username = name
+      detail.username = name
     }
 
     const setId = (userId: number) => {
-      detail.value.id = userId
+      detail.id = userId
     }
 
     const setAvatar = (avatarUrl: string) => {
-      detail.value.avatar = avatarUrl
+      detail.avatar = avatarUrl
     }
 
     const setDetail = (user: User) => {
-      detail.value = user
+      Object.assign(detail, user)
     }
 
     const clearDetail = () => {
-      detail.value = { ...empty }
+      Object.assign(detail, empty)
       console.log('User detail cleared')
     }
 

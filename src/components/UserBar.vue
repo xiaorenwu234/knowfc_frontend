@@ -17,7 +17,7 @@
       @mouseleave="leaveHead()"
     >
       <RouterLink v-if="computedIsLogin" :to="personalCenterPath">
-        <img :src="getAvatar()" class="image-full" alt="头像" />
+        <img :src="store.detail.avatar" class="image-full" alt="头像" />
       </RouterLink>
       <RouterLink v-else to="/signin">
         <img src="../assets/default-avatar.png" class="image-full" alt="默认头像" />
@@ -103,24 +103,21 @@
     v-if="showPaperForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 专利上传模态框 -->
   <div
     v-if="showPatentForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 数据集上传模态框 -->
   <div
     v-if="showDatasetForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 批量导入模态框 -->
   <div
@@ -207,8 +204,9 @@
 <script setup lang="js">
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/index.js'
-import { getAvatar, getUserId } from '@/js/User.js'
+import { getUserId } from '@/js/User.js'
 import { getUnreadCount } from '@/js/chat.js'
+import { useUserStore } from '@/stores/user'
 
 const personalCenterPath = ref('')
 
@@ -216,8 +214,7 @@ const personalCenterPath = ref('')
 const showUploadTypeMenu = ref(false)
 
 router.beforeEach((to, from, next) => {
-  if (computedIsLogin.value)
-    personalCenterPath.value = '/personal-center/' + getUserId()
+  if (computedIsLogin.value) personalCenterPath.value = '/personal-center/' + getUserId()
   next()
 })
 
@@ -306,6 +303,7 @@ const goToNotify = () => {
 }
 
 const unReadCount = ref(0)
+const store = useUserStore()
 
 onMounted(async () => {
   unReadCount.value = await getUnreadCount()
