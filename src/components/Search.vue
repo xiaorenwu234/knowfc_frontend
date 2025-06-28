@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue'
-import {searchUsers} from "@/js/User.ts";
-import {getSpecificContact} from "@/js/chat.ts";
+import {searchUsers} from "@/ts/User.ts";
+import {getSpecificContact} from "@/ts/chat.ts";
 
 const showDropdown = ref(false)
 const searchQuery = ref('')

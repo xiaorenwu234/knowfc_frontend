@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -78,6 +78,11 @@ const router = createRouter({
       name: 'project',
       component: () => import('../views/Project.vue'),
     },
+    {
+      path: '/upload-paper',
+      name: 'upload-paper',
+      component: () => import('../views/UploadPaperView.vue'),
+    }
   ],
 })
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import router from '@/router'
 import { ref } from 'vue'
-import { login } from '@/js/User.ts'
-import { notify } from '@/js/toast.ts'
+import { login } from '@/ts/User.ts'
+import { notify } from '@/ts/toast.ts'
 
 const password = ref('')
 const username = ref('')

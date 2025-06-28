@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Person } from '@/js/Person'
+import type { Person } from '@/ts/Person'
 import { RouterLink } from 'vue-router'
 
 const { person } = defineProps<{ person: Person | null }>()

@@ -42,8 +42,8 @@
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 import WorkCard from './WorkCard.vue'
 import PersonCard from './PersonCard.vue'
-import type { Work } from '@/js/Work'
-import type { Person } from '@/js/Person'
+import type { Work } from '@/ts/Work'
+import type { Person } from '@/ts/Person'
 
 const categories = ['文章', '同仁', '热点']
 

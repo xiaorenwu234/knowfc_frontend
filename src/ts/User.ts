@@ -1,4 +1,4 @@
-import instance from '@/js/axios.ts'
+import instance from '@/ts/axios.ts'
 import { useUserStore } from '@/stores/user'
 
 // Interfaces for the search response
@@ -6,11 +6,6 @@ interface Author {
   id: number
   name: string
   affiliation: string
-}
-
-interface Field {
-  id: number
-  name: string
 }
 
 export interface User {
@@ -84,7 +79,6 @@ let userStore = () => {
 }
 
 export const getUserId = () => {
-  console.log(userStore().detail)
   return userStore().detail.id
 }
 
@@ -241,8 +235,6 @@ export const changeUserInfo = async (
     const response = await instance.post(url, formData)
     console.log('User info updated successfully:', response.data)
     if (response.data.code === 200) {
-      const store = userStore()
-      console.log(response.data)
       setUserDetail(user)
       return [true, '用户信息更新成功'] as [boolean, string]
     } else {
