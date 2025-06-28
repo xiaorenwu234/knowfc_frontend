@@ -17,7 +17,7 @@
       @mouseleave="leaveHead()"
     >
       <RouterLink v-if="computedIsLogin" :to="personalCenterPath">
-        <img :src="getAvatar()" class="image-full" alt="头像" />
+        <img :src="store.detail.avatar" class="image-full" alt="头像" />
       </RouterLink>
       <RouterLink v-else to="/signin">
         <img src="../assets/default-avatar.png" class="image-full" alt="默认头像" />
@@ -37,9 +37,9 @@
     </div>
     <!-- 书架 -->
     <div ref="shelf" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
-      <RouterLink to="/Bookshelf/BookshelfIndex" class="w-full h-full">
+      <div class="w-full h-full" @click="showForm = !showForm">
         <icon class="icon-[mi--favorite] w-full h-full" />
-      </RouterLink>
+      </div>
     </div>
     <!-- 历史 -->
     <div ref="history" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
@@ -103,24 +103,21 @@
     v-if="showPaperForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 专利上传模态框 -->
   <div
     v-if="showPatentForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 数据集上传模态框 -->
   <div
     v-if="showDatasetForm"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     @click.self="hideAllForms"
-  >
-  </div>
+  ></div>
 
   <!-- 批量导入模态框 -->
   <div
@@ -202,22 +199,25 @@
       <button class="btn btn-ghost w-full mt-2" @click="closeBatchResult">关闭</button>
     </div>
   </div>
+  <FavoritesView v-model:showForm="showForm"></FavoritesView>
 </template>
 
-<script setup lang="js">
+<script setup>
 import { computed, onMounted, ref } from 'vue'
 import router from '@/router/index.js'
-import { getAvatar, getUserId } from '@/js/User.js'
-import { getUnreadCount } from '@/js/chat.js'
+import { useUserStore } from '@/stores/user'
+import { getUserId } from '@/ts/User.js'
+import { getUnreadCount } from '@/ts/chat.js'
+import FavoritesView from "@/views/FavoritesView.vue";
 
 const personalCenterPath = ref('')
 
 // 投稿类型选择菜单
 const showUploadTypeMenu = ref(false)
+const showForm = ref(false)
 
 router.beforeEach((to, from, next) => {
-  if (computedIsLogin.value)
-    personalCenterPath.value = '/personal-center/' + getUserId()
+  if (computedIsLogin.value) personalCenterPath.value = '/personal-center/' + getUserId()
   next()
 })
 
@@ -306,6 +306,7 @@ const goToNotify = () => {
 }
 
 const unReadCount = ref(0)
+const store = useUserStore()
 
 onMounted(async () => {
   unReadCount.value = await getUnreadCount()

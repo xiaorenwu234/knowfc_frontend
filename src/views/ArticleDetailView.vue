@@ -246,8 +246,8 @@
 
           <!-- 下载和操作按钮 -->
           <div class="mt-6 space-y-3">
-            <button 
-              
+            <button
+
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
               <a :href="articleDetail.pdf_url">查看 PDF</a>
@@ -327,8 +327,8 @@ import {
   getArticleLike,
   likeArticle,
   sendComment,
-} from '@/js/ArticleDetail.js'
-import { getWorkDetail } from '@/js/Work.js'
+} from '@/ts/ArticleDetail.js'
+import { getWorkDetail } from '@/ts/Work.js'
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()

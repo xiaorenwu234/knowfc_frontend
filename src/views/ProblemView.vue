@@ -127,13 +127,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
-import { getQuestionDetail, getAnswers, submitAnswerTo, searchProblem } from '@/js/Problem'
+import { getQuestionDetail, getAnswers, submitAnswerTo } from '@/ts/Problem'
 import { useRoute } from 'vue-router'
-import { getUserName } from '@/js/User'
+import { getUserName } from '@/ts/User'
 
 const route = useRoute()
 

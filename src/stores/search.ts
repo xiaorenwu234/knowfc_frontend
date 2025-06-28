@@ -16,7 +16,7 @@ export const useSearchStore = defineStore('search', () => {
             institution: ''
         }
     })
-    
+
     function setType(type: string) {
         searchQuery.value.type = type
     }

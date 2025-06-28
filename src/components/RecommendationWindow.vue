@@ -1,7 +1,7 @@
 <template>
   <div class="w-full bg-white px-2 py-2 rounded-2xl min-h-screen">
     <TabGroup>
-      <TabList class="flex space-x-1 rounded-xlbg-blue-900/20 p-1">
+      <TabList class="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
         <Tab v-for="category in categories" as="template" :key="category" v-slot="{ selected }">
           <button
             :class="[
@@ -42,8 +42,8 @@
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue'
 import WorkCard from './WorkCard.vue'
 import PersonCard from './PersonCard.vue'
-import type { Work } from '@/js/Work'
-import type { Person } from '@/js/Person'
+import type { Work } from '@/ts/Work'
+import type { Person } from '@/ts/Person'
 
 const categories = ['文章', '同仁', '热点']
 

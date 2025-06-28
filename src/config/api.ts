@@ -10,7 +10,8 @@ export const API_CONFIG = {
     USER_INFO: '/users/id',
     UNREAD_MESSAGE_NUMBER: '/message/unread-count',
     WORK_CONTENT:'/works/content',
-    APPLY_FOR_PROJECT:'/project/apply'
+    APPLY_FOR_PROJECT:'/project/apply',
+    GET_WORK_FIELDS:'/works/fields',
   }
 }
 

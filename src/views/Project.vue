@@ -217,7 +217,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildApiUrl, API_CONFIG } from '@/config/api'
 import axios from 'axios'
-import { getUserId } from '@/js/User'
+import { getUserId } from '@/ts/User'
 
 const router = useRouter()
 const route = useRoute()

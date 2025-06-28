@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
+import VueCropper from 'vue-cropperjs'
+import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { checkFollowStatus, followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
-import instance from '@/js/axios'
-import { getUserId, logout } from '@/js/User'
-import { notify } from '@/js/toast'
-import type { ProjectSummary } from '@/js/ProjectSummary'
+import { getUserId, logout, setUserDetail, type User } from '@/ts/User'
+import {
+  checkFollowStatus,
+  followUser,
+  getFollowList,
+  getFanCount,
+  getFanList,
+  getFollowCount,
+  unfollowUser,
+} from '@/ts/FollowUser.ts'
+import instance from '@/ts/axios'
+import { notify } from '@/ts/toast'
+import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
-import UserGraph from "@/views/UserGraph.vue";
+import UserGraph from '@/views/UserGraph.vue'
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -31,11 +41,14 @@ const handleQuit = () => {
 }
 
 const ownerReference = ref('Ta')
-const userInfo = ref(null)
+const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
 const following = ref(false)
+const followCount = ref(0)
+const fanCount = ref(0)
+
 const fetchUserInfo = async () => {
   await axios.get(url).then((res) => {
     userInfo.value = res.data.data
@@ -46,12 +59,14 @@ const showModal = ref(false)
 const reason = ref('')
 const errorMessage = ref('')
 const projectId = ref()
-const categories = [
-  `${ownerReference.value}创建的科研项目`,
-  `${ownerReference.value}参与的科研项目`,
-  `${ownerReference.value}的论文`,
-  `${ownerReference.value}的科研人员网络`,
-]
+const categories = computed(() => {
+  return [
+    `${ownerReference.value}创建的科研项目`,
+    `${ownerReference.value}参与的科研项目`,
+    `${ownerReference.value}的论文`,
+    `${ownerReference.value}的科研人员网络`,
+  ]
+})
 
 const openModal = (pId: number) => {
   showModal.value = true
@@ -88,15 +103,23 @@ const submit = async () => {
 const handleFollow = async () => {
   if (following.value) await unfollowUser(userIdOnDisplay)
   else await followUser(userIdOnDisplay)
-
   following.value = !following.value
 }
+
 const showFollowModal = ref(false)
 const showFollow = () => {
   showFollowModal.value = true
 }
 const handleCloseFollowModal = () => {
   showFollowModal.value = false
+}
+
+const showFanModal = ref(false)
+const showFan = () => {
+  showFanModal.value = true
+}
+const handleCloseFanModal = () => {
+  showFanModal.value = false
 }
 
 const getOwnerProjects = async () => {
@@ -128,17 +151,48 @@ const getParticipatedProjects = async () => {
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
 const followList = ref()
+const fanList = ref()
+
+const cropperRef = ref()
+const imageUrl = ref('')
+const showCropper = ref(false)
+
+const onSelectImage = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  imageUrl.value = URL.createObjectURL(file)
+  showCropper.value = true
+}
+
+const cancelCrop = () => {
+  showCropper.value = false
+  imageUrl.value = ''
+}
+
+const confirmCrop = () => {
+  const canvas = cropperRef.value.getCroppedCanvas({ width: 300, height: 300 })
+  canvas.toBlob(async (blob: Blob | null) => {
+    if (!blob) return
+    const uuid = crypto.randomUUID()
+    const filename = `${uuid}.jpg`
+    const file = new File([blob], filename, { type: 'image/jpeg' })
+    await updateAvatar(file)
+    cancelCrop()
+  }, 'image/jpeg')
+}
 
 const updateAvatar = async (avatar: File) => {
   const formData = new FormData()
+  formData.append('id', getUserId().toString())
   formData.append('avatar', avatar)
   try {
-    const response = await axios.post('/users/update-info', formData, {
+    const response = await instance.post('/users/update-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (response.data.code === 200) {
       notify('success', '头像更新成功')
-      fetchUserInfo()
+      await fetchUserInfo()
+      setUserDetail({ ...(userInfo.value as User) })
     } else {
       notify('error', '头像更新失败', response.data.msg)
     }
@@ -156,8 +210,17 @@ onMounted(() => {
   checkFollowStatus(userIdOnDisplay).then((res) => {
     following.value = res
   })
+  getFanCount(userIdOnDisplay).then((res) => {
+    fanCount.value = res
+  })
+  getFollowCount(userIdOnDisplay).then((res) => {
+    followCount.value = res
+  })
   getFollowList(userIdOnDisplay).then((res) => {
     followList.value = res
+  })
+  getFanList(userIdOnDisplay).then((res) => {
+    fanList.value = res
   })
 })
 
@@ -214,7 +277,7 @@ const submitCreate = async () => {
     } else {
       createError.value = res.data.msg || '创建失败'
     }
-  } catch (e) {
+  } catch {
     createError.value = '网络错误'
   }
 }
@@ -227,20 +290,81 @@ const submitCreate = async () => {
         class="flex sm:flex-col items-center sm:items-start sm:w-[28%] sm:min-h-[250px] gap-4 sm:gap-0"
       >
         <div class="w-full sm:flex sm:justify-center">
-          <img
-            class="w-[140px] aspect-square sm:w-[calc(100%-50px)] rounded-full border-2 mx-auto sm:mx-0 mt-4"
-            :src="userInfo?.avatar || '/image.png'"
-            alt="头像"
-          />
+          <div
+            class="relative group w-[140px] aspect-square sm:w-[calc(100%-50px)] mx-auto sm:mx-0 mt-4"
+          >
+            <img
+              class="w-full h-full rounded-full border-2 object-cover"
+              :src="userInfo?.avatar"
+              alt="头像"
+            />
+
+            <label
+              v-if="ownerReference == '我'"
+              for="avatarUpload"
+              class="absolute inset-0 bg-black/50 text-white text-sm flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+            >
+              更换头像
+            </label>
+
+            <input
+              v-if="ownerReference == '我'"
+              id="avatarUpload"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="onSelectImage"
+            />
+          </div>
+
+          <div
+            v-if="showCropper"
+            class="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+          >
+            <div class="bg-white p-4 rounded shadow-lg w-[90vw] max-w-[400px] max-h-[90vh]">
+              <div class="text-lg font-bold mb-2">裁剪头像</div>
+              <VueCropper
+                ref="cropperRef"
+                :src="imageUrl"
+                :aspect-ratio="1"
+                :view-mode="1"
+                :auto-crop-area="1"
+                style="height: 300px; width: 100%"
+              />
+              <div class="mt-4 flex justify-end gap-2">
+                <button class="px-4 py-1 bg-gray-300 rounded" @click="cancelCrop">取消</button>
+                <button class="px-4 py-1 bg-blue-600 text-white rounded" @click="confirmCrop">
+                  确定
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="flex flex-col sm:block sm:my-[25px] w-full sm:w-auto mx-auto">
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
-            关注列表
-          </button>
+          <div class="w-full flex gap-2">
+            <div class="w-1/2 pr-1">
+              <button
+                class="btn w-full mx-auto mt-6"
+                :style="{ width: 'calc(50%-1px)' }"
+                @click="showFollow"
+              >
+                关注数 {{ followCount }}
+              </button>
+            </div>
+            <div class="w-1/2 pl-1">
+              <button
+                class="btn w-full mx-auto mt-6"
+                :style="{ width: 'calc(50%-1px)' }"
+                @click="showFan"
+              >
+                粉丝数 {{ fanCount }}
+              </button>
+            </div>
+          </div>
           <button
             v-if="ownerReference != 'Ta'"
             class="btn w-full mx-auto mt-6"
@@ -253,7 +377,7 @@ const submitCreate = async () => {
           </button>
           <button
             v-if="ownerReference == 'Ta'"
-            class="btn mx-auto mt-6 w-24"
+            class="btn mx-auto mt-6 w-full"
             :class="following ? '' : 'btn-primary'"
             @click="handleFollow"
           >
@@ -261,7 +385,7 @@ const submitCreate = async () => {
           </button>
         </div>
       </div>
-      <div class="flex-1 mt-4 bg-white px-2 py-2 rounded-2xl min-h-screen">
+      <div class="flex-1 mt-4 bg-white px-2 py-2 rounded-2xl">
         <TabGroup>
           <TabList class="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
             <Tab v-for="category in categories" as="template" :key="category" v-slot="{ selected }">
@@ -290,7 +414,7 @@ const submitCreate = async () => {
             >
               <template v-if="idx === 0">
                 <div class="flex w-full flex-wrap">
-                  <div v-for="project in projects" :key="project.id" class="w-1/2">
+                  <div v-for="project in projects" :key="project.id" class="w-1/2 p-2">
                     <div class="border-[2px] rounded-xl h-full">
                       <div class="p-4">
                         <h3 class="text-base font-semibold text-blue-600">
@@ -310,10 +434,17 @@ const submitCreate = async () => {
                     </div>
                   </div>
                 </div>
+                <button
+                  v-if="ownerReference == '我'"
+                  class="ml-4 btn-sm mb-2 h-12 text-white btn btn-primary"
+                  @click="openCreateModal"
+                >
+                  创建项目
+                </button>
               </template>
               <template v-else-if="idx === 1">
                 <div class="flex w-full flex-wrap mt-4">
-                  <div v-for="project in participatedProjects" :key="project.id" class="w-1/2">
+                  <div v-for="project in participatedProjects" :key="project.id" class="w-1/2 p-2">
                     <div class="border-[2px] rounded-xl h-full">
                       <div class="p-4">
                         <h3 class="text-base font-semibold text-blue-600">
@@ -445,7 +576,33 @@ const submitCreate = async () => {
       </div>
     </div>
   </div>
+  <div
+    v-if="showFanModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+      <h3 class="text-lg font-bold mb-4">粉丝列表</h3>
+      <div class="flex flex-col">
+        <div v-if="fanList.length > 0">
+          <RouterLink
+            :to="`/personal-center/${user.id}`"
+            v-for="user in fanList"
+            :key="user.id"
+            class="flex items-center mb-4"
+          >
+            <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
+            <div>
+              <p class="font-semibold">{{ user.username }}</p>
+              <p class="text-sm text-gray-500">{{ user.title }} at {{ user.institution }}</p>
+              <p class="text-xs text-gray-400">{{ user.researchArea }}</p>
+            </div>
+          </RouterLink>
+        </div>
+        <div v-else>暂无粉丝</div>
+        <div class="btn mt-4" @click="handleCloseFanModal">关闭</div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

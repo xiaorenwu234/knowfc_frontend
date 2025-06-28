@@ -1,5 +1,5 @@
-import instance from '@/js/axios.ts'
-import { getUserId } from '@/js/User.ts'
+import instance from '@/ts/axios.ts'
+import { getUserId } from '@/ts/User.ts'
 
 export const addFavor = async (workId: string): Promise<Boolean> => {
   const url = '/favor/add'

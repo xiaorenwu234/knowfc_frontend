@@ -161,12 +161,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { buildApiUrl } from '@/config/api'
-import { getUserId } from '@/js/User'
+import { getUserId } from '@/ts/User'
 
 const loading = ref(true)
 const notifiList = ref([])
@@ -239,7 +239,7 @@ async function fetchNotifiList() {
         totalPages.value = 1
       }
     }
-  } catch (e) {
+  } catch {
     notifiList.value = []
     totalPages.value = 1
   }

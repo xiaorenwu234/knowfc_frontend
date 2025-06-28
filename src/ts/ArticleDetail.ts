@@ -1,5 +1,5 @@
-import instance from '@/js/axios.ts'
-import { getUserId } from '@/js/User.ts'
+import instance from '@/ts/axios.ts'
+import { getUserId } from '@/ts/User.ts'
 
 export const getArticleContent = async (articleId: string): Promise<string> => {
   const url = '/works/content'

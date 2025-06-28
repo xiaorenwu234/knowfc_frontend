@@ -91,20 +91,20 @@
           :person="user"
           class="hover:shadow-lg transition-shadow"
         />
-        
+
         <!-- 分页控件 -->
         <div class="flex justify-center mt-8" v-if="totalPages > 1">
           <div class="join">
-            <button 
-              class="join-item btn btn-sm" 
+            <button
+              class="join-item btn btn-sm"
               :disabled="currentPage === 0"
               @click="changePage(currentPage - 1)"
             >
               «
             </button>
             <button class="join-item btn btn-sm">{{ currentPage + 1 }} / {{ totalPages }}</button>
-            <button 
-              class="join-item btn btn-sm" 
+            <button
+              class="join-item btn btn-sm"
               :disabled="currentPage >= totalPages - 1"
               @click="changePage(currentPage + 1)"
             >
@@ -121,7 +121,7 @@
 import { ref, computed, watch } from 'vue'
 import { useSearchStore } from '@/stores/search'
 import PersonCard from '@/components/PersonCard.vue'
-import { searchUsers, type SearchParams, type User } from '@/js/User'
+import { searchUsers, type SearchParams, type User } from '@/ts/User'
 
 // 搜索相关
 const sortBy = ref<'relevance' | 'createdAt'>('relevance')

@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, useTemplateRef, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { hideDock } from '@/js/hidePaths.ts'
+import { hideDock } from '@/ts/hidePaths.ts'
 
 const dockItems = ref([
   {
@@ -103,8 +103,4 @@ function changeTheme() {
 }
 </script>
 
-<style scoped>
-.dock {
-  /* Dock styles here */
-}
-</style>
+<style scoped></style>

@@ -179,9 +179,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-import '@/js/chat.ts'
-import { getChatDetail, getChatList, readMessages, sendChatMessage } from '@/js/chat.ts'
-import { getAvatar, getUserId } from '@/js/User.ts'
+import '@/ts/chat.ts'
+import { getChatDetail, getChatList, readMessages, sendChatMessage } from '@/ts/chat.ts'
+import { getAvatar, getUserId } from '@/ts/User.ts'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import Search from '@/components/Search.vue'
