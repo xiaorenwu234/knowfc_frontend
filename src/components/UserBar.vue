@@ -67,7 +67,7 @@
           选择上传类型
         </div>
         <button
-          @click="openUploadForm('paper')"
+          @click="handlePaperUpload"
           class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <icon class="icon-[material-symbols--article-outline] w-4 h-4 mr-3" />
@@ -97,27 +97,6 @@
       </div>
     </div>
   </div>
-
-  <!-- 论文上传模态框 -->
-  <div
-    v-if="showPaperForm"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
-    @click.self="hideAllForms"
-  ></div>
-
-  <!-- 专利上传模态框 -->
-  <div
-    v-if="showPatentForm"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
-    @click.self="hideAllForms"
-  ></div>
-
-  <!-- 数据集上传模态框 -->
-  <div
-    v-if="showDatasetForm"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
-    @click.self="hideAllForms"
-  ></div>
 
   <!-- 批量导入模态框 -->
   <div
@@ -307,6 +286,11 @@ const goToNotify = () => {
 
 const unReadCount = ref(0)
 const store = useUserStore()
+
+const handlePaperUpload = () => {
+  hideUploadTypeMenu()
+  router.push('/upload-paper')
+}
 
 onMounted(async () => {
   unReadCount.value = await getUnreadCount()

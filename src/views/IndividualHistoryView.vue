@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white">
+  <div class="min-h-screen bg-white pt-24">
     <!-- 顶部标题栏 -->
     <div class="flex items-center justify-between p-6 border-b border-gray-200">
       <div class="flex items-center gap-4 ml-32">
@@ -28,7 +28,7 @@
               <div class="flex items-center gap-3 text-sm text-gray-600 mb-2">
                 <div class="flex items-center gap-1">
                   <icon :class="getTypeIcon(item.type)" class="w-4 h-4" />
-                  <span>{{ item.author }}</span>
+                  <span>{{ item.authors }}</span>
                 </div>
               </div>
 
@@ -72,52 +72,35 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { getHistory } from '@/ts/History.ts'
+import { getUserId } from '@/ts/User.ts'
 
 // 历史记录数据
-const historyData = ref([
-  {
-    id: 1,
-    type: 'article',
-    title: '文章1',
-    author: '作者1',
-    isCollected: false
-  },
-  {
-    id: 2,
-    type: 'article',
-    title: '文章2',
-    author: '作者2',
-    isCollected: true
-  },
-  {
-    id: 3,
-    type: 'article',
-    title: '文章3',
-    author: '作者3',
-    isCollected: false
-  },
-  {
-    id: 4,
-    type: 'article',
-    title: '文章4',
-    author: '作者4',
-    isCollected: false
-  },
-  {
-    id: 5,
-    type: 'dataset',
-    title: '机器学习常用数据集汇总',
-    author: '数据科学家',
-    isCollected: true
-  },
-  {
-    id: 6,
-    type: 'patent',
-    title: '基于深度学习的图像识别方法及系统',
-    author: '某某大学',
-    isCollected: false
+const historyData = ref([])
+
+// 加载历史记录
+const loadHistory = async () => {
+  try {
+    const userId = getUserId()
+    if (!userId) {
+      console.warn('用户ID为空，无法加载历史记录')
+      return
+    }
+    
+    const response = await getHistory(userId)
+    if (response.data && Array.isArray(response.data)) {
+      historyData.value = response.data.map(item => ({
+        id: item.id,
+        type: 'article', // 默认类型，可以根据需要调整
+        title: item.workTitle,
+        authors: Array.isArray(item.authors) ? item.authors.join(', ') : (item.authors || '未知作者'),
+        isCollected: item.isCollected || false
+      }))
+    }
+  } catch (error) {
+    console.error('加载历史记录失败:', error)
   }
-])
+}
 
 const getTypeIcon = (type) => {
   const iconMap = {
@@ -156,7 +139,7 @@ const removeFromHistory = (id) => {
 }
 
 onMounted(() => {
-  // 组件挂载后的初始化逻辑
+  loadHistory()
 })
 </script>
 

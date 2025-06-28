@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 // 导入上传函数 - 请根据实际文件路径调整
-import { uploadPaper, uploadPDF } from '@/js/Upload';
-import { getUserId } from '@/js/User';
+import { uploadPaper, uploadPDF } from '@/ts/Upload';
+import { getUserId } from '@/ts/User';
 
 // 使用 ref 创建响应式数据
 const paperTitle = ref('');
