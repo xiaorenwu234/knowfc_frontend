@@ -7,7 +7,6 @@ import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { getUserId, logout, setUserDetail, type User } from '@/ts/User'
 import {
   checkFollowStatus,
   followUser,
@@ -18,6 +17,7 @@ import {
   unfollowUser,
 } from '@/ts/FollowUser.ts'
 import instance from '@/ts/axios'
+import { getUserId, logout } from '@/ts/User'
 import { notify } from '@/ts/toast'
 import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
@@ -47,7 +47,7 @@ onMounted(async () => {
     const res = await axios.get(buildApiUrl(`/users/${userId}/works`))
 
     if (res.data.code === 200 && Array.isArray(res.data.data)) {
-      console.log('加载论文', res.data)  
+      console.log('加载论文', res.data)
       messages.value = res.data.data.map(item => {
         return {
           time: item.publish_date || '未知时间',
