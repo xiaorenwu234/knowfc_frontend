@@ -1,10 +1,5 @@
 <template>
-  <div class="h-full w-full p-4 md:p-8 px-10 md:px-20">
-    <!-- 搜索区域 -->
-    <div class="container max-w-3xl mx-auto mb-8 sticky top-0 mt-80">
-      <SearchBar />
-
-    </div>
+  <div class=" w-full p-4 md:p-8 px-10 md:px-20 mt-20">
 
     <!-- 结果区域 -->
     <RouterView v-if="hasSearched"></RouterView>
