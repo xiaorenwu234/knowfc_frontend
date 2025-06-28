@@ -351,6 +351,13 @@ const submitCreate = async () => {
                     </div>
                   </div>
                 </div>
+                <button
+                  v-if="ownerReference == '我'"
+                  class="ml-4 btn-sm mb-2 h-12 text-white btn btn-primary"
+                  @click="openCreateModal"
+                >
+                  创建项目
+                </button>
               </template>
               <template v-else-if="idx === 1">
                 <div class="flex w-full flex-wrap mt-4">

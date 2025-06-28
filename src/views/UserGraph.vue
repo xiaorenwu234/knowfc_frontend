@@ -3,6 +3,7 @@
 </template>
 
 <script setup>
+import "vis/dist/vis.css";
 import { onMounted, ref } from "vue";
 import { Network } from "vis";
 import { DataSet } from "vis";
