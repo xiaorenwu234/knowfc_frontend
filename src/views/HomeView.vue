@@ -1,21 +1,6 @@
 <template>
-  <div class="h-full w-full p-4 md:p-8 px-10 md:px-20">
-    <div class="mt-24 max-w-md my-10 text-center mx-auto">
-      <h1
-        class="mb-5 font-bold galada-regular text-6xl mx-2 align-baseline"
-        style="color: white; text-shadow: rgb(153, 36, 0) 6px 6px 3px"
-      >
-        KnowFC
-      </h1>
-      <p class="mb-5" style="color: white; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5)">
-        Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-        quasi. In deleniti eaque aut repudiandae et a id nisi.
-      </p>
-    </div>
-    <div class="container max-w-3xl mx-auto mb-8 sticky top-0 z-50">
-      <SearchBar />
-    </div>
-    <div class="flex w-full mx-8 my-8 gap-4">
+  <div class="h-full w-full p-4 md:p-8 px-10 md:px-20 mt-28">
+    <div class="flex w-full mx-8 gap-4">
       <div class="w-2/3 gap-4">
         <RecommendationWindow />
       </div>

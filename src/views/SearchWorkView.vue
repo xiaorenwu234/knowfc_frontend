@@ -2,7 +2,7 @@
 <template>
   <div class="max-w-6xl mx-auto w-full">
     <!-- 结果统计和操作 -->
-    <div class="flex justify-between items-center mb-6 sticky top-20 z-50">
+    <div class="flex justify-between items-center mb-6 sticky top-20 z-30">
       <div class="text-sm text-gray-600">
         显示 {{ startIndex }}-{{ endIndex }} 共 {{ totalResults }} 条结果
       </div>
