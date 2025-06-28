@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import VueCropper from 'vue-cropperjs'
@@ -59,12 +59,14 @@ const showModal = ref(false)
 const reason = ref('')
 const errorMessage = ref('')
 const projectId = ref()
-const categories = [
-  `${ownerReference.value}创建的科研项目`,
-  `${ownerReference.value}参与的科研项目`,
-  `${ownerReference.value}的论文`,
-  `${ownerReference.value}的科研人员网络`,
-]
+const categories = computed(() => {
+  return [
+    `${ownerReference.value}创建的科研项目`,
+    `${ownerReference.value}参与的科研项目`,
+    `${ownerReference.value}的论文`,
+    `${ownerReference.value}的科研人员网络`,
+  ]
+})
 
 const openModal = (pId: number) => {
   showModal.value = true
