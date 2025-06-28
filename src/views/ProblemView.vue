@@ -105,13 +105,12 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center gap-2">
-                  <h3 class="font-semibold text-gray-900">{{ answer.author }}</h3>
-                  <button
-                    v-show="userName !== answer.author"
-                    class="btn btn-sm btn-outline text-blue-500 border-blue-500 hover:bg-blue-500 px-3 py-1 text-xs"
+                  <h3 
+                    class="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                    @click="goToUserProfile(answer.userId)"
                   >
-                    + 关注
-                  </button>
+                    {{ answer.author }}
+                  </h3>
                 </div>
               </div>
             </div>
@@ -132,10 +131,11 @@ import { ref, onMounted, nextTick } from 'vue'
 import Vditor from 'vditor'
 import 'vditor/dist/index.css'
 import { getQuestionDetail, getAnswers, submitAnswerTo } from '@/ts/Problem'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getUserName } from '@/ts/User'
 
 const route = useRoute()
+const router = useRouter()
 
 const userName = getUserName()
 console.log('当前用户:', userName)
@@ -157,6 +157,10 @@ let contentEditor = null
 const vditorContainer = ref(null)
 
 const questionId = route.query.id // 假设路由参数名为 id
+
+const goToUserProfile = (userId) => {
+  router.push(`/personal-center/${userId}`)
+}
 
 // 渲染 Markdown 内容
 const setAnswerRef = (el, answerId) => {
@@ -307,6 +311,7 @@ const loadAnswers = async () => {
       if (data && data.length > 0) {
         answers.value = data.map((item) => ({
           id: item.id,
+          userId: item.userId,
           author: item.username,
           avatar: item.userAvatar,
           content: item.content,

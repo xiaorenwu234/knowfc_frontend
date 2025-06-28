@@ -343,6 +343,7 @@ const publishDate = ref('')
 
 onMounted(async () => {
   await getArticleDetail(articleId)
+  
   // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
   console.log(articleDetail.value)
 })

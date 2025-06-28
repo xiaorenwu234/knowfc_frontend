@@ -38,10 +38,6 @@ const dockItems = ref([
     path: '/',
   },
   {
-    icon: 'icon-[material-symbols--search]',
-    path: '/search',
-  },
-  {
     icon: 'icon-[material-symbols--chat]',
     path: '/chat',
   },
