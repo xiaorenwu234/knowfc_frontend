@@ -6,7 +6,13 @@ import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
-import { checkFollowStatus, followUser, getFollowList, unfollowUser } from '@/js/FollowUser.ts'
+import {
+  checkFollowStatus,
+  followUser, getFanCount,
+  getFanList, getFollowCount,
+  getFollowList,
+  unfollowUser
+} from '@/js/FollowUser.ts'
 import instance from '@/js/axios'
 import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
@@ -14,13 +20,13 @@ import type { ProjectSummary } from '@/js/ProjectSummary'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   }
 }
 
@@ -35,6 +41,9 @@ const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
 const following = ref(false)
+const followCount = ref(0)
+const fanCount = ref(0)
+
 const fetchUserInfo = async () => {
   await axios.get(url).then((res) => {
     userInfo.value = res.data.data
@@ -67,7 +76,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: getUserId(),
-      content: reason.value,
+      content: reason.value
     })
     closeModal()
     alert('申请已提交成功！')
@@ -81,15 +90,24 @@ const submit = async () => {
 const handleFollow = async () => {
   if (following.value) await unfollowUser(userIdOnDisplay)
   else await followUser(userIdOnDisplay)
-
   following.value = !following.value
 }
+
 const showFollowModal = ref(false)
 const showFollow = () => {
   showFollowModal.value = true
+
 }
 const handleCloseFollowModal = () => {
   showFollowModal.value = false
+}
+
+const showFanModal = ref(false)
+const showFan = () => {
+  showFanModal.value = true
+}
+const handleCloseFanModal = () => {
+  showFanModal.value = false
 }
 
 const getOwnerProjects = async () => {
@@ -121,23 +139,24 @@ const getParticipatedProjects = async () => {
 const projects = ref<ProjectSummary[]>()
 const participatedProjects = ref<ProjectSummary[]>()
 const followList = ref()
+const fanList = ref()
 
 const updateAvatar = async (avatar: File) => {
   const formData = new FormData()
-    formData.append('avatar', avatar)
-    try {
-      const response = await axios.post('/users/update-info', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
-      if (response.data.code === 200) {
-        notify('success', '头像更新成功')
-        fetchUserInfo()
-      } else {
-        notify('error', '头像更新失败', response.data.msg)
-      }
-    } catch (error) {
-      notify('error', '网络错误', error?.toString())
+  formData.append('avatar', avatar)
+  try {
+    const response = await axios.post('/users/update-info', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    if (response.data.code === 200) {
+      notify('success', '头像更新成功')
+      fetchUserInfo()
+    } else {
+      notify('error', '头像更新失败', response.data.msg)
     }
+  } catch (error) {
+    notify('error', '网络错误', error?.toString())
+  }
 }
 
 onMounted(() => {
@@ -146,8 +165,21 @@ onMounted(() => {
   ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
   getOwnerProjects()
   getParticipatedProjects()
-  checkFollowStatus(userIdOnDisplay).then((res)=>{following.value=res})
-  getFollowList(userIdOnDisplay).then((res)=>{followList.value=res})
+  checkFollowStatus(userIdOnDisplay).then((res) => {
+    following.value = res
+  })
+  getFanCount(userIdOnDisplay).then((res) => {
+    fanCount.value = res
+  })
+  getFollowCount(userIdOnDisplay).then((res) => {
+    followCount.value = res
+  })
+  getFollowList(userIdOnDisplay).then((res) => {
+    followList.value = res
+  })
+  getFanList(userIdOnDisplay).then((res) => {
+    fanList.value = res
+  })
 })
 
 onUnmounted(() => {
@@ -159,7 +191,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: '',
+  cooperationTerms: ''
 })
 const createError = ref('')
 
@@ -194,7 +226,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -227,9 +259,22 @@ const submitCreate = async () => {
           <div class="text-2xl text-gray-600 tracking-wide mb-4 sm:mb-[25px] text-center">
             {{ userInfo?.username }}
           </div>
-          <button v-if="ownerReference != 'Ta'" class="btn w-full mx-auto mt-6" @click="showFollow">
-            关注列表
-          </button>
+          <div class="w-full flex gap-2">
+            <div class="w-1/2 pr-1">
+              <button class="btn w-full mx-auto mt-6"
+                      :style="{width: 'calc(50%-1px)'}"
+                      @click="showFollow">
+                关注数 {{ followCount }}
+              </button>
+            </div>
+            <div class="w-1/2 pl-1">
+              <button class="btn w-full mx-auto mt-6"
+                      :style="{width: 'calc(50%-1px)'}"
+                      @click="showFan">
+                粉丝数 {{ fanCount }}
+              </button>
+            </div>
+          </div>
           <button
             v-if="ownerReference != 'Ta'"
             class="btn w-full mx-auto mt-6"
@@ -242,7 +287,7 @@ const submitCreate = async () => {
           </button>
           <button
             v-if="ownerReference == 'Ta'"
-            class="btn mx-auto mt-6 w-24"
+            class="btn mx-auto mt-6 w-full"
             :class="following ? '' : 'btn-primary'"
             @click="handleFollow"
           >
@@ -397,7 +442,8 @@ const submitCreate = async () => {
       <h3 class="text-lg font-bold mb-4">关注列表</h3>
       <div class="flex flex-col">
         <div v-if="followList.length > 0">
-          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in followList" :key="user.id" class="flex items-center mb-4">
+          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in followList" :key="user.id"
+                      class="flex items-center mb-4">
             <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
             <div>
               <p class="font-semibold">{{ user.username }}</p>
@@ -408,6 +454,29 @@ const submitCreate = async () => {
         </div>
         <div v-else>暂无关注</div>
         <div class="btn mt-4" @click="handleCloseFollowModal">关闭</div>
+      </div>
+    </div>
+  </div>
+  <div
+    v-if="showFanModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white p-6 rounded-lg w-full max-w-md mx-4">
+      <h3 class="text-lg font-bold mb-4">粉丝列表</h3>
+      <div class="flex flex-col">
+        <div v-if="fanList.length > 0">
+          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in fanList" :key="user.id"
+                      class="flex items-center mb-4">
+            <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
+            <div>
+              <p class="font-semibold">{{ user.username }}</p>
+              <p class="text-sm text-gray-500">{{ user.title }} at {{ user.institution }}</p>
+              <p class="text-xs text-gray-400">{{ user.researchArea }}</p>
+            </div>
+          </RouterLink>
+        </div>
+        <div v-else>暂无粉丝</div>
+        <div class="btn mt-4" @click="handleCloseFanModal">关闭</div>
       </div>
     </div>
   </div>

@@ -84,7 +84,6 @@ export interface IFollowUserListItem {
   followedAt: string
 }
 
-
 export const getFollowList = async (userId:string):Promise<IFollowUserListItem[]> => {
   const url = '/follow/list'
   try {
@@ -105,3 +104,69 @@ export const getFollowList = async (userId:string):Promise<IFollowUserListItem[]
     return [];
   }
 }
+
+export const getFanList = async (userId:string):Promise<IFollowUserListItem[]> => {
+  const url = '/follow/fans'
+  try {
+    const response = await instance.get(url, {
+      params: {
+        userId: userId
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('获取成功')
+      return response.data.data
+    } else {
+      console.error('获取失败:', response.data.message)
+      return [];
+    }
+  } catch (err) {
+    console.error('获取操作失败', err)
+    return [];
+  }
+}
+
+export const getFollowCount = async (userId:string):Promise<number> => {
+  const url = '/follow/count'
+  try {
+    const response = await instance.get(url, {
+      params: {
+        userId: userId
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('获取成功')
+      return response.data.data
+    } else {
+      console.error('获取失败:', response.data.message)
+      return 0;
+    }
+  } catch (err) {
+    console.error('获取操作失败', err)
+    return 0;
+  }
+}
+
+export const getFanCount = async (userId:string):Promise<number> => {
+  const url = '/follow/fans-count'
+  try {
+    const response = await instance.get(url, {
+      params: {
+        userId: userId
+      }
+    })
+    if (response.data.code === 200) {
+      console.log('获取成功')
+      return response.data.data
+    } else {
+      console.error('获取失败:', response.data.message)
+      return 0;
+    }
+  } catch (err) {
+    console.error('获取操作失败', err)
+    return 0;
+  }
+}
+
+
+
