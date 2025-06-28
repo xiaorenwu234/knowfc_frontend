@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import ArticlesTimeLine from '@/components/ArticlesTimeLine.vue'
 import EditPersonalData from '@/components/EditPersonalData.vue'
 import axios from 'axios'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
@@ -17,6 +16,8 @@ import instance from '@/js/axios'
 import { getUserId, logout } from '@/js/User'
 import { notify } from '@/js/toast'
 import type { ProjectSummary } from '@/js/ProjectSummary'
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
+import UserGraph from "@/views/UserGraph.vue";
 
 const windowSize = ref({
   width: window.innerWidth,
@@ -54,6 +55,12 @@ const showModal = ref(false)
 const reason = ref('')
 const errorMessage = ref('')
 const projectId = ref()
+const categories = [
+  `${ownerReference.value}创建的科研项目`,
+  `${ownerReference.value}参与的科研项目`,
+  `${ownerReference.value}的论文`,
+  `${ownerReference.value}的科研人员网络`,
+]
 
 const openModal = (pId: number) => {
   showModal.value = true
@@ -146,7 +153,7 @@ const updateAvatar = async (avatar: File) => {
   formData.append('avatar', avatar)
   try {
     const response = await axios.post('/users/update-info', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
     if (response.data.code === 200) {
       notify('success', '头像更新成功')
@@ -295,67 +302,85 @@ const submitCreate = async () => {
           </button>
         </div>
       </div>
+      <div class="flex-1 mt-4 bg-white px-2 py-2 rounded-2xl min-h-screen">
+        <TabGroup>
+          <TabList class="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
+            <Tab v-for="category in categories" as="template" :key="category" v-slot="{ selected }">
+              <button
+                :class="[
+                  'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                  'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2 transition-all',
+                  selected
+                    ? 'bg-white text-blue-700 shadow'
+                    : 'text-blue-40 hover:bg-white/[0.12] hover:text-white',
+                ]"
+              >
+                {{ category }}
+              </button>
+            </Tab>
+          </TabList>
 
-      <div class="flex-1 mt-4">
-        <div>
-          <div class="font-bold text-xl">
-            {{ ownerReference + '创建的科研项目' }}
-            <button
-              v-if="ownerReference == '我'"
-              class="ml-4 btn-sm mb-2 btn btn-primary"
-              @click="openCreateModal"
+          <TabPanels class="mt-2 transition-all">
+            <TabPanel
+              v-for="(c, idx) in categories"
+              :key="idx"
+              :class="[
+                'rounded-xl bg-white p-3 flex flex-col gap-4',
+                'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
+              ]"
             >
-              创建项目
-            </button>
-          </div>
-          <div class="flex w-full flex-wrap">
-            <div v-for="project in projects" :key="project.id" class="w-1/2">
-              <div class="border-[2px] rounded-xl h-full">
-                <div class="p-4">
-                  <h3 class="text-base font-semibold text-blue-600">
-                    <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
-                  </h3>
-                  <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
-                  <p class="text-gray-600 text-sm mt-4">
-                    <span class="badge badge-outline mr-2">合作条件</span>
-                    {{ project.cooperationTerms }}
-                  </p>
+              <template v-if="idx === 0">
+                <div class="flex w-full flex-wrap">
+                  <div v-for="project in projects" :key="project.id" class="w-1/2">
+                    <div class="border-[2px] rounded-xl h-full">
+                      <div class="p-4">
+                        <h3 class="text-base font-semibold text-blue-600">
+                          <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
+                        </h3>
+                        <p class="text-gray-600 text-sm mt-4 line-clamp-3">
+                          {{ project.projectInfo }}
+                        </p>
+                        <p class="text-gray-600 text-sm mt-4">
+                          <span class="badge badge-outline mr-2">合作条件</span>
+                          {{ project.cooperationTerms }}
+                        </p>
+                      </div>
+                      <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
+                        <button class="btn" @click="openModal(project.id)">申请加入项目</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
-                  <button class="btn" @click="openModal(project.id)">申请加入项目</button>
+              </template>
+              <template v-else-if="idx === 1">
+                <div class="flex w-full flex-wrap mt-4">
+                  <div v-for="project in participatedProjects" :key="project.id" class="w-1/2">
+                    <div class="border-[2px] rounded-xl h-full">
+                      <div class="p-4">
+                        <h3 class="text-base font-semibold text-blue-600">
+                          <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
+                        </h3>
+                        <p class="text-gray-600 text-sm mt-4 line-clamp-3">
+                          {{ project.projectInfo }}
+                        </p>
+                        <p class="text-gray-600 text-sm mt-4">
+                          <span class="badge badge-outline mr-2">合作条件</span>
+                          {{ project.cooperationTerms }}
+                        </p>
+                      </div>
+                      <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
+                        <button class="btn" @click="openModal(project.id)">申请加入项目</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="font-bold text-xl mt-8">
-          {{ ownerReference + '参与的科研项目' }}
-        </div>
-        <div class="flex w-full flex-wrap mt-4">
-          <div v-for="project in participatedProjects" :key="project.id" class="w-1/2">
-            <div class="border-[2px] rounded-xl h-full">
-              <div class="p-4">
-                <h3 class="text-base font-semibold text-blue-600">
-                  <RouterLink :to="`/project/${project.id}`">{{ project.name }}</RouterLink>
-                </h3>
-                <p class="text-gray-600 text-sm mt-4 line-clamp-3">{{ project.projectInfo }}</p>
-                <p class="text-gray-600 text-sm mt-4">
-                  <span class="badge badge-outline mr-2">合作条件</span>
-                  {{ project.cooperationTerms }}
-                </p>
-              </div>
-              <div v-if="ownerReference == 'Ta'" class="p-2 flex justify-end">
-                <button class="btn" @click="openModal(project.id)">申请加入项目</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="font-bold text-xl mt-4">{{ ownerReference + '的论文' }}</div>
-          <ArticlesTimeLine class="mt-2"></ArticlesTimeLine>
-        </div>
+              </template>
+              <template v-else-if="idx === 3">
+                <UserGraph></UserGraph>
+              </template>
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
       </div>
     </div>
   </div>
@@ -442,8 +467,12 @@ const submitCreate = async () => {
       <h3 class="text-lg font-bold mb-4">关注列表</h3>
       <div class="flex flex-col">
         <div v-if="followList.length > 0">
-          <RouterLink :to="`/personal-center/${user.id}`" v-for="user in followList" :key="user.id"
-                      class="flex items-center mb-4">
+          <RouterLink
+            :to="`/personal-center/${user.id}`"
+            v-for="user in followList"
+            :key="user.id"
+            class="flex items-center mb-4"
+          >
             <img :src="user.avatar" alt="Avatar" class="w-12 h-12 rounded-full mr-4" />
             <div>
               <p class="font-semibold">{{ user.username }}</p>
@@ -482,4 +511,5 @@ const submitCreate = async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+</style>
