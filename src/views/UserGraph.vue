@@ -22,61 +22,71 @@ const drawNetwork = () => {
   }
   const options = {
     nodes: {
-      borderWidth: 2,
-      size: 25,
+      borderWidth: 3,  // 增加边框宽度
+      size: 30,        // 增加节点大小
+      shape: 'circularImage', // 圆形图片样式
       color: {
-        border: '#222222',
-        background: '#666666',
+        border: '#2B7CE9',
+        background: '#FFCC00', // 节点背景色
         highlight: {
-          border: '#2B7CE9',
-          background: '#D2E5FF'
+          border: '#FF5733',
+          background: '#FFD700'
         },
         hover: {
-          border: '#2B7CE9',
-          background: '#D2E5FF'
+          border: '#FF5733',
+          background: '#FFD700'
         }
       },
       font: {
-        color: '#eeeeee',
-        size: 14,
-        face: 'arial'
+        color: '#111111',
+        size: 16,  // 更大字体
+        face: 'Helvetica', // 更现代的字体
+        background: 'transparent'
       },
-      shadow: true
+      shadow: true,
+      borderWidthSelected: 4  // 选中节点时边框宽度
     },
     edges: {
       color: {
         color: 'lightgray',
-        highlight: '#2B7CE9',
-        hover: '#2B7CE9'
+        highlight: '#FF5733', // 高亮边的颜色
+        hover: '#FF5733'
       },
-      width: 1,
+      width: 2, // 增加边的宽度
       smooth: {
-        type: 'continuous'
+        type: 'continuous',
+        forceDirection: 'none',
+        roundness: 0.5  // 边的弯曲效果
       },
       arrows: {
-        to: { enabled: false, scaleFactor: 1 }
+        to: { enabled: true, scaleFactor: 0.7 }  // 增加箭头指示方向
       },
       font: {
         color: '#343434',
-        size: 12,
-        strokeWidth: 0,
+        size: 14,
+        strokeWidth: 1,
         align: 'middle'
       },
-      selectionWidth: 2,
+      selectionWidth: 3, // 选中边时的宽度
       shadow: true
     },
     physics: {
       enabled: true,
       solver: 'forceAtlas2Based',
       forceAtlas2Based: {
-        gravitationalConstant: -50,
-        centralGravity: 0.01,
-        springLength: 100,
-        springConstant: 0.08
+        gravitationalConstant: -140,
+        centralGravity: 0.008,
+        springLength: 150,
+        springConstant: 0.04
       },
       stabilization: {
         iterations: 1000,
-        updateInterval: 25
+        updateInterval: 25,
+        fit: true
+      },
+      adaptiveTimestep: false,  // 关闭自适应时间步长，减少抖动
+      barnesHut: {
+        avoidOverlap: 1
       }
     },
     interaction: {
@@ -87,8 +97,14 @@ const drawNetwork = () => {
     }
   }
 
+  // 在节点数据中直接使用 avatar 字段设置图片
+  nodes.value.forEach(node => {
+    node.image = node.avatar || '';  // 确保头像字段正确
+  })
+
   network.value = new Network(container, data, options)
 }
+
 
 onMounted(() => {
   getGraph().then(res => {
