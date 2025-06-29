@@ -37,16 +37,18 @@ const router = createRouter({
           path: 'works',
           name: 'search-works',
           component: () => import('../views/SearchWorkView.vue'),
-        }, {
+        },
+        {
           path: 'users',
           name: 'search-users',
           component: () => import('../views/SearchUserView.vue'),
-        }, {
+        },
+        {
           path: 'problems',
           name: 'search-problems',
           component: () => import('../views/SearchProblemView.vue'),
-        }
-      ]
+        },
+      ],
     },
     {
       path: '/chat',
@@ -84,10 +86,15 @@ const router = createRouter({
       component: () => import('../views/UploadPaperView.vue'),
     },
     {
+      path: '/pdf-view/:id',
+      name: 'pdf-view',
+      component: () => import('../views/PDFReaderView.vue'),
+    },
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../views/FavoritesView.vue'),
-    }
+    },
   ],
 })
 

@@ -17,7 +17,7 @@ export const getArticleContent = async (articleId: string): Promise<string> => {
   }
 }
 
-export const getArticleLike = async (articleId: number): Promise<boolean> => {
+export const getArticleLike = async (articleId: string): Promise<boolean> => {
   const url = `/works/like/${articleId}/${getUserId()}`
   try {
     const response = await instance.get(url)
