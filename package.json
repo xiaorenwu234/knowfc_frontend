@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "copy-webviewer": "mkdir -p ./public/lib/webviewer && cp -a ./node_modules/@pdftron/webviewer/public/* ./public/lib/webviewer",
+    "copy-webviewer": "node copy-webviewer.cjs",
     "dev": "npm run copy-webviewer && vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
@@ -58,6 +58,7 @@
     "eslint": "^9.22.0",
     "eslint-plugin-oxlint": "^0.16.0",
     "eslint-plugin-vue": "~10.0.0",
+    "fs-extra": "^11.3.0",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
     "npm-run-all2": "^7.0.2",

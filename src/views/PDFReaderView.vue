@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div class="min-h-screen bg-white pt-24" id="webviewer" ref="viewer"></div>
 </template>
 
 <script setup lang="ts">
@@ -7,8 +7,9 @@ import instance from '@/ts/axios'
 import type { Paper } from '@/ts/Paper'
 import { notify } from '@/ts/toast'
 import { getUserId } from '@/ts/User'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
+import WebViewer from '@pdftron/webviewer'
 
 const paper = ref<Paper>()
 
@@ -31,11 +32,18 @@ const getPDFDetail = async (id: string) => {
 }
 const router = useRoute()
 const id = router.params.id as string
+const viewer = useTemplateRef('viewer')
 
 onMounted(async () => {
   await getPDFDetail(id)
-console.log('PDF Detail:', paper.value);
-
+  WebViewer(
+    {
+      path: '/lib/webviewer',
+      initialDoc: paper.value?.fileUrl,
+      defaultLanguage: 'zh_cn',
+    },
+    viewer.value!,
+  ).then((instance) => {})
 })
 </script>
 
