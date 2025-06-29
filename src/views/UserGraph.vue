@@ -3,104 +3,90 @@
 </template>
 
 <script setup>
-import "vis/dist/vis.css";
-import { onMounted, ref } from "vue";
-import { Network } from "vis";
-import { DataSet } from "vis";
+import 'vis/dist/vis.css'
+import { onMounted, ref } from 'vue'
+import { Network } from 'vis'
+import { DataSet } from 'vis'
+import { getGraph } from '@/ts/graph.js'
 
-const networkContainer = ref(null);
-const network = ref(null);
-const nodes = new DataSet([
-  { id: 1, label: "Node 1", shape: 'circularImage', image: '/image.png' },
-  { id: 2, label: "Node 2", shape: 'circle', color: '#97C2FC' },
-  { id: 3, label: "Node 3", shape: 'box', color: '#FFA807' },
-  { id: 4, label: "Node 4", shape: 'diamond', color: '#FB7E81' },
-  { id: 5, label: "Node 5", shape: 'star', color: '#7BE141' },
-  { id: 6, label: "Node 6", shape: 'triangle', color: '#6E6EFD' },
-  { id: 7, label: "Node 7", shape: 'ellipse', color: '#C2FABC' },
-  { id: 8, label: "Node 8", shape: 'database', color: '#FF8C42' },
-  { id: 9, label: "Node 9", shape: 'hexagon', color: '#EA3546' },
-  { id: 10, label: "Node 10", shape: 'square', color: '#662E9B' },
-]);
-
-const edges = new DataSet([
-  { from: 1, to: 2, label: "edge 1-2", width: 2 },
-  { from: 1, to: 3, label: "edge 1-3", width: 1, dashes: true },
-  { from: 2, to: 4, label: "edge 2-4", color: { color: 'red' } },
-  { from: 2, to: 5, label: "edge 2-5", arrows: 'to' },
-  { from: 3, to: 6, label: "edge 3-6", arrows: 'from,to' },
-  { from: 4, to: 7, label: "edge 4-7", color: 'green' },
-  { from: 5, to: 8, label: "edge 5-8", width: 3 },
-  { from: 6, to: 9, label: "edge 6-9", dashes: [5, 5] },
-  { from: 7, to: 10, label: "edge 7-10" },
-  { from: 8, to: 10, label: "edge 8-10", arrows: 'middle' },
-  { from: 9, to: 10, label: "edge 9-10", smooth: { type: 'curvedCW' } },
-  { from: 1, to: 10, label: "edge 1-10", length: 200 },
-]);
+const networkContainer = ref(null)
+const network = ref(null)
+const nodes = ref()
+const edges = ref()
 
 const drawNetwork = () => {
-  const container = networkContainer.value;
+  const container = networkContainer.value
   const data = {
-    nodes: nodes,
-    edges: edges,
-  };
+    nodes: nodes.value,
+    edges: edges.value
+  }
   const options = {
     nodes: {
-      borderWidth: 2,
-      size: 25,
+      borderWidth: 3,
+      size: 30,
+      shape: 'circularImage',
       color: {
-        border: '#222222',
-        background: '#666666',
+        border: '#2B7CE9',
+        background: '#FFCC00',
         highlight: {
-          border: '#2B7CE9',
-          background: '#D2E5FF'
+          border: '#FF5733',
+          background: '#FFD700'
         },
         hover: {
-          border: '#2B7CE9',
-          background: '#D2E5FF'
+          border: '#FF5733',
+          background: '#FFD700'
         }
       },
       font: {
-        color: '#eeeeee',
-        size: 14,
-        face: 'arial'
+        color: '#111111',
+        size: 16,
+        face: 'Helvetica',
+        background: 'transparent'
       },
-      shadow: true
+      shadow: true,
+      borderWidthSelected: 4
     },
     edges: {
       color: {
         color: 'lightgray',
-        highlight: '#2B7CE9',
-        hover: '#2B7CE9'
+        highlight: '#FF5733',
+        hover: '#FF5733'
       },
-      width: 1,
+      width: 2,
       smooth: {
-        type: 'continuous'
+        type: 'continuous',
+        forceDirection: 'none',
+        roundness: 0.5
       },
       arrows: {
-        to: { enabled: false, scaleFactor: 1 }
+        to: { enabled: true, scaleFactor: 0.7 }
       },
       font: {
         color: '#343434',
-        size: 12,
-        strokeWidth: 0,
+        size: 14,
+        strokeWidth: 1,
         align: 'middle'
       },
-      selectionWidth: 2,
+      selectionWidth: 3,
       shadow: true
     },
     physics: {
       enabled: true,
       solver: 'forceAtlas2Based',
       forceAtlas2Based: {
-        gravitationalConstant: -50,
-        centralGravity: 0.01,
-        springLength: 100,
-        springConstant: 0.08
+        gravitationalConstant: -140,
+        centralGravity: 0.008,
+        springLength: 150,
+        springConstant: 0.04
       },
       stabilization: {
         iterations: 1000,
-        updateInterval: 25
+        updateInterval: 25,
+        fit: true
+      },
+      adaptiveTimestep: false,
+      barnesHut: {
+        avoidOverlap: 1
       }
     },
     interaction: {
@@ -109,14 +95,45 @@ const drawNetwork = () => {
       hideEdgesOnDrag: true,
       multiselect: true
     }
-  };
+  }
 
-  network.value = new Network(container, data, options);
-};
+
+  const generateTextImage = (text) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 75;
+    canvas.height = 75;
+
+    ctx.fillStyle = '#FFCC00';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = '16px Helvetica';
+    ctx.fillStyle = '#111111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    return canvas.toDataURL();
+  }
+
+  nodes.value.forEach(node => {
+    node.image = node.avatar || generateTextImage(`${node.entityType === 'USER' ? '用户' : node.entityType === 'INSTITUTION' ? '机构' : '研究领域'}`);
+  })
+
+  network.value = new Network(container, data, options)
+}
+
 
 onMounted(() => {
-  drawNetwork();
-});
+  getGraph().then(res => {
+    console.log(res)
+    nodes.value = res.nodes
+    edges.value = res.edges
+    drawNetwork()
+  })
+})
 </script>
 
 <style>
