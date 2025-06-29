@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- 主要内容区域 -->
-    <div class="max-w-5xl mt-24 mx-auto px-4 py-6">
+    <div class="max-w-5xl mx-auto px-4 py-6">
       <!-- 问题标题 -->
       <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <h1 class="text-2xl font-bold text-gray-900 mb-4 leading-relaxed">
@@ -105,7 +105,7 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center gap-2">
-                  <h3 
+                  <h3
                     class="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
                     @click="goToUserProfile(answer.userId)"
                   >

@@ -1,23 +1,27 @@
 <template>
-  <div class="max-w-3xl mx-auto p-6">
-    <div class="flex items-center justify-between mb-6 mt-20">
-      <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
-      <div class="flex items-center gap-3">
-        <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount }} 条</span>
-        <button class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
-          @click="markAllAsRead" :disabled="notifiList.length === 0">
-          全部已读
-        </button>
-        <button class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
-          @click="cleanupOldNotifications">
-          清理历史
-        </button>
+  <div class="w-screen h-screen p-20">
+    <div class="max-w-7xl h-full mx-auto p-12 rounded-md">
+      <div class="flex items-center justify-between mb-6 mt-14">
+        <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
+        <div class="flex items-center gap-3">
+          <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount
+            }} 条</span>
+          <button
+            class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+            @click="markAllAsRead" :disabled="notifiList.length === 0">
+            全部已读
+          </button>
+          <button
+            class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
+            @click="cleanupOldNotifications">
+            清理历史
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="mb-4 flex flex-wrap gap-2">
-      <button v-for="type in eventTypes" :key="type.value" @click="
+      <div class="mb-4 flex flex-wrap gap-2">
+        <button v-for="type in eventTypes" :key="type.value" @click="
         filterType = type.value,
-        currentPage = 1,
+        currentPage = 0,
         fetchNotifiList()
         " :class="[
           'px-3 py-1 rounded-full text-sm border transition',
@@ -45,7 +49,7 @@
                   @click.stop="handleTitleClick(item)">
                   {{ getNotifTitle(item) }}
                 </span>
-              </div>
+                </div>
 
 
               <div class="flex items-center gap-2">
@@ -115,13 +119,15 @@
             ? 'bg-blue-600 text-white border-blue-600'
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
             " class="w-8 h-8 flex items-center justify-center rounded-full border transition">
-            {{ page }}
-          </button>
-          <button
-            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)" aria-label="下一页">
-            <span>&gt;</span>
-          </button>
+              {{ page }}
+            </button>
+            <button
+              class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+              :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)"
+              aria-label="下一页">
+              <span>&gt;</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -152,12 +158,14 @@ function openConfirm(type, item) {
   confirmItem.value = item
   showConfirm.value = true
 }
+
 function closeConfirm() {
   showConfirm.value = false
   confirmType.value = ''
   confirmItem.value = null
   fetchNotifiList()
 }
+
 let eventSource = null
 
 const eventTypes = [
@@ -216,10 +224,12 @@ async function fetchNotifiList() {
   loading.value = false
   fetchUnreadCount()
 }
+
 // 监听分页和分类变化，自动刷新
 watch([currentPage, filterType], () => {
   fetchNotifiList()
 })
+
 // 获取未读数
 async function fetchUnreadCount() {
   const userId = getUserId()
@@ -244,6 +254,7 @@ function setupSSE() {
     fetchNotifiList()
   }
 }
+
 onMounted(() => {
   fetchNotifiList()
   setupSSE()
@@ -265,6 +276,7 @@ async function handleRead(item) {
     fetchNotifiList()
   }
 }
+
 // 标记全部已读
 async function markAllAsRead() {
   const userId = getUserId()
@@ -435,6 +447,7 @@ async function handleConfirm(item) {
 
   closeConfirm()
 }
+
 async function deleteNotification(notificationId) {
   if (!notificationId) return
   if (!confirm('确定要删除这条通知吗？')) return
@@ -442,8 +455,8 @@ async function deleteNotification(notificationId) {
   try {
     await axios.delete(buildApiUrl(`/notification/del/${notificationId}`), {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     })
     // 删除成功后刷新列表和未读数
     fetchNotifiList()

@@ -1,18 +1,30 @@
 <template>
-  <div ref="networkContainer" id="mynetwork" style="width: 100%; height: 600px"></div>
+  <div>
+    <!-- 添加输入框，并给输入框加上边框样式 -->
+    <input
+      v-model="searchUserId"
+      type="text"
+      placeholder="输入用户名查找"
+      @input="highlightNode"
+      style="margin-bottom: 10px; padding: 8px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc;">
+    <div ref="networkContainer" id="mynetwork" style="width: 100%; height: 600px"></div>
+  </div>
 </template>
 
 <script setup>
 import 'vis/dist/vis.css'
 import { onMounted, ref } from 'vue'
 import { Network } from 'vis'
-import { DataSet } from 'vis'
+import { useRouter } from 'vue-router'
 import { getGraph } from '@/ts/graph.js'
 
 const networkContainer = ref(null)
 const network = ref(null)
 const nodes = ref()
 const edges = ref()
+
+const router = useRouter()
+const searchUserId = ref('')
 
 const drawNetwork = () => {
   const container = networkContainer.value
@@ -97,7 +109,6 @@ const drawNetwork = () => {
     }
   }
 
-
   const generateTextImage = (text) => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -123,8 +134,41 @@ const drawNetwork = () => {
   })
 
   network.value = new Network(container, data, options)
+
+  network.value.on('click', (event) => {
+    const { nodes: clickedNodes } = event;
+    if (clickedNodes.length > 0) {
+      const nodeId = clickedNodes[0];
+      const node = nodes.value.find(n => n.id === nodeId);
+      if (node && node.userId) {
+        handleNodeClick(node.userId);
+      }
+    }
+  })
 }
 
+const highlightNode = () => {
+  const userId = searchUserId.value.trim();
+  if (!userId) {
+    return;
+  }
+
+  const targetNode = nodes.value.find(node => node.entityType === 'USER' && node.label === userId);
+  if (targetNode) {
+    network.value.selectNodes([targetNode.id]);
+    network.value.focus(targetNode.id, {
+      scale: 1.5,
+      animation: {
+        duration: 1000,
+        easingFunction: 'easeInOutQuad'
+      }
+    });
+  }
+}
+
+const handleNodeClick = (userId) => {
+  router.push(`/personal-center/${userId}`);
+}
 
 onMounted(() => {
   getGraph().then(res => {

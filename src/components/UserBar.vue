@@ -37,7 +37,7 @@
     </div>
     <!-- 书架 -->
     <div ref="shelf" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
-      <div class="w-full h-full" @click="showForm = !showForm">
+      <div class="w-full h-full cursor-pointer" @click="router.push('/favorites')">
         <icon class="icon-[mi--favorite] w-full h-full" />
       </div>
     </div>
@@ -74,7 +74,7 @@
           上传论文
         </button>
         <button
-          @click="openUploadForm('patent')"
+          @click="handlePatentUpload"
           class="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <icon class="icon-[material-symbols--license] w-4 h-4 mr-3" />
@@ -178,7 +178,6 @@
       <button class="btn btn-ghost w-full mt-2" @click="closeBatchResult">关闭</button>
     </div>
   </div>
-  <FavoritesView v-model:showForm="showForm" v-if="showForm"></FavoritesView>
 </template>
 
 <script setup>
@@ -290,6 +289,11 @@ const store = useUserStore()
 const handlePaperUpload = () => {
   hideUploadTypeMenu()
   router.push('/upload-paper')
+}
+
+const handlePatentUpload = () => {
+  hideUploadTypeMenu()
+  router.push('/upload-patent')
 }
 
 onMounted(async () => {

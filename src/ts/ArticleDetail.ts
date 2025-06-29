@@ -7,8 +7,8 @@ export const getArticleContent = async (articleId: string): Promise<string> => {
   try {
     const response = await instance.get(url, {
       params: {
-        id: articleId,
-      },
+        id: articleId
+      }
     })
     return response.data.data
   } catch (err) {
@@ -17,7 +17,7 @@ export const getArticleContent = async (articleId: string): Promise<string> => {
   }
 }
 
-export const getArticleLike = async (articleId: number): Promise<boolean> => {
+export const getArticleLike = async (articleId: string): Promise<boolean> => {
   const url = `/works/like/${articleId}/${getUserId()}`
   try {
     const response = await instance.get(url)
@@ -35,7 +35,7 @@ export const likeArticle = async (articleId: number): Promise<boolean> => {
   const url = '/works/like'
   const data = {
     userId: getUserId(),
-    workId: articleId,
+    workId: articleId
   }
 
   try {
@@ -56,7 +56,7 @@ export const cancelLikeArticle = async (articleId: number): Promise<boolean> => 
   const url = '/works/unlike'
   const data = {
     userId: getUserId(),
-    workId: articleId,
+    workId: articleId
   }
   try {
     const response = await instance.post(url, data)
@@ -79,10 +79,10 @@ export const sendComment = async (articleId: number, content: string): Promise<b
   const data = {
     userId: getUserId(),
     workId: articleId,
-    content: content,
+    content: content
   }
 
-  try{
+  try {
     const response = await instance.post(url, data)
     if (response.data.code === 200) {
       return true
@@ -90,11 +90,46 @@ export const sendComment = async (articleId: number, content: string): Promise<b
       console.error('评论失败:', response.data.message)
       return false
     }
-  }
-  catch (err) {
+  } catch (err) {
     console.error('评论请求失败:', err)
     return false
   }
 }
 
+interface comment {
+  id: number
+  userId: number
+  userAvatar: string
+  userName: string
+  content: string
+}
+
+export const fetchComments = async (workId: number, pageNum = 1, pageSize = 100): Promise<comment[]> => {
+  try {
+    const res = await instance.get(`/works/getComments/${workId}/${pageNum}/${pageSize}`)
+    return res.data.data
+  } catch (e) {
+    console.error('获取评论失败')
+    return []
+  }
+}
+
+export const requestFullText = async (workId: number): Promise<boolean> => {
+  const userId = getUserId()
+  try {
+    await instance.get(`/works/requestFullText/${workId}/${userId}`).then((response) => {
+      if (response.data.code === 200) {
+        console.log('请求全文成功')
+        return true
+      } else {
+        console.error('请求全文失败:', response.data.message)
+        return false
+      }
+    })
+  } catch (error) {
+    console.log('请求全文发送失败')
+    return false
+  }
+  return false
+}
 

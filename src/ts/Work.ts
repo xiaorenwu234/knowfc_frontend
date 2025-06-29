@@ -4,7 +4,7 @@ export interface Work {
   id: string;
   title: string;
   authors: Author[];
-  fields: string[];
+  // fields: string[];
   keywords: string[];
   abstract: string;
   date: string;
@@ -13,6 +13,10 @@ export interface Work {
   likes: number;
   comments: Comment[];
   pdf_url: string;
+}
+
+export interface FullWorkInfo extends Work {
+  coverUrl: string,
 }
 
 interface Comment {
@@ -35,7 +39,7 @@ interface APIResponseList {
       id: number;
       title: string;
       authors: Author[];
-      fields: Array<{ id: number; name: string }>;
+      // fields: Array<{ id: number; name: string }>;
       keywords: string[] | null;
       abstractContent: string;
       publish_date: string;
@@ -56,7 +60,8 @@ interface APIResponse {
     id: number;
     title: string;
     authors: Author[];
-    fields: Array<{ id: number; name: string }>;
+    coverUrl: string;
+    // fields: Array<{ id: number; name: string }>;
     keywords: string[] | null;
     abstractContent: string;
     publish_date: string;
@@ -75,17 +80,17 @@ export async function searchWorks(title: string): Promise<Work[]> {
       params: {
         title
       }
-    });
+    })
 
     if (data.code !== 200) {
-      throw new Error(`API Error: ${data.msg}`);
+      throw new Error(`API Error: ${data.msg}`)
     }
 
     return data.data.content.map(item => ({
       id: item.id.toString(),
       title: item.title,
       authors: item.authors,
-      fields: item.fields.map(f => f.name),
+      // fields: item.fields.map(f => f.name),
       keywords: item.keywords || [],
       abstract: item.abstractContent,
       date: item.publish_date,
@@ -94,31 +99,32 @@ export async function searchWorks(title: string): Promise<Work[]> {
       likes: item.likes,
       comments: item.comments,
       pdf_url: item.pdf_url
-    }));
+    }))
   } catch (error) {
-    console.error('Error fetching works:', error);
-    throw error;
+    console.error('Error fetching works:', error)
+    throw error
   }
 }
 
-export async function getWorkDetail(id: string): Promise<Work> {
+export async function getWorkDetail(id: string): Promise<FullWorkInfo> {
   try {
     const { data } = await instance.get<APIResponse>('/works/content', {
       params: {
         id
       }
-    });
-
+    })
     if (data.code !== 200) {
-      throw new Error(`API Error: ${data.msg}`);
+      throw new Error(`API Error: ${data.msg}`)
     }
+    const item = data.data
+    // console.log(item)
 
-    const item = data.data;
     return {
+      coverUrl: item.coverUrl?item.coverUrl:'brand-logomark-primary-large.jpg',
       id: item.id.toString(),
       title: item.title,
       authors: item.authors,
-      fields: item.fields.map(f => f.name),
+      // fields: item.fields.map(f => f.name),
       keywords: item.keywords || [],
       abstract: item.abstractContent,
       date: item.publish_date,
@@ -127,9 +133,9 @@ export async function getWorkDetail(id: string): Promise<Work> {
       likes: item.likes,
       comments: item.comments,
       pdf_url: item.pdf_url
-    };
+    }
   } catch (error) {
-    console.error('Error fetching work detail:', error);
-    throw error;
+    console.error('Error fetching work detail:', error)
+    throw error
   }
 }
