@@ -257,9 +257,7 @@
             <button
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
-              <a :href="router.resolve({ name: 'UserProfile', params: { id: articleId as string } }).href" target="_blank"
-                >查看 PDF</a
-              >
+              <a :href="articleDetail.pdf_url">查看 PDF</a>
             </button>
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
@@ -332,7 +330,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { cancelLikeArticle, getArticleLike, likeArticle, sendComment } from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
 
-const router = useRouter()
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
 const articleId = route.query.id
