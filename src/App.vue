@@ -29,8 +29,6 @@ watch(
 </script>
 
 <template>
-  <Header class="h-24 w-full fixed top-0 z-50"/>
-
   <!-- Dock栏 -->
   <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
     <DockBar />
