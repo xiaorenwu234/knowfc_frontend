@@ -36,6 +36,15 @@ watch(
     if (!header.value) return
 
     isHidden.value = hideHeader.includes(newPath)
+    let shouldHide = false
+    for (const hidePath of hideHeader){
+        if (newPath.startsWith(hidePath)){
+            shouldHide = true
+            break
+        }
+    }
+    isHidden.value = shouldHide
+
     if (isHidden.value) {
       header.value.classList.add('-translate-y-24')
       header.value.classList.add('opacity-0')

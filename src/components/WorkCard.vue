@@ -38,7 +38,7 @@
             <div
               class="badge badge-outline mx-1"
               :class="getBadgeClass(f)"
-              v-for="(f, i) in work.fields"
+              v-for="(f, i) in work.keywords"
               :key="i"
             >
               {{ f }}

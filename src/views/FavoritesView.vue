@@ -14,6 +14,8 @@ import {
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
 import router from '@/router'
+import { addHistory } from '@/ts/History'
+import { getUserId } from '@/ts/User'
 
 const i = ref(0)
 
@@ -122,6 +124,7 @@ const openFolder = async (folderUuid: string) => {
       params: { id: folderUuid },
     }).href
     window.open(url, '_blank')
+    addHistory(getUserId(), folderUuid)
   }
   hideContextMenu()
 }

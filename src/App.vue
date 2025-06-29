@@ -23,6 +23,15 @@ watch(
   () => route.path,
   (newPath) => {
     isHidden.value = hideHeader.includes(newPath)
+    let shouldHide = false
+    for (const hidePath of hideHeader){
+        if (newPath.startsWith(hidePath)){
+            shouldHide = true
+            break
+        }
+    }
+    isHidden.value = shouldHide
+
     inHome.value = newPath === '/'
     showSearch.value = newPath === '/' || newPath.startsWith('/search')
   },
@@ -32,7 +41,7 @@ watch(
 
 <template>
   <!-- Dock栏 -->
-  <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
+  <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50" :class="{ 'opacity-0': isHidden, '-translate-x-24': isHidden }">
     <DockBar />
   </div>
 

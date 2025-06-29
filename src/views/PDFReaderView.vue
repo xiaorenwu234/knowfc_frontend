@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white pt-24" id="webviewer" ref="viewer"></div>
+  <div class="h-screen bg-white" id="webviewer" ref="viewer"></div>
 </template>
 
 <script setup lang="ts">
@@ -35,15 +35,31 @@ const id = router.params.id as string
 const viewer = useTemplateRef('viewer')
 
 onMounted(async () => {
-  await getPDFDetail(id)
   WebViewer(
     {
       path: '/lib/webviewer',
-      initialDoc: paper.value?.fileUrl,
-      defaultLanguage: 'zh_cn',
     },
     viewer.value!,
-  ).then((instance) => {})
+  ).then(async (instance) => {
+    await getPDFDetail(id)
+    const url = paper.value?.fileUrl
+    instance.UI.setLanguage('zh_cn')
+    if (!url) {
+      notify('error', '文件路径未知')
+    } else if (url.startsWith('http://arxiv.org')) {
+      const response = await fetch(url)
+      if (!response.ok) {
+        notify('error', '文件下载失败')
+        throw new Error('Download failed: ' + response.status)
+      }
+      const blob = await response.blob()
+      instance.UI.loadDocument(blob, { filename: url.substring(21) + '.pdf' })
+    } else {
+      instance.UI.loadDocument(url)
+    }
+    const { annotationManager } = instance.Core
+    annotationManager.addEventListener('annotationChanged', () => {})
+  })
 })
 </script>
 
