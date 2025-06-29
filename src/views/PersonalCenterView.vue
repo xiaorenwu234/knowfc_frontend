@@ -7,6 +7,7 @@ import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { getUserId, logout, setUserDetail, type User } from '@/ts/User'
 import {
   checkFollowStatus,
   followUser,
@@ -17,7 +18,6 @@ import {
   unfollowUser,
 } from '@/ts/FollowUser.ts'
 import instance from '@/ts/axios'
-import { getUserId, logout } from '@/ts/User'
 import { notify } from '@/ts/toast'
 import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
@@ -39,22 +39,22 @@ const handleQuit = () => {
   logout()
   router.push('/')
 }
-const userId = getUserId()
+
 const messages = ref([])
 const ownerReference = ref('Ta')
 onMounted(async () => {
   try {
-    const res = await axios.get(buildApiUrl(`/users/${userId}/works`))
+    const res = await axios.get(buildApiUrl(`/users/${userIdOnDisplay}/works`))
 
     if (res.data.code === 200 && Array.isArray(res.data.data)) {
       console.log('加载论文', res.data)
-      messages.value = res.data.data.map(item => {
+      messages.value = res.data.data.map((item) => {
         return {
           time: item.publish_date || '未知时间',
           title: item.title || '无标题',
           content: item.abstractContent || '',
           user: item.users?.[0]?.username || '匿名作者',
-          avatar: item.users?.[0]?.avatar || '默认头像地址'
+          avatar: item.users?.[0]?.avatar || '默认头像地址',
         }
       })
     }
@@ -63,8 +63,7 @@ onMounted(async () => {
   }
 })
 
-
-const userInfo = ref(null)
+const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
@@ -124,8 +123,14 @@ const submit = async () => {
 }
 
 const handleFollow = async () => {
-  if (following.value) await unfollowUser(userIdOnDisplay)
-  else await followUser(userIdOnDisplay)
+  if (following.value) {
+    await unfollowUser(userIdOnDisplay)
+    if (following.value) fanCount.value--
+  } else {
+    await followUser(userIdOnDisplay)
+    if (!following.value) fanCount.value++
+  }
+
   following.value = !following.value
 }
 
