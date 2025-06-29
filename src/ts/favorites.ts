@@ -171,3 +171,25 @@ export const uploadFile = async (folderId: string, pdfFile: File): Promise<[bool
     return [false, '文件上传失败'] as [boolean, string]
   }
 }
+
+
+export const deleteFile = async (fileId: string): Promise<[boolean, string]> => {
+  const url = '/paper/del'
+    try {
+        const response = await instance.delete(url, {
+        params: {
+            id: fileId,
+            userId: getUserId().toString(),
+        },
+        })
+      console.log(response.data)
+        if (response.data.code === 200) {
+        return [true, '文件删除成功'] as [boolean, string]
+        } else {
+        return [false, response.data.msg] as [boolean, string]
+        }
+    } catch (error) {
+        console.error('Error deleting file:', error)
+        return [false, '文件删除失败'] as [boolean, string]
+    }
+}

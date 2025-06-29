@@ -9,6 +9,7 @@ import {
   paperData,
   analyzePDF,
   uploadFile,
+  deleteFile,
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
@@ -291,7 +292,14 @@ const resetInputState = () => {
 
 const deleteFolder = async () => {
   if (!contextMenu.value.folderUuid) return
-  const [result, message] = await removeFolder(contextMenu.value.folderUuid)
+  const delFolder = allFolders.value.find((f) => f.uuid === contextMenu.value.folderUuid)
+  let result: boolean
+  let message: string
+  if (delFolder.type === 'folder') {
+    ;[result, message] = await removeFolder(delFolder.uuid)
+  } else {
+    ;[result, message] = await deleteFile(delFolder.uuid)
+  }
   if (result) {
     notify('success', `删除成功`)
     allFolders.value = allFolders.value.filter((f) => f.uuid !== contextMenu.value.folderUuid)
@@ -485,7 +493,10 @@ const submitFile = async () => {
 
         <div class="flex">
           <h2 class="card-title text-2xl mb-4 pr-8">我的收藏夹</h2>
-          <div class="btn btn-outline  mb-4" @click="uploadDocument">上传文献</div>
+          <div class="btn btn-outline mb-4" @click="uploadDocument">
+            <icon class="icon-[material-symbols--upload] w-5 h-5 mr-2" />
+            上传文献
+          </div>
           <div class="ml-6 btn btn-outline btn-primary">论文自动收集</div>
         </div>
 
