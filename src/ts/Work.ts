@@ -4,7 +4,7 @@ export interface Work {
   id: string;
   title: string;
   authors: Author[];
-  fields: string[];
+  // fields: string[];
   keywords: string[];
   abstract: string;
   date: string;
@@ -118,7 +118,7 @@ export async function getWorkDetail(id: string): Promise<Work> {
       id: item.id.toString(),
       title: item.title,
       authors: item.authors,
-      fields: item.fields.map(f => f.name),
+      // fields: item.fields.map(f => f.name),
       keywords: item.keywords || [],
       abstract: item.abstractContent,
       date: item.publish_date,

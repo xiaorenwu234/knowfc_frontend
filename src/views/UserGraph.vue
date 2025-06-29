@@ -22,12 +22,12 @@ const drawNetwork = () => {
   }
   const options = {
     nodes: {
-      borderWidth: 3,  // 增加边框宽度
-      size: 30,        // 增加节点大小
-      shape: 'circularImage', // 圆形图片样式
+      borderWidth: 3,
+      size: 30,
+      shape: 'circularImage',
       color: {
         border: '#2B7CE9',
-        background: '#FFCC00', // 节点背景色
+        background: '#FFCC00',
         highlight: {
           border: '#FF5733',
           background: '#FFD700'
@@ -39,27 +39,27 @@ const drawNetwork = () => {
       },
       font: {
         color: '#111111',
-        size: 16,  // 更大字体
-        face: 'Helvetica', // 更现代的字体
+        size: 16,
+        face: 'Helvetica',
         background: 'transparent'
       },
       shadow: true,
-      borderWidthSelected: 4  // 选中节点时边框宽度
+      borderWidthSelected: 4
     },
     edges: {
       color: {
         color: 'lightgray',
-        highlight: '#FF5733', // 高亮边的颜色
+        highlight: '#FF5733',
         hover: '#FF5733'
       },
-      width: 2, // 增加边的宽度
+      width: 2,
       smooth: {
         type: 'continuous',
         forceDirection: 'none',
-        roundness: 0.5  // 边的弯曲效果
+        roundness: 0.5
       },
       arrows: {
-        to: { enabled: true, scaleFactor: 0.7 }  // 增加箭头指示方向
+        to: { enabled: true, scaleFactor: 0.7 }
       },
       font: {
         color: '#343434',
@@ -67,7 +67,7 @@ const drawNetwork = () => {
         strokeWidth: 1,
         align: 'middle'
       },
-      selectionWidth: 3, // 选中边时的宽度
+      selectionWidth: 3,
       shadow: true
     },
     physics: {
@@ -84,7 +84,7 @@ const drawNetwork = () => {
         updateInterval: 25,
         fit: true
       },
-      adaptiveTimestep: false,  // 关闭自适应时间步长，减少抖动
+      adaptiveTimestep: false,
       barnesHut: {
         avoidOverlap: 1
       }
@@ -97,9 +97,29 @@ const drawNetwork = () => {
     }
   }
 
-  // 在节点数据中直接使用 avatar 字段设置图片
+
+  const generateTextImage = (text) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 75;
+    canvas.height = 75;
+
+    ctx.fillStyle = '#FFCC00';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.font = '16px Helvetica';
+    ctx.fillStyle = '#111111';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+    return canvas.toDataURL();
+  }
+
   nodes.value.forEach(node => {
-    node.image = node.avatar || '';  // 确保头像字段正确
+    node.image = node.avatar || generateTextImage(`${node.entityType === 'USER' ? '用户' : node.entityType === 'INSTITUTION' ? '机构' : '研究领域'}`);
   })
 
   network.value = new Network(container, data, options)
