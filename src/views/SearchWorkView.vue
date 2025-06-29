@@ -155,6 +155,7 @@ const initSearch = async () => {
     totalResults.value = 0
     endIndex.value = 0
   }
+  
 }
 
 initSearch()
