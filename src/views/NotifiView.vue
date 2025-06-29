@@ -46,7 +46,7 @@
                 </span>
               </div>
 
-              <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
+
               <div class="flex items-center gap-2">
                 <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
                 <button @click.stop="deleteNotification(item.id)" title="删除通知"
@@ -66,7 +66,8 @@
             </div>
             <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
             <!-- 项目邀请操作 -->
-            <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
+            <div v-if="(item.eventType === '项目邀请' || item.eventType === '项目申请') && !item.readStatus"
+              class="mt-3 flex gap-2">
               <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
                 @click.stop="openConfirm('accept', item)">
                 同意
@@ -126,7 +127,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -167,7 +168,7 @@ const eventTypes = [
   { label: '问题收到回答', value: '问题收到回答' },
 ]
 
-function formatTime(time: string | null) {
+function formatTime(time) {
   if (!time) return ''
   return new Date(time).toLocaleString()
 }
@@ -332,49 +333,86 @@ function handleTitleClick(item) {
   }
 }
 
+/**
+ * 处理确认邀请的函数
+ *
+ * @param item 项目邀请信息
+ * @returns 无返回值
+ */
+async function handleProjectApply(item, accept) {
+  try {
+    // 构建 query 参数
+    const queryParams = new URLSearchParams({
+      projectId: item.notifBody?.projectId,
+      applicantId: item.senderId,
+      isAccepted: accept ? 'true' : 'false'
+    }).toString()
+    console.log('处理项目申请参数:', queryParams) // 调试输出
+    const url = buildApiUrl(`/project/handleApply?${queryParams}`)
+
+    // 发送 POST 请求（query 参数形式）
+    const res = await axios.post(url)
+
+    if (res.data?.code === 200) {
+      item.readStatus=true // 标记为已读
+      alert('操作成功')
+      fetchNotifiList()
+    } else {
+      const msg = res.data?.msg || '未知错误'
+      if (msg === '用户已经是该项目的成员') {
+        item.readStatus=true // 标记为已读
+        // 已读处理，不弹窗，直接刷新通知列表或忽略
+        alert('操作失败: ' + msg)
+      } else {
+        alert('操作失败: ' + msg)
+      }
+    }
+    
+  } catch (err) {
+    alert('网络错误，操作失败')
+    console.error(err)
+  }
+}
+
+
+// 修改 handleConfirm 使其支持项目申请和项目邀请的处理
 async function handleConfirm(item) {
   if (!confirmItem.value) return
 
-  const inviterId = confirmItem.value.senderId
+  const accept = confirmType.value === 'accept'
 
-  const inviteeId = confirmItem.value.receiverId
-
-  const projectId = confirmItem.value.notifBody?.projectId
-  const isAccepted = confirmType.value === 'accept'
-
-  if (!inviterId || !inviteeId || !projectId) {
-    console.error('缺少必要字段')
-    return
+  if (item.eventType === '项目申请') {
+    // 调用项目申请处理接口
+    await handleProjectApply(item, accept)
+  } else if (item.eventType === '项目邀请') {
+    // 现有的项目邀请处理逻辑（伪代码演示，原代码完整）
+    const inviterId = item.senderId
+    const inviteeId = item.receiverId
+    const projectId = item.notifBody?.projectId
+    if (!inviterId || !inviteeId || !projectId) {
+      console.error('缺少必要字段')
+      return
+    }
+    try {
+      const res = await axios.post(
+        buildApiUrl('/project/handleInvite'),
+        { inviterId, inviteeId, projectId, isAccepted: accept }
+      )
+      if (res.data?.code === 200) {
+        
+        alert('操作成功')
+        fetchNotifiList()
+      } else {
+        alert('操作失败: ' + (res.data?.msg || '未知错误'))
+      }
+      item.readStatus=true // 标记为已读
+    } catch (err) {
+      alert('网络错误，操作失败')
+      console.error(err)
+    }
   }
 
-  const payload = {
-    inviterId,
-    inviteeId,
-    projectId,
-    isAccepted: isAccepted.toString(),
-  }
-
-  try {
-    await axios.post(buildApiUrl('/project/handleInvite'), payload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      transformRequest: [
-        (data) =>
-          Object.entries(data)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&'),
-      ],
-    })
-
-    // 设置状态为已读并关闭弹窗
-    handleRead(item)
-    closeConfirm()
-    fetchNotifiList()
-  } catch (error) {
-    console.error('处理邀请失败：', error)
-    alert('操作失败，请稍后再试')
-  }
+  closeConfirm()
 }
 async function deleteNotification(notificationId) {
   if (!notificationId) return

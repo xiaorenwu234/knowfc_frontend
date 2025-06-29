@@ -271,34 +271,6 @@ async function fetchProject() {
   } catch (e) {
     console.error('获取项目失败', e)
   }
-  // project.value = {
-  //     id: 1,
-  //     name: 'AI科研协作平台',
-  //     projectInfo: '本项目旨在打造一个面向高校师生的AI科研协作与知识共享平台。',
-  //     cooperationTerms: '欢迎有AI、前端、后端开发经验的同学加入，需每周参与例会。',
-  //     owner: {
-  //         id: 1,
-  //         username: 'Dr. Zhang',
-  //         avatar: 'https://knowfc.oss-cn-beijing.aliyuncs.com/avatar/3d.jpg',
-  //         title: '教授',
-  //         institution: '清华大学计算机系'
-  //     },
-  //     members: [
-  //         {
-  //             id: 2,
-  //             username: 'Alice',
-  //             avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-  //             title: '博士生'
-  //         },
-  //         {
-  //             id: 3,
-  //             username: 'Bob',
-  //             avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-  //             degree: '硕士生'
-  //         }
-  //     ],
-  //     createTime: '2025-06-24T14:02:13.031071'
-  // }
 }
 function goToUser(userId) {
   if (userId) {
@@ -377,11 +349,17 @@ async function searchUsers() {
 }
 
 // 发送邀请
+// 发送邀请
 async function sendInvites() {
-  const inviterId = user.id
+  const inviterId = userid
   const projectId = id || prompt('请输入项目ID')
 
   if (!projectId) return alert('缺少项目ID')
+
+  if (isJoined.value) {
+    alert('你已在项目里，无法发送邀请')
+    return
+  }
 
   for (const inviteeId of selectedUserIds.value) {
     await axios.post(
@@ -406,4 +384,5 @@ async function sendInvites() {
   alert('邀请发送成功')
   closeInviteDialog()
 }
+
 </script>
