@@ -1,21 +1,25 @@
 <template>
-  <div class="max-w-3xl mx-auto p-6">
-    <div class="flex items-center justify-between mb-6 mt-20">
-      <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
-      <div class="flex items-center gap-3">
-        <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount }} 条</span>
-        <button class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
-          @click="markAllAsRead" :disabled="notifiList.length === 0">
-          全部已读
-        </button>
-        <button class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
-          @click="cleanupOldNotifications">
-          清理历史
-        </button>
+  <div class="w-screen h-screen p-20">
+    <div class="max-w-7xl h-full mx-auto p-12 bg-white rounded-md">
+      <div class="flex items-center justify-between mb-6 mt-14">
+        <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
+        <div class="flex items-center gap-3">
+          <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount
+            }} 条</span>
+          <button
+            class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+            @click="markAllAsRead" :disabled="notifiList.length === 0">
+            全部已读
+          </button>
+          <button
+            class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
+            @click="cleanupOldNotifications">
+            清理历史
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="mb-4 flex flex-wrap gap-2">
-      <button v-for="type in eventTypes" :key="type.value" @click="
+      <div class="mb-4 flex flex-wrap gap-2">
+        <button v-for="type in eventTypes" :key="type.value" @click="
         filterType = type.value,
         currentPage = 0,
         fetchNotifiList()
@@ -25,101 +29,111 @@
             ? 'bg-blue-700 text-white border-blue-700'
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100',
         ]">
-        {{ type.label }}
-      </button>
-    </div>
-    <div v-if="loading" class="text-gray-400 text-center py-10">加载中...</div>
-    <div v-else-if="notifiList.length === 0" class="text-gray-400 text-center py-10">暂无通知</div>
-    <div v-else>
-      <div class="overflow-y-auto rounded-xl" style="max-height: 600px; min-height: 500px">
-        <ul>
-          <li v-for="item in notifiList" :key="item.id"
-            class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
-            :style="{ opacity: item.readStatus ? 0.7 : 1 }"
-            @click="item.eventType !== '项目申请' ? handleRead(item) : null">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
-                <span class="font-medium text-gray-800 cursor-pointer hover:underline"
-                  @click.stop="handleTitleClick(item)">
+          {{ type.label }}
+        </button>
+      </div>
+      <div v-if="loading" class="text-gray-400 text-center py-10">加载中...</div>
+      <div v-else-if="notifiList.length === 0" class="text-gray-400 text-center py-10">暂无通知
+      </div>
+      <div v-else>
+        <div class="overflow-y-auto rounded-xl" style="max-height: 600px; min-height: 500px">
+          <ul>
+            <li v-for="item in notifiList" :key="item.id"
+                class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
+                :style="{ opacity: item.readStatus ? 0.7 : 1 }"
+                @click="item.eventType !== '项目申请' ? handleRead(item) : null">
+              <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                  <span v-if="!item.readStatus"
+                        class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
+                  <span class="font-medium text-gray-800 cursor-pointer hover:underline"
+                        @click.stop="handleTitleClick(item)">
                   {{ getNotifTitle(item) }}
                 </span>
-              </div>
+                </div>
 
-              <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
-                <button @click.stop="deleteNotification(item.id)" title="删除通知"
-                  class="ml-3 p-1 rounded hover:bg-red-100 transition-colors text-black hover:text-red-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24"
-                    height="24">
-                    <path fill-rule="evenodd"
-                      d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.499.058l.346-9z"
-                      clip-rule="evenodd" />
-                  </svg>
+<!--                <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>-->
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
+                  <button @click.stop="deleteNotification(item.id)" title="删除通知"
+                          class="ml-3 p-1 rounded hover:bg-red-100 transition-colors text-black hover:text-red-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                         width="24"
+                         height="24">
+                      <path fill-rule="evenodd"
+                            d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.499.058l.346-9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                  </button>
+
+
+                </div>
+
+              </div>
+              <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
+              <!-- 项目邀请操作 -->
+              <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
+                <button
+                  class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
+                  @click.stop="openConfirm('accept', item)">
+                  同意
                 </button>
-
-
-
+                <button
+                  class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
+                  @click.stop="openConfirm('reject', item)">
+                  拒绝
+                </button>
               </div>
-
-            </div>
-            <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
-            <!-- 项目邀请操作 -->
-            <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
-              <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
-                @click.stop="openConfirm('accept', item)">
-                同意
-              </button>
-              <button class="px-4 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm shadow transition"
-                @click.stop="openConfirm('reject', item)">
-                拒绝
-              </button>
-            </div>
-            <!-- 系统通知带链接 -->
-            <div v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl" class="mt-3">
-              <a :href="item.notifBody.actionUrl" target="_blank" class="text-blue-600 hover:underline text-sm">查看详情</a>
-            </div>
-            <!-- 确认弹窗 -->
-            <div v-if="showConfirm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-              <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
-                <div class="text-lg font-bold mb-4 text-gray-800">
-                  {{ confirmType === 'accept' ? '确认同意该项目邀请？' : '确认拒绝该项目邀请？' }}
-                </div>
-                <div class="flex justify-end gap-3">
-                  <button @click="closeConfirm"
-                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">
-                    取消
-                  </button>
-                  <button @click="handleConfirm(item)"
-                    class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
-                    确定
-                  </button>
+              <!-- 系统通知带链接 -->
+              <div v-else-if="item.eventType === '系统通知' && item.notifBody?.actionUrl"
+                   class="mt-3">
+                <a :href="item.notifBody.actionUrl" target="_blank"
+                   class="text-blue-600 hover:underline text-sm">查看详情</a>
+              </div>
+              <!-- 确认弹窗 -->
+              <div v-if="showConfirm"
+                   class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+                  <div class="text-lg font-bold mb-4 text-gray-800">
+                    {{ confirmType === 'accept' ? '确认同意该项目邀请？' : '确认拒绝该项目邀请？' }}
+                  </div>
+                  <div class="flex justify-end gap-3">
+                    <button @click="closeConfirm"
+                            class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">
+                      取消
+                    </button>
+                    <button @click="handleConfirm(item)"
+                            class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
+                      确定
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <!-- 分页控件 -->
-      <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 mt-15 select-none">
-        <div class="flex justify-center items-center gap-2 mt-20 select-none">
-          <button
-            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === 0" @click="changePage(currentPage - 1)" aria-label="上一页">
-            <span>&lt;</span>
-          </button>
-          <button v-for="page in totalPages" :key="page" @click="changePage(page - 1)" :class="currentPage === page - 1
+            </li>
+          </ul>
+        </div>
+        <!-- 分页控件 -->
+        <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 mt-15 select-none">
+          <div class="flex justify-center items-center gap-2 mt-20 select-none">
+            <button
+              class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+              :disabled="currentPage === 0" @click="changePage(currentPage - 1)"
+              aria-label="上一页">
+              <span>&lt;</span>
+            </button>
+            <button v-for="page in totalPages" :key="page" @click="changePage(page - 1)" :class="currentPage === page - 1
             ? 'bg-blue-600 text-white border-blue-600'
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
             " class="w-8 h-8 flex items-center justify-center rounded-full border transition">
-            {{ page }}
-          </button>
-          <button
-            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)" aria-label="下一页">
-            <span>&gt;</span>
-          </button>
+              {{ page }}
+            </button>
+            <button
+              class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+              :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)"
+              aria-label="下一页">
+              <span>&gt;</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -150,11 +164,13 @@ function openConfirm(type, item) {
   confirmItem.value = item
   showConfirm.value = true
 }
+
 function closeConfirm() {
   showConfirm.value = false
   confirmType.value = ''
   confirmItem.value = null
 }
+
 let eventSource = null
 
 const eventTypes = [
@@ -164,7 +180,7 @@ const eventTypes = [
   { label: '成果被评论', value: '成果被评论' },
   { label: '用户关注', value: '用户关注' },
   { label: '系统通知', value: '系统通知' },
-  { label: '问题收到回答', value: '问题收到回答' },
+  { label: '问题收到回答', value: '问题收到回答' }
 ]
 
 function formatTime(time: string | null) {
@@ -211,10 +227,12 @@ async function fetchNotifiList() {
   loading.value = false
   fetchUnreadCount()
 }
+
 // 监听分页和分类变化，自动刷新
 watch([currentPage, filterType], () => {
   fetchNotifiList()
 })
+
 // 获取未读数
 async function fetchUnreadCount() {
   const userId = getUserId()
@@ -239,6 +257,7 @@ function setupSSE() {
     fetchNotifiList()
   }
 }
+
 onMounted(() => {
   fetchNotifiList()
   setupSSE()
@@ -260,6 +279,7 @@ async function handleRead(item) {
     fetchNotifiList()
   }
 }
+
 // 标记全部已读
 async function markAllAsRead() {
   const userId = getUserId()
@@ -351,20 +371,20 @@ async function handleConfirm(item) {
     inviterId,
     inviteeId,
     projectId,
-    isAccepted: isAccepted.toString(),
+    isAccepted: isAccepted.toString()
   }
 
   try {
     await axios.post(buildApiUrl('/project/handleInvite'), payload, {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
       transformRequest: [
         (data) =>
           Object.entries(data)
             .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&'),
-      ],
+            .join('&')
+      ]
     })
 
     // 设置状态为已读并关闭弹窗
@@ -376,6 +396,7 @@ async function handleConfirm(item) {
     alert('操作失败，请稍后再试')
   }
 }
+
 async function deleteNotification(notificationId) {
   if (!notificationId) return
   if (!confirm('确定要删除这条通知吗？')) return
@@ -383,8 +404,8 @@ async function deleteNotification(notificationId) {
   try {
     await axios.delete(buildApiUrl(`/notification/del/${notificationId}`), {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     })
     // 删除成功后刷新列表和未读数
     fetchNotifiList()

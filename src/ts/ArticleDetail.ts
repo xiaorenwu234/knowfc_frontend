@@ -99,12 +99,7 @@ export const sendComment = async (articleId: number, content: string): Promise<b
 export const requestFullText = async (workId: number): Promise<boolean> => {
   const userId = getUserId()
   try {
-    await instance.get(`/works/requestFullText/${workId}/${userId}`, {
-      params: {
-        workId: workId,
-        userId: userId
-      }
-    }).then((response) => {
+    await instance.get(`/works/requestFullText/${workId}/${userId}`).then((response) => {
       if (response.data.code === 200) {
         console.log('请求全文成功')
         return true
