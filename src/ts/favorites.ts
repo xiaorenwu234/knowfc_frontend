@@ -212,16 +212,17 @@ export const renameFile = async (fileId: string, newName: string): Promise<[bool
   const url = '/paper/update'
   const fileInfo = await getFileInfo(fileId)
   fileInfo.name = newName
-  console.log(fileInfo)
-  const data = {
-    userId: getUserId().toString(),
-    id: fileId,
-    paperInfo: new Blob([JSON.stringify(fileInfo)], {
+  const formData = new FormData()
+  formData.append('userId', getUserId().toString())
+  formData.append('id', fileId)
+  formData.append(
+    'paperInfo',
+    new Blob([JSON.stringify(fileInfo)], {
       type: 'application/json',
     }),
-  }
+  )
   try {
-    const response = await instance.put(url, data)
+    const response = await instance.post(url, formData)
     if (response.data.code === 200) {
       return [true, '文件重命名成功'] as [boolean, string]
     } else {
