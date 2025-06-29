@@ -29,11 +29,13 @@ watch(
 </script>
 
 <template>
+  <Header class="h-24 w-full fixed top-0 z-50"/>
+
   <!-- Dock栏 -->
-  <div class="fixed left-0 w-auto h-[100vh] flex flex-col justify-center z-50">
+  <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
     <DockBar />
   </div>
-  
+
   <div class=" w-screen sticky top-0 bg-container flex flex-col">
     <!-- 遮罩 -->
     <div
@@ -65,7 +67,7 @@ watch(
 
     <!-- 搜索栏 -->
     <SearchBar class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
-    
+
     <!-- 主体 -->
     <div class="flex-1 min-h-screen bg-container z-0 mt-[-112px]">
         <RouterView :key="$route.fullPath"></RouterView>
