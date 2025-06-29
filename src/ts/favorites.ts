@@ -1,8 +1,8 @@
 import instance from '@/ts/axios.ts'
 import { getUserId } from '@/ts/User.ts'
+import { ref } from 'vue'
 
 export const getChildrenFolders = async (uuid: string = ''): Promise<any> => {
-  console.log('uuid:', uuid)
   const url = '/library/get'
   try {
     const response = await instance.get(url, {
@@ -11,7 +11,6 @@ export const getChildrenFolders = async (uuid: string = ''): Promise<any> => {
         id: uuid,
       },
     })
-    console.log(response.data.data.items)
     return response.data.data
   } catch (err) {
     console.error('Error fetching folders:', err)
@@ -32,7 +31,6 @@ export const addFolder = async (
   formData.append('userId', getUserId().toString())
   try {
     const response = await instance.post(url, formData, {})
-    console.log(response.data)
     if (response.data.code === 200) {
       return [true, response.data.data.id] as [boolean, string]
     } else {
@@ -53,7 +51,6 @@ export const removeFolder = async (uuid: string): Promise<[boolean, string]> => 
         userId: getUserId().toString(),
       },
     })
-    console.log(response.data)
     if (response.data.code === 200) {
       return [true, '文件夹删除成功'] as [boolean, string]
     } else {
@@ -77,7 +74,6 @@ export const changeFolderName = async (
   formData.append('description', '')
   try {
     const response = await instance.post(url, formData, {})
-    console.log(response.data)
     if (response.data.code === 200) {
       return [true, '文件夹重命名成功'] as [boolean, string]
     } else {
@@ -95,24 +91,105 @@ export const moveFolder = async (
   fromId: string,
   toId: string,
 ): Promise<[boolean, string]> => {
-  console.log('move folder:', mode, fromId, toId)
   const url = '/library/move'
   const formData = new FormData()
   formData.append('mode', mode)
   formData.append('fromItemType', fromItemType)
   formData.append('fromId', fromId)
   formData.append('toId', toId)
-  try{
+  try {
     const response = await instance.post(url, formData, {})
-    console.log(response.data)
     if (response.data.code === 200) {
       return [true, '文件夹移动成功'] as [boolean, string]
     } else {
       return [false, response.data.msg] as [boolean, string]
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error moving folder:', error)
     return [false, '文件夹移动失败'] as [boolean, string]
   }
+}
+
+export const paperData = ref({
+  title: '',
+  authors: [],
+  abstractContent: '',
+  keywords: [],
+  publishDate: '',
+  journal: '',
+  volume: '',
+  issue: '',
+  pages: '',
+  type: '',
+  source: '',
+})
+
+
+export const analyzePDF = async (pdfFile: File): Promise<[boolean, string]> => {
+  const url = '/paper/getPaperData'
+  console.log(pdfFile.name)
+  const formData = new FormData()
+  formData.append('pdfFile', pdfFile)
+  formData.append('userId', getUserId().toString())
+  try {
+    const response = await instance.post(url, formData)
+    console.log(response.data)
+    if (response.data.code !== 200) {
+      console.error('获取论文数据失败:', response.data.msg)
+      return [false, '获取论文数据失败'] as [boolean, string]
+    }
+    paperData.value = response.data.data
+    return [true, '获取论文数据成功'] as [boolean, string]
+  } catch (error) {
+    console.error('Error fetching paper data:', error)
+    return [false, '获取论文数据失败'] as [boolean, string]
+  }
+}
+
+export const uploadFile = async (folderId: string, pdfFile: File): Promise<[boolean, string]> => {
+  const url = '/paper/upload'
+  const formData = new FormData()
+  formData.append('pdfFile', pdfFile)
+  formData.append('userId', getUserId().toString())
+  formData.append('libraryId', folderId)
+  formData.append(
+    'paperInfo',
+    new Blob([JSON.stringify(paperData.value)], {
+      type: 'application/json',
+    }),
+  )
+
+  try {
+    const response = await instance.post(url, formData)
+    if (response.data.code === 200) {
+      return [true, '文件上传成功'] as [boolean, string]
+    } else {
+      return [false, response.data.msg] as [boolean, string]
+    }
+  } catch (error) {
+    console.error('Error uploading file:', error)
+    return [false, '文件上传失败'] as [boolean, string]
+  }
+}
+
+
+export const deleteFile = async (fileId: string): Promise<[boolean, string]> => {
+  const url = '/paper/del'
+    try {
+        const response = await instance.delete(url, {
+        params: {
+            id: fileId,
+            userId: getUserId().toString(),
+        },
+        })
+      console.log(response.data)
+        if (response.data.code === 200) {
+        return [true, '文件删除成功'] as [boolean, string]
+        } else {
+        return [false, response.data.msg] as [boolean, string]
+        }
+    } catch (error) {
+        console.error('Error deleting file:', error)
+        return [false, '文件删除失败'] as [boolean, string]
+    }
 }

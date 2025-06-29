@@ -144,8 +144,11 @@
         <!-- 评论区 -->
         <div id="comments" class="mb-8">
           <h2 class="text-2xl font-bold mb-4">评论区</h2>
-          <div class="space-y-4 mb-4" v-for="(comment, index) in articleDetail.comments"
-               :key="index">
+          <div
+            class="space-y-4 mb-4"
+            v-for="(comment, index) in articleDetail.comments"
+            :key="index"
+          >
             <div class="p-4 border rounded-lg bg-gray-50">
               <div class="flex items-center gap-2 mb-2">
                 <img
@@ -248,10 +251,11 @@
           <!-- 下载和操作按钮 -->
           <div class="mt-6 space-y-3">
             <button
-
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
-              <a :href="articleDetail.pdf_url">查看 PDF</a>
+              <a :href="router.resolve({ name: 'UserProfile', params: { id: articleId as string } }).href" target="_blank"
+                >查看 PDF</a
+              >
             </button>
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
@@ -318,36 +322,31 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import {
-  cancelLikeArticle,
-  getArticleLike,
-  likeArticle,
-  sendComment
-} from '@/ts/ArticleDetail.js'
+import { useRoute, useRouter } from 'vue-router'
+import { cancelLikeArticle, getArticleLike, likeArticle, sendComment } from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
 
+const router = useRouter()
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
 const articleId = route.query.id
 const articleDetail = ref({})
-const getArticleDetail = async (articleId) => {
+const getArticleDetail = async (articleId: string) => {
   articleDetail.value = await getWorkDetail(articleId)
   console.log(articleDetail.value)
   liked_statement.value = await getArticleLike(articleId)
 }
-const publishDate = ref('')
-
 onMounted(async () => {
-  await getArticleDetail(articleId)
+  await getArticleDetail(articleId as string)
+
   // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
 })
 
 
 // 平滑滚动到指定区域
-const scrollToSection = (sectionId) => {
+const scrollToSection = (sectionId: string) => {
   // 设置当前激活的章节
   activeSection.value = sectionId
 
@@ -374,10 +373,6 @@ const handleLike = async () => {
       articleDetail.value.likes -= 1
     }
   }
-}
-
-const getYear = (dataString) => {
-  return dataString.split('-')[0]
 }
 
 const showCommentEditor = ref(false)
