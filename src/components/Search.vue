@@ -8,6 +8,9 @@ const searchQuery = ref('')
 const searchResults = ref([])
 const contactPersonList = defineModel('contactPersonList')
 const activeContact=defineModel('activeContact')
+
+const updateMessage = defineEmits(['updateMessage'])
+
 watch(searchQuery, async (newQuery: string) => {
   if (newQuery.trim() === '') {
     showDropdown.value = false
@@ -34,14 +37,11 @@ const addUser = async (contactId: number) => {
     activeContact.value = contactPersonList.value[personIndex]
   }
   else{
-    console.log(contactId)
     const newContact = await getSpecificContact(contactId)
-    console.log(newContact)
     contactPersonList.value.unshift(await getSpecificContact(contactId))
-    console.log(newContact)
     activeContact.value = newContact
-    console.log(contactPersonList.value)
   }
+  updateMessage('updateMessage', activeContact.value)
 }
 </script>
 

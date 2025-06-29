@@ -9,7 +9,7 @@ import {
   paperData,
   analyzePDF,
   uploadFile,
-  deleteFile,
+  deleteFile, renameFile,
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
@@ -247,15 +247,29 @@ const confirmNameChange = async () => {
   if (contextMenu.value.isRenaming && contextMenu.value.folderUuid) {
     const folder = allFolders.value.find((f) => f.uuid === contextMenu.value.folderUuid)
     if (folder && contextMenu.value.newName.trim()) {
-      const [result, message] = await changeFolderName(
-        contextMenu.value.folderUuid,
-        contextMenu.value.newName,
-      )
-      if (result) {
-        notify('success', `重命名成功`)
-        folder.title = contextMenu.value.newName
-      } else {
-        notify('error', `重命名失败: ${message}`)
+      if(folder.type === 'folder') {
+        const [result, message] = await changeFolderName(
+          contextMenu.value.folderUuid,
+          contextMenu.value.newName,
+        )
+        if (result) {
+          notify('success', `重命名成功`)
+          folder.title = contextMenu.value.newName
+        } else {
+          notify('error', `重命名失败: ${message}`)
+        }
+      }
+      else{
+        const [result, message] = await renameFile(
+          contextMenu.value.folderUuid,
+          contextMenu.value.newName,
+        )
+        if (result) {
+          notify('success', `重命名成功`)
+          folder.title = contextMenu.value.newName
+        } else {
+          notify('error', `重命名失败: ${message}`)
+        }
       }
     } else {
       notify('error', `文件夹名称不能为空`)

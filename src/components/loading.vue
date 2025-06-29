@@ -49,13 +49,12 @@
           </li>
         </ul>
       </div>
-      <span>文件解析中，请稍后</span>
+      <span style="color: black">文件解析中，请稍后</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* From Uiverse.io by Nawsome */
 .loader {
   --background: linear-gradient(135deg, #23c4f8, #275efe);
   --shadow: rgba(39, 94, 254, 0.28);
