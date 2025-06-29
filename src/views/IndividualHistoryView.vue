@@ -12,19 +12,19 @@
     <div class="px-6 py-4">
       <!-- 文章列表 - 列表式布局 -->
       <div class="space-y-3 max-w-6xl mx-auto">
-        <div 
-          v-for="item in historyData" 
+        <div
+          v-for="item in historyData"
           :key="item.id"
           class="relative group bg-white border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 transition-all cursor-pointer"
           @click="viewArticle(item)">
-          
+
           <div class="flex items-center p-4">
             <!-- 内容信息 -->
             <div class="flex-1 min-w-0">
               <h3 class="font-medium text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
                 {{ item.title }}
               </h3>
-              
+
               <div class="flex items-center gap-3 text-sm text-gray-600 mb-2">
                 <div class="flex items-center gap-1">
                   <icon :class="getTypeIcon(item.type)" class="w-4 h-4" />
@@ -45,12 +45,12 @@
 
             <!-- 操作按钮 -->
             <div class="flex items-center gap-2 ml-4">
-              <button 
+              <button
                 @click.stop="toggleCollect(item)"
                 class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
                 <icon :class="item.isCollected ? 'icon-[material-symbols--star]' : 'icon-[material-symbols--star-outline]'" class="w-5 h-5" />
               </button>
-              <button 
+              <button
                 @click.stop="removeFromHistory(item.id)"
                 class="p-2 text-gray-400 hover:text-red-500 transition-colors">
                 <icon class="icon-[material-symbols--delete-outline] w-5 h-5" />
@@ -73,7 +73,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getHistory } from '@/ts/History.ts'
+import { addHistory, getHistory } from '@/ts/History.ts'
 import { getUserId } from '@/ts/User.ts'
 
 const router = useRouter()
@@ -88,7 +88,7 @@ const loadHistory = async () => {
       console.warn('用户ID为空，无法加载历史记录')
       return
     }
-    
+
     const response = await getHistory(userId)
     if (response.data && Array.isArray(response.data)) {
       historyData.value = response.data.map(item => ({
@@ -140,9 +140,12 @@ const removeFromHistory = (id) => {
   if (index > -1) {
     historyData.value.splice(index, 1)
   }
+  console.log(id)
 }
 
 onMounted(() => {
+  addHistory(getUserId(),1)
+
   loadHistory()
 })
 </script>

@@ -12,6 +12,7 @@ export const API_CONFIG = {
     WORK_CONTENT:'/works/content',
     APPLY_FOR_PROJECT:'/project/apply',
     GET_WORK_FIELDS:'/works/fields',
+    GET_GRAPH:'/graph/id',
   }
 }
 
