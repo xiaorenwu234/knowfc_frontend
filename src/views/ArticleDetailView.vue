@@ -172,10 +172,10 @@
         <div class="sticky top-24">
           <div class="bg-gray-100 rounded-lg overflow-hidden">
             <!-- 索引标题 -->
-<!--            <div class="bg-gray-200 px-4 py-2 flex">-->
-<!--              <span class="flex-1 font-semibold">概块</span>-->
-<!--              <span class="text-blue-600 cursor-pointer hover:underline">引用</span>-->
-<!--            </div>-->
+            <!--            <div class="bg-gray-200 px-4 py-2 flex">-->
+            <!--              <span class="flex-1 font-semibold">概块</span>-->
+            <!--              <span class="text-blue-600 cursor-pointer hover:underline">引用</span>-->
+            <!--            </div>-->
 
             <!-- 索引内容 -->
             <div class="p-4 space-y-3">
@@ -201,28 +201,28 @@
               >
                 摘要
               </a>
-<!--              <a-->
-<!--                @click="scrollToSection('related')"-->
-<!--                :class="[-->
-<!--                  'block cursor-pointer transition-colors',-->
-<!--                  activeSection === 'related'-->
-<!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
-<!--                    : 'text-blue-600 hover:underline',-->
-<!--                ]"-->
-<!--              >-->
-<!--                相关文章-->
-<!--              </a>-->
-<!--              <a-->
-<!--                @click="scrollToSection('citations')"-->
-<!--                :class="[-->
-<!--                  'block cursor-pointer transition-colors',-->
-<!--                  activeSection === 'citations'-->
-<!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
-<!--                    : 'text-blue-600 hover:underline',-->
-<!--                ]"-->
-<!--              >-->
-<!--                引用-->
-<!--              </a>-->
+              <!--              <a-->
+              <!--                @click="scrollToSection('related')"-->
+              <!--                :class="[-->
+              <!--                  'block cursor-pointer transition-colors',-->
+              <!--                  activeSection === 'related'-->
+              <!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
+              <!--                    : 'text-blue-600 hover:underline',-->
+              <!--                ]"-->
+              <!--              >-->
+              <!--                相关文章-->
+              <!--              </a>-->
+              <!--              <a-->
+              <!--                @click="scrollToSection('citations')"-->
+              <!--                :class="[-->
+              <!--                  'block cursor-pointer transition-colors',-->
+              <!--                  activeSection === 'citations'-->
+              <!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
+              <!--                    : 'text-blue-600 hover:underline',-->
+              <!--                ]"-->
+              <!--              >-->
+              <!--                引用-->
+              <!--              </a>-->
               <a
                 @click="scrollToSection('authors')"
                 :class="[
@@ -322,7 +322,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { cancelLikeArticle, getArticleLike, likeArticle, sendComment } from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
 
@@ -337,10 +337,8 @@ const getArticleDetail = async (articleId: string) => {
 }
 onMounted(async () => {
   await getArticleDetail(articleId as string)
-
   // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
 })
-
 
 // 平滑滚动到指定区域
 const scrollToSection = (sectionId: string) => {
@@ -351,7 +349,7 @@ const scrollToSection = (sectionId: string) => {
   if (element) {
     element.scrollIntoView({
       behavior: 'smooth',
-      block: 'start'
+      block: 'start',
     })
   }
 }
