@@ -139,9 +139,9 @@ const uploadDocument = () => {
 }
 
 const initUploadModal = async () => {
-  const folders = await getChildrenFolders('')
-  uploadCurrentFolder.value = { uuid: folders.id, title: 'root', type: 'folder' }
-  uploadFolderPath.value = [{ uuid: folders.id, title: 'root', type: 'folder' }]
+  uploadCurrentFolder.value = currentFolder.value
+  uploadFolderPath.value = folderPath.value
+  const folders = await getChildrenFolders(currentFolder.value.uuid)
   uploadFolders.value = folders.items.map((item) => ({
     uuid: item.id,
     title: item.name,
@@ -458,7 +458,7 @@ const submitFile = async () => {
   if (result) {
     notify('success', `文件上传成功`)
     showModal.value = false
-    showUploadModal.value=false
+    showUploadModal.value = false
   } else {
     notify('error', `文件上传失败: ${msg}`)
   }
@@ -483,7 +483,11 @@ const submitFile = async () => {
           <icon class="icon-[material-symbols--close] w-5 h-5" />
         </button>
 
-        <h2 class="card-title text-2xl mb-4 pr-8">我的收藏夹</h2>
+        <div class="flex">
+          <h2 class="card-title text-2xl mb-4 pr-8">我的收藏夹</h2>
+          <div class="btn btn-outline  mb-4" @click="uploadDocument">上传文献</div>
+          <div class="ml-6 btn btn-outline btn-primary">论文自动收集</div>
+        </div>
 
         <div class="w-full" id="favoritesBody" @click="handleClickOutside">
           <div class="w-full">
