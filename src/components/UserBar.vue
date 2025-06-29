@@ -178,7 +178,7 @@
       <button class="btn btn-ghost w-full mt-2" @click="closeBatchResult">关闭</button>
     </div>
   </div>
-  <FavoritesView v-model:showForm="showForm"></FavoritesView>
+  <FavoritesView v-model:showForm="showForm" v-if="showForm"></FavoritesView>
 </template>
 
 <script setup>
