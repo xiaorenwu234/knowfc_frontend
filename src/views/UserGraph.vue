@@ -6,13 +6,15 @@
 import 'vis/dist/vis.css'
 import { onMounted, ref } from 'vue'
 import { Network } from 'vis'
-import { DataSet } from 'vis'
+import { useRouter } from 'vue-router'  // 导入 useRouter
 import { getGraph } from '@/ts/graph.js'
 
 const networkContainer = ref(null)
 const network = ref(null)
 const nodes = ref()
 const edges = ref()
+
+const router = useRouter()  // 获取路由实例
 
 const drawNetwork = () => {
   const container = networkContainer.value
@@ -123,8 +125,21 @@ const drawNetwork = () => {
   })
 
   network.value = new Network(container, data, options)
-}
 
+  network.value.on('click', (event) => {
+    const { nodes: clickedNodes } = event;
+    if (clickedNodes.length > 0) {
+      const nodeId = clickedNodes[0];
+      const node = nodes.value.find(n => n.id === nodeId);
+      if (node && node.userId) {
+        handleNodeClick(node.userId);
+      }
+    }
+  })
+}
+const handleNodeClick = (userId) => {
+  router.push(`/personal-center/${userId}`);
+}
 
 onMounted(() => {
   getGraph().then(res => {
