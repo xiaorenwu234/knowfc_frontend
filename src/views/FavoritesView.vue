@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import {addFolder, getChildrenFolders, changeFolderName, removeFolder} from '@/ts/favorites.ts'
+import {
+  addFolder,
+  getChildrenFolders,
+  changeFolderName,
+  removeFolder,
+  moveFolder
+} from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 
 const i = ref(0)
@@ -25,7 +31,9 @@ interface ContextMenuState {
 
 interface CopiedFolder {
   uuid: string | null
+  type: 'folder' | 'file' | null
   action: 'copy' | 'cut' | null
+  fromId: string | null
 }
 
 // 响应式数据
@@ -34,6 +42,7 @@ const selectedFolderUuid = ref<string | null>(null)
 const copiedFolder = ref<CopiedFolder>({
   uuid: null,
   action: null,
+  type: 'folder',
 })
 const currentFolder = ref<Folder>({ uuid: '', title: 'root', type: 'folder' })
 
@@ -52,25 +61,35 @@ const contextMenu = ref<ContextMenuState>({
 })
 
 // 方法
-const pasteFolder = () => {
+const pasteFolder = async () => {
   if (!copiedFolder.value.uuid) return
 
-  const folderToCopy = allFolders.value.find((f) => f.uuid === copiedFolder.value.uuid)
-  if (!folderToCopy) return
+  const [result,msg] = await moveFolder(
+    copiedFolder.value.action,
+    copiedFolder.value.type,
+    copiedFolder.value.fromId,
+    currentFolder.value.uuid
+  )
 
-  const newFolder: Folder = {
-    ...folderToCopy,
-    uuid: `folder-${Date.now()}`,
-    title: `${folderToCopy.title} (${copiedFolder.value.action === 'copy' ? '复制' : '剪切'})`,
-  }
+  const folders = await getChildrenFolders(currentFolder.value.uuid)
+  handleFolders(folders.items)
 
-  allFolders.value.push(newFolder)
-
-  if (copiedFolder.value.action === 'cut') {
-    allFolders.value = allFolders.value.filter((f) => f.uuid !== copiedFolder.value.uuid)
-  }
-
-  copiedFolder.value = { uuid: null, action: null }
+  // const folderToCopy = allFolders.value.find((f) => f.uuid === copiedFolder.value.uuid)
+  // if (!folderToCopy) return
+  //
+  // const newFolder: Folder = {
+  //   ...folderToCopy,
+  //   uuid: `folder-${Date.now()}`,
+  //   title: `${folderToCopy.title} (${copiedFolder.value.action === 'copy' ? '复制' : '剪切'})`,
+  // }
+  //
+  // allFolders.value.push(newFolder)
+  //
+  // if (copiedFolder.value.action === 'cut') {
+  //   allFolders.value = allFolders.value.filter((f) => f.uuid !== copiedFolder.value.uuid)
+  // }
+  //
+  // copiedFolder.value = { uuid: null, action: null }
   hideContextMenu()
 }
 
@@ -131,8 +150,7 @@ const confirmNameChange = async () => {
       } else {
         notify('error', `重命名失败: ${message}`)
       }
-    }
-    else{
+    } else {
       notify('error', `文件夹名称不能为空`)
     }
   } else if (contextMenu.value.isCreating) {
@@ -166,8 +184,8 @@ const resetInputState = () => {
 
 const deleteFolder = async () => {
   if (!contextMenu.value.folderUuid) return
-  const [result,message] = await removeFolder(contextMenu.value.folderUuid)
-  if(result){
+  const [result, message] = await removeFolder(contextMenu.value.folderUuid)
+  if (result) {
     notify('success', `删除成功`)
     allFolders.value = allFolders.value.filter((f) => f.uuid !== contextMenu.value.folderUuid)
     selectedFolderUuid.value = null
@@ -222,11 +240,12 @@ const handleClickOutside = () => {
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (selectedFolderUuid.value !== null) {
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === selectedFolderUuid.value)
     if ((event.metaKey || event.ctrlKey) && event.key === 'c') {
-      copiedFolder.value = { uuid: selectedFolderUuid.value, action: 'copy' }
+      copiedFolder.value = { uuid: selectedFolder.uuid, action: 'copy', type: selectedFolder.type, fromId: selectedFolder.uuid }
       notify('success', `文件已复制`)
     } else if ((event.metaKey || event.ctrlKey) && event.key === 'x') {
-      copiedFolder.value = { uuid: selectedFolderUuid.value, action: 'cut' }
+      copiedFolder.value = { uuid: selectedFolder.uuid, action: 'cut', type: selectedFolder.type, fromId: selectedFolder.uuid }
       notify('success', `文件已剪切`)
     } else if ((event.metaKey || event.ctrlKey) && event.key === 'v' && copiedFolder.value.uuid) {
       pasteFolder()
@@ -236,9 +255,12 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const handleCopy = (folderUuid: string | null) => {
   if (folderUuid) {
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'copy',
+      type: selectedFolder?.type || 'folder',
+      fromId: folderUuid,
     }
     hideContextMenu()
   }
@@ -246,10 +268,14 @@ const handleCopy = (folderUuid: string | null) => {
 
 const handleCut = (folderUuid: string | null) => {
   if (folderUuid) {
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'cut',
+      type: selectedFolder?.type || 'folder',
+      fromId: folderUuid,
     }
+    console.log(copiedFolder.value)
     hideContextMenu()
   }
 }
@@ -260,7 +286,7 @@ const jumpFolder = async (folderUuid: string) => {
       currentFolder.value = folderPath.value[i]
       const folders = await getChildrenFolders(folderUuid)
       currentFolder.value = {
-        uuid: folders.id,
+        uuid: folderUuid,
         title: folderPath.value[i].title,
         type: 'folder',
       }
@@ -277,7 +303,7 @@ const handleFolders = (folders: any[]) => {
     allFolders.value.push({
       uuid: folder.id || `folder-${i.value++}`,
       title: folder.name,
-      type: folder.type || 'folder',
+      type: folder.itemType || 'folder',
     })
   }
 }
