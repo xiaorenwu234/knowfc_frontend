@@ -1,9 +1,9 @@
 <template>
-    <div ref="searchBar" class="flex flex-col gap-2 p-4 sticky top-0 z-50 transition-all duration-300 mx-auto"
-        :class="[isNearTop ? 'max-w-80' : 'max-w-3xl']"
+    <div ref="searchBar" class="flex flex-col gap-2 p-4 sticky top-0 transition-all duration-300 mx-auto"
+        :class="[isNearTop ? 'w-80' : 'w-[640px]']"
         @focusin="isFocused = true" @focusout="isFocused = false;">
         <!-- 搜索框 -->
-        <label class="input input-bordered flex items-center gap-2 rounded-full focus-within:shadow-2xl  focus-within:shadow-blue-400 transition-all bg-opacity-60 backdrop-blur-sm" >
+        <label class="input input-bordered flex items-center gap-2 rounded-full focus-within:shadow-2xl  focus-within:shadow-blue-400 transition-all bg-opacity-60 backdrop-blur-sm z-40" >
             <input
                 ref="searchInput"
                 type="text"
@@ -179,6 +179,20 @@ const handleScroll = () => {
     }
 }
 
+// 监听路由切换
+router.beforeEach((to, from, next) => {
+    if (to.path === '/') {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+        isNearTop.value = false
+        next()
+    } else {
+        isNearTop.value = true
+        next()
+    }
+})
 // 全局快捷键处理
 const handleGlobalKeydown = (e) => {
     // 检查是否按下 Ctrl+K

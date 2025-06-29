@@ -71,6 +71,13 @@ const pasteFolder = async () => {
     currentFolder.value.uuid
   )
 
+  if(result){
+    notify('success', `文件夹已${copiedFolder.value.action === 'copy' ? '复制' : '剪切'}到当前文件夹`)
+  } else {
+    notify('error', `操作失败: ${msg}`)
+    return
+  }
+
   const folders = await getChildrenFolders(currentFolder.value.uuid)
   handleFolders(folders.items)
 
@@ -325,7 +332,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="showForm"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     @click.self="showForm = false"
   >
     <div

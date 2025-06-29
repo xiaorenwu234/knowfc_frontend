@@ -34,7 +34,9 @@ const addUser = async (contactId: number) => {
     activeContact.value = contactPersonList.value[personIndex]
   }
   else{
+    console.log(contactId)
     const newContact = await getSpecificContact(contactId)
+    console.log(newContact)
     contactPersonList.value.unshift(await getSpecificContact(contactId))
     console.log(newContact)
     activeContact.value = newContact

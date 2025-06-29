@@ -1,18 +1,20 @@
 <template>
-  <div ref="header" class="transition-all duration-300 ease-in-out">
+  <div ref="header" class="transition-all duration-300 ease-in-out sticky top-0">
     <div
       class="fixed w-screen h-24 z-10"
       :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute }"
     ></div>
-    <Logo />
-    <UserBar />
+    <Logo class="z-[9999] fixed"/>
+    <UserBar class="z-[9999] fixed"/>
+    <SearchBar class="z-[9999] sticky top-0 "/>
   </div>
 </template>
 
 
 <script setup lang="ts">
-import Logo from './Logo.vue'
+import Logo from './com/Logo.vue'
 import UserBar from './UserBar.vue'
+import SearchBar from './SearchBar.vue'
 import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { hideHeader } from '@/ts/hidePaths.js'

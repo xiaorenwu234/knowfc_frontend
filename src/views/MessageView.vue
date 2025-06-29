@@ -185,6 +185,7 @@ import { getAvatar, getUserId } from '@/ts/User.ts'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 import Search from '@/components/Search.vue'
+import {notify} from "@/ts/toast.ts";
 
 const MAX_MESSAGE_LENGTH = 100
 
@@ -270,7 +271,7 @@ const selectContact = async (contact) => {
 
 const senderAvatar = getAvatar()
 
-const sendMessage = () => {
+const sendMessage = async () => {
   if (!newMessage.value.trim() || !activeContact.value) return
 
   const msg = {
@@ -280,16 +281,22 @@ const sendMessage = () => {
     senderAvatar,
   }
 
-  sendChatMessage(newMessage.value, activeContact.value.chatWithUserId)
+  const [result,returnMessage] = await sendChatMessage(newMessage.value, activeContact.value.chatWithUserId)
 
-  messages.value.push(msg)
-  // 更新联系人的最后一条消息
-  if (activeContact.value) {
-    activeContact.value.lastMessage = newMessage.value
+  if(result){
+    messages.value.push(msg)
+    // 更新联系人的最后一条消息
+    if (activeContact.value) {
+      activeContact.value.lastMessage = newMessage.value
+    }
+    newMessage.value = ''
+    resizeTextarea()
+    nextTick(scrollToBottom)
   }
-  newMessage.value = ''
-  resizeTextarea()
-  nextTick(scrollToBottom)
+
+  else{
+    notify('warning',returnMessage)
+  }
 }
 
 const formatTime = (dateStr) => {
