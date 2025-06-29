@@ -17,7 +17,7 @@
     <div class="mb-4 flex flex-wrap gap-2">
       <button v-for="type in eventTypes" :key="type.value" @click="
         filterType = type.value,
-        currentPage = 1,
+        currentPage = 0,
         fetchNotifiList()
         " :class="[
           'px-3 py-1 rounded-full text-sm border transition',
