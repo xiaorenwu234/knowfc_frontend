@@ -71,6 +71,13 @@ const pasteFolder = async () => {
     currentFolder.value.uuid
   )
 
+  if(result){
+    notify('success', `文件夹已${copiedFolder.value.action === 'copy' ? '复制' : '剪切'}到当前文件夹`)
+  } else {
+    notify('error', `操作失败: ${msg}`)
+    return
+  }
+
   const folders = await getChildrenFolders(currentFolder.value.uuid)
   handleFolders(folders.items)
 

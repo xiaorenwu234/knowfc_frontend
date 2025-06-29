@@ -1,6 +1,6 @@
 import instance from '@/ts/axios.ts'
-import {getUserId} from '@/ts/User.ts'
-import {list} from 'postcss'
+import { getUserId } from '@/ts/User.ts'
+import { list } from 'postcss'
 
 export const getChatList = async (): Promise<any[]> => {
   const url = '/message/chat-list'
@@ -56,20 +56,26 @@ export const readMessages = (receiverId: number, senderId: number) => {
     })
 }
 
-export const sendChatMessage = (content: string, receiverId: number) => {
+export const sendChatMessage = async (
+  content: string,
+  receiverId: number,
+): Promise<[boolean, string]> => {
   const formData = new FormData()
   formData.append('content', content)
   formData.append('senderId', getUserId())
   formData.append('receiverId', receiverId.toString())
   const url = '/message/send'
 
-  instance.post(url, formData, {})
-    .then((res) => {
-      console.log('Message sent successfully:', res.data)
-    })
-    .catch((err) => {
-      console.error('Error sending message:', err)
-    })
+  try {
+    const res = await instance.post(url, formData, {})
+    if (res.data.code === 200) {
+      return [true, '消息发送成功']
+    }
+    return [false, res.data.msg]
+  } catch (err) {
+    console.error('Error sending message:', err)
+    return [false, '消息发送失败']
+  }
 }
 
 export const getUnreadCount = async (): Promise<number> => {
@@ -77,8 +83,8 @@ export const getUnreadCount = async (): Promise<number> => {
   try {
     const res = await instance.get(url, {
       params: {
-        'userId': getUserId().toString(),
-      }
+        userId: getUserId().toString(),
+      },
     })
     return res.data.data || 0
   } catch (err) {
@@ -86,7 +92,6 @@ export const getUnreadCount = async (): Promise<number> => {
     return 0
   }
 }
-
 
 export const getSpecificContact = async (contactId: number): Promise<any> => {
   const url = '/message/chat-with-user'
@@ -97,13 +102,13 @@ export const getSpecificContact = async (contactId: number): Promise<any> => {
   try {
     const response = await instance.get(url, {
       params: {
-        'userId': getUserId().toString(),
-        'otherUserId': contactId.toString(),
-      }
+        userId: getUserId(),
+        otherUserId: contactId,
+      },
     })
-    return response.data[0] || {}
-  }
-  catch (error) {
+    console.log(response.data.data)
+    return response.data.data[0] || {}
+  } catch (error) {
     console.error('获取特定联系人失败:', error)
     return {}
   }
