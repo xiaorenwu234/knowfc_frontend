@@ -16,6 +16,7 @@ const isWhiteRoute = computed(() => {
 
 const isHidden = ref(false)
 const inHome = ref(false)
+const showSearch = ref(false)
 
 // 监听路由变化控制 header 显示
 watch(
@@ -23,6 +24,7 @@ watch(
   (newPath) => {
     isHidden.value = hideHeader.includes(newPath)
     inHome.value = newPath === '/'
+    showSearch.value = newPath === '/' || newPath.startsWith('/search')
   },
   { immediate: true },
 )
@@ -64,7 +66,7 @@ watch(
     </div>
 
     <!-- 搜索栏 -->
-    <SearchBar class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
+    <SearchBar v-if="showSearch" class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
 
     <!-- 主体 -->
     <div class="flex-1 min-h-screen bg-container z-0 mt-[-112px]">
