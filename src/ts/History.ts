@@ -1,5 +1,14 @@
 import instance from '@/ts/axios.ts'
 
+export interface IHistory {
+  id: number,
+  type: string,
+  paperId: string,
+  workTitle: string,
+  authors: Array<string> | string,
+  isCollected: boolean
+}
+
 export const getHistory = async (userId: string | number): Promise<any> => {
   const url = `/read-history/getByUserId/${userId}`
   try {
@@ -22,10 +31,10 @@ export const getHistory = async (userId: string | number): Promise<any> => {
   }
 }
 
-export const deleteHistory = async (userId: string | number, workId: string | number): Promise<any> => {
-  const url = `/read-history/delete/${userId}/${workId}`
+export const deleteHistory = async (userId: number, paperId: string): Promise<any> => {
+  const url = `/read-history/delete/${userId}/${paperId}`
   try {
-    const response = await instance.get(url)
+    const response = await instance.delete(url)
 
     // 检查响应状态
     if (response.data.code === 200) {
@@ -42,17 +51,20 @@ export const deleteHistory = async (userId: string | number, workId: string | nu
 
 interface ReadingUpsertRequest {
   userId: number,
-  workId: number,
+  paperId: string,
   newDuration: number,
   lastPosition: number,
 }
 
-export const addHistory = async (userId: number, workId: number, newDuration = 0, lastPosition = 0): Promise<any> => {
+export const addHistory = async (userId: number, paperId: string, newDuration = 0, lastPosition = 0): Promise<any> => {
   const url = '/read-history/update'
   try {
-    const param: ReadingUpsertRequest = { userId, workId, newDuration, lastPosition }
-    const response = await instance.post(url, { params: { readingUpsertRequest: param } })
-
+    const param: ReadingUpsertRequest = { userId, paperId, newDuration, lastPosition }
+    const response = await instance.post(url, param, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
     // 检查响应状态
     if (response.data.code === 200) {
       return response.data

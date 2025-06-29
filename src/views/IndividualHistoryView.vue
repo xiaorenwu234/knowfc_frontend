@@ -21,8 +21,9 @@
           <div class="flex items-center p-4">
             <!-- 内容信息 -->
             <div class="flex-1 min-w-0">
-              <h3 class="font-medium text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
-                {{ item.title }}
+              <h3
+                class="font-medium text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+                {{ item.workTitle }}
               </h3>
 
               <div class="flex items-center gap-3 text-sm text-gray-600 mb-2">
@@ -37,7 +38,8 @@
                 <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
                   {{ getTypeLabel(item.type) }}
                 </span>
-                <span v-if="item.isCollected" class="text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">
+                <span v-if="item.isCollected"
+                      class="text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded">
                   已收藏
                 </span>
               </div>
@@ -48,10 +50,12 @@
               <button
                 @click.stop="toggleCollect(item)"
                 class="p-2 text-gray-400 hover:text-yellow-500 transition-colors">
-                <icon :class="item.isCollected ? 'icon-[material-symbols--star]' : 'icon-[material-symbols--star-outline]'" class="w-5 h-5" />
+                <icon
+                  :class="item.isCollected ? 'icon-[material-symbols--star]' : 'icon-[material-symbols--star-outline]'"
+                  class="w-5 h-5" />
               </button>
               <button
-                @click.stop="removeFromHistory(item.id)"
+                @click.stop="removeFromHistory(item.paperId)"
                 class="p-2 text-gray-400 hover:text-red-500 transition-colors">
                 <icon class="icon-[material-symbols--delete-outline] w-5 h-5" />
               </button>
@@ -68,18 +72,19 @@
       </div>
     </div>
   </div>
+  <button @click="">init</button>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { addHistory, getHistory } from '@/ts/History.ts'
+import { deleteHistory, getHistory} from '@/ts/History.ts'
 import { getUserId } from '@/ts/User.ts'
-
 const router = useRouter()
+
 // 历史记录数据
 const historyData = ref([])
-
+const userId = getUserId()
 // 加载历史记录
 const loadHistory = async () => {
   try {
@@ -93,9 +98,9 @@ const loadHistory = async () => {
     if (response.data && Array.isArray(response.data)) {
       historyData.value = response.data.map(item => ({
         id: item.id,
-        type: item.type, // 默认类型，可以根据需要调整
-        workId: item.workId,
-        title: item.workTitle,
+        type: item.type,
+        paperId: item.paperId,
+        workTitle: item.workTitle,
         authors: Array.isArray(item.authors) ? item.authors.join(', ') : (item.authors || '未知作者'),
         isCollected: item.isCollected || false
       }))
@@ -121,31 +126,31 @@ const getTypeLabel = (type) => {
     article: '文章',
     video: '视频',
     dataset: '数据集',
-    patent: '专利'
+    patent: '专利',
+    journal: '期刊'
   }
   return labelMap[type] || '其他'
 }
 
 const viewArticle = (item) => {
   // 跳转到文章详情页
-  router.push(`/article-detail?id=${item.workId}`)
+  console.log(item)
+  router.push(`/article-detail?id=${item.paperId}`)
 }
 
 const toggleCollect = (item) => {
   item.isCollected = !item.isCollected
 }
 
-const removeFromHistory = (id) => {
-  const index = historyData.value.findIndex(item => item.id === id)
+const removeFromHistory = (paperId) => {
+  const index = historyData.value.findIndex(item => item.paperId === paperId)
   if (index > -1) {
     historyData.value.splice(index, 1)
   }
-  console.log(id)
+  deleteHistory(userId,paperId)
 }
 
 onMounted(() => {
-  addHistory(getUserId(),1)
-
   loadHistory()
 })
 </script>
