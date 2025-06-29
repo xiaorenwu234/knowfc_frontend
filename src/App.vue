@@ -35,8 +35,11 @@ watch(
   <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
     <DockBar />
   </div>
+  <div class="bg-container w-screen h-screen fixed top-0 left-0 z-0">
 
-  <div class="w-screen sticky top-0 bg-container flex flex-col">
+  </div>
+
+  <div class="w-screen sticky top-0 flex flex-col">
     <!-- 遮罩 -->
     <div
       class="fixed w-screen h-24 z-30"
@@ -77,7 +80,7 @@ watch(
     <SearchBar v-if="showSearch" class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
 
     <!-- 主体 -->
-    <div class="flex-1 min-h-screen bg-container z-0 " :class="{'mt-[-112px]': showSearch}">
+    <div class="flex-1 min-h-screen z-0 " :class="{'mt-[-112px]': showSearch}">
       <RouterView :key="$route.fullPath"></RouterView>
     </div>
   </div>
