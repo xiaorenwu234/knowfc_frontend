@@ -146,18 +146,21 @@
           <h2 class="text-2xl font-bold mb-4">评论区</h2>
           <div
             class="space-y-4 mb-4"
-            v-for="(comment, index) in articleDetail.comments"
+            v-for="(comment, index) in comments"
             :key="index"
           >
             <div class="p-4 border rounded-lg bg-gray-50">
               <div class="flex items-center gap-2 mb-2">
-                <img
-                  class="w-8 h-8 rounded-full flex items-center justify-center aspect-square"
-                  :src="comment.avatar"
-                  alt="头像"
-                />
-                <span class="font-semibold text-gray-800">{{ comment.username }}</span>
-                <span class="text-xs text-gray-400 mt-1">2024-06-30</span>
+                <RouterLink :to="`/personal-center/${comment.userId}`">
+                  <img
+                    class="w-8 h-8 rounded-full flex items-center justify-center aspect-square cursor-pointer transition hover:scale-105"
+                    :src="comment.userAvatar"
+                    alt="头像"
+                  />
+                </RouterLink>
+                <span class="font-semibold text-gray-800">{{ comment.userName }}</span>
+                <span class="text-xs text-gray-400 mt-1">{{ simplifyCreateTime(comment.createTime)
+                  }}</span>
               </div>
               <div class="text-gray-700 leading-relaxed">
                 {{ comment.content }}
@@ -176,7 +179,6 @@
             <!--              <span class="flex-1 font-semibold">概块</span>-->
             <!--              <span class="text-blue-600 cursor-pointer hover:underline">引用</span>-->
             <!--            </div>-->
-
             <!-- 索引内容 -->
             <div class="p-4 space-y-3">
               <a
@@ -323,21 +325,32 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { cancelLikeArticle, getArticleLike, likeArticle, sendComment } from '@/ts/ArticleDetail.js'
+import {
+  cancelLikeArticle,
+  fetchComments,
+  getArticleLike,
+  likeArticle,
+  sendComment
+} from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
 const articleId = route.query.id
 const articleDetail = ref({})
+const comments = ref({})
 const getArticleDetail = async (articleId: string) => {
   articleDetail.value = await getWorkDetail(articleId)
-  console.log(articleDetail.value)
   liked_statement.value = await getArticleLike(articleId)
+}
+const simplifyCreateTime = (createTime: string): string => {
+  return createTime.trim().slice(0, 19).replace('T', ' ')
 }
 onMounted(async () => {
   await getArticleDetail(articleId as string)
-  // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
+  await fetchComments(articleId).then((res) => {
+    comments.value = res
+  })
 })
 
 // 平滑滚动到指定区域
@@ -349,7 +362,7 @@ const scrollToSection = (sectionId: string) => {
   if (element) {
     element.scrollIntoView({
       behavior: 'smooth',
-      block: 'start',
+      block: 'start'
     })
   }
 }

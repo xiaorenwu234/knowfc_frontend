@@ -96,6 +96,24 @@ export const sendComment = async (articleId: number, content: string): Promise<b
   }
 }
 
+interface comment {
+  id: number
+  userId: number
+  userAvatar: string
+  userName: string
+  content: string
+}
+
+export const fetchComments = async (workId: number, pageNum = 1, pageSize = 100): Promise<comment[]> => {
+  try {
+    const res = await instance.get(`/works/getComments/${workId}/${pageNum}/${pageSize}`)
+    return res.data.data
+  } catch (e) {
+    console.error('获取评论失败')
+    return []
+  }
+}
+
 export const requestFullText = async (workId: number): Promise<boolean> => {
   const userId = getUserId()
   try {
