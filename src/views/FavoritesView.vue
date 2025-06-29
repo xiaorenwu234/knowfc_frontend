@@ -9,10 +9,11 @@ import {
   paperData,
   analyzePDF,
   uploadFile,
-  deleteFile,
+  deleteFile, renameFile,
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
+import router from '@/router'
 
 const i = ref(0)
 
@@ -75,9 +76,11 @@ const contextMenu = ref<ContextMenuState>({
 const pasteFolder = async () => {
   if (!copiedFolder.value.uuid) return
 
+
+
   const [result, msg] = await moveFolder(
     copiedFolder.value.action,
-    copiedFolder.value.type,
+    copiedFolder.value.type ==='folder' ? 'folder': 'paper',
     copiedFolder.value.fromId,
     currentFolder.value.uuid,
   )
@@ -114,7 +117,11 @@ const openFolder = async (folderUuid: string) => {
       type: 'folder',
     })
   } else {
-    console.log('打开文件: ', folder.title)
+    const url = router.resolve({
+      name: 'pdf-view',
+      params: { id: folderUuid },
+    }).href
+    window.open(url, '_blank')
   }
   hideContextMenu()
 }
@@ -223,14 +230,12 @@ const handleFileUpload = async (event: Event) => {
     isLoading.value = true
     showModal.value = true
     const [result, msg] = await analyzePDF(file.value)
-    console.log('okok')
     isLoading.value = false
     if (result) {
       notify('success', `文件 ${file.value.name}解析完成`)
     } else {
       notify('error', `解析失败失败: ${msg}`)
     }
-    // showUploadModal.value = false
   }
 }
 
@@ -247,15 +252,29 @@ const confirmNameChange = async () => {
   if (contextMenu.value.isRenaming && contextMenu.value.folderUuid) {
     const folder = allFolders.value.find((f) => f.uuid === contextMenu.value.folderUuid)
     if (folder && contextMenu.value.newName.trim()) {
-      const [result, message] = await changeFolderName(
-        contextMenu.value.folderUuid,
-        contextMenu.value.newName,
-      )
-      if (result) {
-        notify('success', `重命名成功`)
-        folder.title = contextMenu.value.newName
-      } else {
-        notify('error', `重命名失败: ${message}`)
+      if(folder.type === 'folder') {
+        const [result, message] = await changeFolderName(
+          contextMenu.value.folderUuid,
+          contextMenu.value.newName,
+        )
+        if (result) {
+          notify('success', `重命名成功`)
+          folder.title = contextMenu.value.newName
+        } else {
+          notify('error', `重命名失败: ${message}`)
+        }
+      }
+      else{
+        const [result, message] = await renameFile(
+          contextMenu.value.folderUuid,
+          contextMenu.value.newName,
+        )
+        if (result) {
+          notify('success', `重命名成功`)
+          folder.title = contextMenu.value.newName
+        } else {
+          notify('error', `重命名失败: ${message}`)
+        }
       }
     } else {
       notify('error', `文件夹名称不能为空`)
@@ -374,12 +393,13 @@ const handleKeydown = (event: KeyboardEvent) => {
         type: selectedFolder.type,
         fromId: selectedFolder.uuid,
       }
+      console.log(selectedFolder.type)
       notify('success', `文件已复制`)
     } else if ((event.metaKey || event.ctrlKey) && event.key === 'x') {
       copiedFolder.value = {
         uuid: selectedFolder.uuid,
         action: 'cut',
-        type: selectedFolder.type,
+        type: selectedFolder?.type || 'folder',
         fromId: selectedFolder.uuid,
       }
       notify('success', `文件已剪切`)
@@ -391,7 +411,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const handleCopy = (folderUuid: string | null) => {
   if (folderUuid) {
-    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'copy',
@@ -404,7 +424,7 @@ const handleCopy = (folderUuid: string | null) => {
 
 const handleCut = (folderUuid: string | null) => {
   if (folderUuid) {
-    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'cut',

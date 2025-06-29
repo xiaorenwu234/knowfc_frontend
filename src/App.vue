@@ -16,6 +16,7 @@ const isWhiteRoute = computed(() => {
 
 const isHidden = ref(false)
 const inHome = ref(false)
+const showSearch = ref(false)
 
 // 监听路由变化控制 header 显示
 watch(
@@ -23,6 +24,7 @@ watch(
   (newPath) => {
     isHidden.value = hideHeader.includes(newPath)
     inHome.value = newPath === '/'
+    showSearch.value = newPath === '/' || newPath.startsWith('/search')
   },
   { immediate: true },
 )
@@ -33,8 +35,11 @@ watch(
   <div class="fixed right-0 w-auto h-[100vh] flex flex-col justify-center z-50">
     <DockBar />
   </div>
+  <div class="bg-container w-screen h-screen fixed top-0 left-0 z-0">
 
-  <div class="w-screen sticky top-0 bg-container flex flex-col">
+  </div>
+
+  <div class="w-screen sticky top-0 flex flex-col">
     <!-- 遮罩 -->
     <div
       class="fixed w-screen h-24 z-30"
@@ -72,13 +77,10 @@ watch(
     </div>
 
     <!-- 搜索栏 -->
-    <SearchBar
-      class="z-40 sticky top-0"
-      :class="{ 'opacity-0': isHidden, '-translate-y-24': isHidden }"
-    />
+    <SearchBar v-if="showSearch" class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
 
     <!-- 主体 -->
-    <div class="flex-1 min-h-screen bg-container z-0 mt-[-112px]">
+    <div class="flex-1 min-h-screen z-0 " :class="{'mt-[-112px]': showSearch}">
       <RouterView :key="$route.fullPath"></RouterView>
     </div>
   </div>

@@ -124,7 +124,6 @@ export const paperData = ref({
   source: '',
 })
 
-
 export const analyzePDF = async (pdfFile: File): Promise<[boolean, string]> => {
   const url = '/paper/getPaperData'
   console.log(pdfFile.name)
@@ -172,24 +171,65 @@ export const uploadFile = async (folderId: string, pdfFile: File): Promise<[bool
   }
 }
 
-
 export const deleteFile = async (fileId: string): Promise<[boolean, string]> => {
   const url = '/paper/del'
-    try {
-        const response = await instance.delete(url, {
-        params: {
-            id: fileId,
-            userId: getUserId().toString(),
-        },
-        })
-      console.log(response.data)
-        if (response.data.code === 200) {
-        return [true, '文件删除成功'] as [boolean, string]
-        } else {
-        return [false, response.data.msg] as [boolean, string]
-        }
-    } catch (error) {
-        console.error('Error deleting file:', error)
-        return [false, '文件删除失败'] as [boolean, string]
+  try {
+    const response = await instance.delete(url, {
+      params: {
+        id: fileId,
+        userId: getUserId().toString(),
+      },
+    })
+    console.log(response.data)
+    if (response.data.code === 200) {
+      return [true, '文件删除成功'] as [boolean, string]
+    } else {
+      return [false, response.data.msg] as [boolean, string]
     }
+  } catch (error) {
+    console.error('Error deleting file:', error)
+    return [false, '文件删除失败'] as [boolean, string]
+  }
+}
+
+export const getFileInfo = async (fileId: string): Promise<any> => {
+  const url = '/paper/get'
+  try {
+    const response = await instance.get(url, {
+      params: {
+        userId: getUserId().toString(),
+        id: fileId,
+      },
+    })
+    return response.data.data
+  } catch (err) {
+    console.error('Error fetching file info:', err)
+    return {}
+  }
+}
+
+export const renameFile = async (fileId: string, newName: string): Promise<[boolean, string]> => {
+  const url = '/paper/update'
+  const fileInfo = await getFileInfo(fileId)
+  fileInfo.name = newName
+  const formData = new FormData()
+  formData.append('userId', getUserId().toString())
+  formData.append('id', fileId)
+  formData.append(
+    'paperInfo',
+    new Blob([JSON.stringify(fileInfo)], {
+      type: 'application/json',
+    }),
+  )
+  try {
+    const response = await instance.post(url, formData)
+    if (response.data.code === 200) {
+      return [true, '文件重命名成功'] as [boolean, string]
+    } else {
+      return [false, response.data.msg] as [boolean, string]
+    }
+  } catch (error) {
+    console.error('Error renaming file:', error)
+    return [false, '文件重命名失败'] as [boolean, string]
+  }
 }

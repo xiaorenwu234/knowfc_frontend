@@ -15,7 +15,7 @@
     >
       <div class="p-4 border-b border-gray-200 flex justify-between items-center">
         <h2 class="text-lg font-semibold">联系人</h2>
-        <Search class="z-[100]" v-model:contactPersonList="contactPersonList" v-model:activeContact="activeContact"></Search>
+        <Search class="z-[100]" v-model:contactPersonList="contactPersonList" v-model:activeContact="activeContact" @updateMessage="selectContact"></Search>
         <button @click="toggleCollapse" class="md:hidden p-1 rounded-md hover:bg-gray-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +254,7 @@ const toggleCollapse = () => {
 const selectContact = async (contact) => {
   activeContact.value = contact
   readMessages(contact.chatWithUserId, getUserId())
-  // 加载聊天消息
+  message.value = []
   messages.value = await getChatDetail(contact.chatWithUserId)
   console.log(messages.value)
 
