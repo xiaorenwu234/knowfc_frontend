@@ -39,7 +39,7 @@ interface APIResponseList {
       id: number;
       title: string;
       authors: Author[];
-      fields: Array<{ id: number; name: string }>;
+      // fields: Array<{ id: number; name: string }>;
       keywords: string[] | null;
       abstractContent: string;
       publish_date: string;
@@ -61,7 +61,7 @@ interface APIResponse {
     title: string;
     authors: Author[];
     coverUrl: string;
-    fields: Array<{ id: number; name: string }>;
+    // fields: Array<{ id: number; name: string }>;
     keywords: string[] | null;
     abstractContent: string;
     publish_date: string;
@@ -90,7 +90,7 @@ export async function searchWorks(title: string): Promise<Work[]> {
       id: item.id.toString(),
       title: item.title,
       authors: item.authors,
-      fields: item.fields.map(f => f.name),
+      // fields: item.fields.map(f => f.name),
       keywords: item.keywords || [],
       abstract: item.abstractContent,
       date: item.publish_date,

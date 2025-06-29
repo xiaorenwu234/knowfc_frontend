@@ -1,21 +1,25 @@
 <template>
-  <div class="max-w-3xl mx-auto p-6">
-    <div class="flex items-center justify-between mb-6 mt-20">
-      <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
-      <div class="flex items-center gap-3">
-        <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount }} 条</span>
-        <button class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
-          @click="markAllAsRead" :disabled="notifiList.length === 0">
-          全部已读
-        </button>
-        <button class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
-          @click="cleanupOldNotifications">
-          清理历史
-        </button>
+  <div class="w-screen h-screen p-20">
+    <div class="max-w-7xl h-full mx-auto p-12 rounded-md">
+      <div class="flex items-center justify-between mb-6 mt-14">
+        <h2 class="text-3xl font-extrabold text-gray-800">我的通知</h2>
+        <div class="flex items-center gap-3">
+          <span v-if="unreadCount > 0" class="text-blue-600 text-sm font-bold">未读 {{ unreadCount
+            }} 条</span>
+          <button
+            class="px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 transition"
+            @click="markAllAsRead" :disabled="notifiList.length === 0">
+            全部已读
+          </button>
+          <button
+            class="px-3 py-1 rounded bg-gray-200 text-gray-700 text-sm hover:bg-gray-300 transition"
+            @click="cleanupOldNotifications">
+            清理历史
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="mb-4 flex flex-wrap gap-2">
-      <button v-for="type in eventTypes" :key="type.value" @click="
+      <div class="mb-4 flex flex-wrap gap-2">
+        <button v-for="type in eventTypes" :key="type.value" @click="
         filterType = type.value,
         currentPage = 0,
         fetchNotifiList()
@@ -36,7 +40,8 @@
           <li v-for="item in notifiList" :key="item.id"
             class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
             :style="{ opacity: item.readStatus ? 0.7 : 1 }"
-            @click="item.eventType !== '项目申请' ? handleRead(item) : null">
+            @click="!['项目申请', '项目邀请', '项目邀请处理'].includes(item.eventType) ? handleRead(item) : null"
+>
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-2">
                 <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
@@ -44,9 +49,9 @@
                   @click.stop="handleTitleClick(item)">
                   {{ getNotifTitle(item) }}
                 </span>
-              </div>
+                </div>
 
-              <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
+
               <div class="flex items-center gap-2">
                 <span class="text-xs text-gray-400">{{ formatTime(item.createTime) }}</span>
                 <button @click.stop="deleteNotification(item.id)" title="删除通知"
@@ -66,7 +71,8 @@
             </div>
             <div class="mt-2 text-gray-600 whitespace-pre-line">{{ getNotifText(item) }}</div>
             <!-- 项目邀请操作 -->
-            <div v-if="item.eventType === '项目申请' && !item.readStatus" class="mt-3 flex gap-2">
+            <div v-if="(item.eventType === '项目邀请' || item.eventType === '项目申请') && !item.readStatus"
+              class="mt-3 flex gap-2">
               <button class="px-4 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm shadow transition"
                 @click.stop="openConfirm('accept', item)">
                 同意
@@ -91,7 +97,7 @@
                     class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">
                     取消
                   </button>
-                  <button @click="handleConfirm(item)"
+                  <button @click="handleConfirm(confirmItem)"
                     class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
                     确定
                   </button>
@@ -113,20 +119,22 @@
             ? 'bg-blue-600 text-white border-blue-600'
             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
             " class="w-8 h-8 flex items-center justify-center rounded-full border transition">
-            {{ page }}
-          </button>
-          <button
-            class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
-            :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)" aria-label="下一页">
-            <span>&gt;</span>
-          </button>
+              {{ page }}
+            </button>
+            <button
+              class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-200 transition disabled:opacity-50"
+              :disabled="currentPage === totalPages - 1" @click="changePage(currentPage + 1)"
+              aria-label="下一页">
+              <span>&gt;</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -150,24 +158,29 @@ function openConfirm(type, item) {
   confirmItem.value = item
   showConfirm.value = true
 }
+
 function closeConfirm() {
   showConfirm.value = false
   confirmType.value = ''
   confirmItem.value = null
+  fetchNotifiList()
 }
+
 let eventSource = null
 
 const eventTypes = [
   { label: '全部', value: '全部' },
   { label: '项目邀请处理', value: '项目邀请处理' },
+  { label: '项目邀请', value: '项目邀请' },
   { label: '项目申请', value: '项目申请' },
   { label: '成果被评论', value: '成果被评论' },
   { label: '用户关注', value: '用户关注' },
   { label: '系统通知', value: '系统通知' },
   { label: '问题收到回答', value: '问题收到回答' },
+
 ]
 
-function formatTime(time: string | null) {
+function formatTime(time) {
   if (!time) return ''
   return new Date(time).toLocaleString()
 }
@@ -211,10 +224,12 @@ async function fetchNotifiList() {
   loading.value = false
   fetchUnreadCount()
 }
+
 // 监听分页和分类变化，自动刷新
 watch([currentPage, filterType], () => {
   fetchNotifiList()
 })
+
 // 获取未读数
 async function fetchUnreadCount() {
   const userId = getUserId()
@@ -239,6 +254,7 @@ function setupSSE() {
     fetchNotifiList()
   }
 }
+
 onMounted(() => {
   fetchNotifiList()
   setupSSE()
@@ -260,6 +276,7 @@ async function handleRead(item) {
     fetchNotifiList()
   }
 }
+
 // 标记全部已读
 async function markAllAsRead() {
   const userId = getUserId()
@@ -279,9 +296,11 @@ async function cleanupOldNotifications() {
 function getNotifTitle(item) {
   if (item.eventType === '系统通知' && item.notifBody?.title) return item.notifBody.title
   if (item.eventType === '项目邀请处理' && item.notifBody?.projectName)
-    return `项目邀请：${item.notifBody.projectName}`
+    return `项目邀请处理：${item.notifBody.projectName}`
   if (item.eventType === '项目申请' && item.notifBody?.projectName)
     return `项目申请：${item.notifBody.projectName}`
+  if (item.eventType === '项目邀请' && item.notifBody?.projectName)
+    return `项目邀请：${item.notifBody.projectName}`
   if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle)
     return `评论：${item.notifBody.resourceTitle}`
   if (item.eventType === '用户关注') return '新关注'
@@ -302,9 +321,13 @@ function handleTitleClick(item) {
     return
   }
   if (
-    (item.eventType === '项目邀请处理' || item.eventType === '项目申请') &&
+    (item.eventType === '项目邀请' || item.eventType === '项目申请') &&
     item.notifBody?.projectId
   ) {
+    router.push({ path: `/project/${item.notifBody.projectId}` })
+    return
+  }
+  if (item.eventType === '项目邀请处理' && item.notifBody?.projectId) {
     router.push({ path: `/project/${item.notifBody.projectId}` })
     return
   }
@@ -332,50 +355,99 @@ function handleTitleClick(item) {
   }
 }
 
+/**
+ * 处理确认邀请的函数
+ *
+ * @param item 项目邀请信息
+ * @returns 无返回值
+ */
+async function handleProjectApply(item, accept) {
+  try {
+    // 构建 query 参数
+    const queryParams = new URLSearchParams({
+      projectId: item.notifBody?.projectId,
+      applicantId: item.senderId,
+      isAccepted: accept ? 'true' : 'false'
+    }).toString()
+    console.log('处理项目申请参数:', queryParams) // 调试输出
+    const url = buildApiUrl(`/project/handleApply?${queryParams}`)
+
+    // 发送 POST 请求（query 参数形式）
+    const res = await axios.post(url)
+
+    if (res.data?.code === 200) {
+      
+      alert('操作成功')
+    } else {
+      const msg = res.data?.msg || '未知错误'
+      if (msg === '用户已经是该项目的成员') {
+        // 已读处理，不弹窗，直接刷新通知列表或忽略
+        alert('操作失败: ' + msg)
+      } else {
+        alert('操作失败: ' + msg)
+      }
+    }
+    handleRead(item) // 标记为已读
+  } catch (err) {
+    alert('网络错误，操作失败')
+    console.error(err)
+  }
+}
+
+
+// 修改 handleConfirm 使其支持项目申请和项目邀请的处理
 async function handleConfirm(item) {
   if (!confirmItem.value) return
 
-  const inviterId = confirmItem.value.senderId
-
-  const inviteeId = confirmItem.value.receiverId
-
-  const projectId = confirmItem.value.notifBody?.projectId
-  const isAccepted = confirmType.value === 'accept'
-
+  const accept = confirmType.value === 'accept'
+  console.log('处理确认邀请:', item, accept) // 调试输出
+  if (item.eventType === '项目申请') {
+    // 调用项目申请处理接口
+    await handleProjectApply(item, accept)
+  }else if (item.eventType === '项目邀请') {
+  const inviterId = item.senderId
+  const inviteeId = item.receiverId
+  const projectId = item.notifBody?.projectId
   if (!inviterId || !inviteeId || !projectId) {
     console.error('缺少必要字段')
     return
   }
 
-  const payload = {
-    inviterId,
-    inviteeId,
-    projectId,
-    isAccepted: isAccepted.toString(),
-  }
+  console.log('处理项目邀请参数:', { inviterId, inviteeId, projectId, isAccepted: accept })
 
   try {
-    await axios.post(buildApiUrl('/project/handleInvite'), payload, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      transformRequest: [
-        (data) =>
-          Object.entries(data)
-            .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-            .join('&'),
-      ],
-    })
+    const res = await axios.post(
+      buildApiUrl('/project/handleInvite'),
+      {},  // 空 body，因为参数放在 query
+      {
+        params: {
+          inviterId,
+          inviteeId,
+          projectId,
+          isAccepted: accept
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    )
 
-    // 设置状态为已读并关闭弹窗
-    handleRead(item)
-    closeConfirm()
-    fetchNotifiList()
-  } catch (error) {
-    console.error('处理邀请失败：', error)
-    alert('操作失败，请稍后再试')
+    console.log('处理项目邀请响应:', res.data)
+    if (res.data?.code === 200) {
+      alert('操作成功')
+    } else {
+      alert('操作失败: ' + (res.data?.msg || '未知错误'))
+    }
+    handleRead(item) // 标记为已读
+  } catch (err) {
+    alert('网络错误，操作失败')
+    console.error(err)
   }
 }
+
+  closeConfirm()
+}
+
 async function deleteNotification(notificationId) {
   if (!notificationId) return
   if (!confirm('确定要删除这条通知吗？')) return
@@ -383,8 +455,8 @@ async function deleteNotification(notificationId) {
   try {
     await axios.delete(buildApiUrl(`/notification/del/${notificationId}`), {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
     })
     // 删除成功后刷新列表和未读数
     fetchNotifiList()
