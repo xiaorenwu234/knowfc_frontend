@@ -77,7 +77,7 @@ watch(
     <SearchBar v-if="showSearch" class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
 
     <!-- 主体 -->
-    <div class="flex-1 min-h-screen bg-container z-0 mt-[-112px]">
+    <div class="flex-1 min-h-screen bg-container z-0 " :class="{'mt-[-112px]': showSearch}">
       <RouterView :key="$route.fullPath"></RouterView>
     </div>
   </div>
