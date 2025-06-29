@@ -21,7 +21,6 @@
 <script setup lang="ts">
 import MyFooter from '@/components/MyFooter.vue'
 import RecommendationWindow from '@/components/RecommendationWindow.vue'
-import SearchBar from '@/components/SearchBar.vue'
 import TimeLine from '@/components/TimeLine.vue'
 </script>
 
