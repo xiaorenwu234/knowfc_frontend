@@ -36,7 +36,8 @@
           <li v-for="item in notifiList" :key="item.id"
             class="relative mb-4 p-5 rounded-xl shadow-sm border border-gray-100 transition bg-white hover:shadow-md"
             :style="{ opacity: item.readStatus ? 0.7 : 1 }"
-            @click="item.eventType !== '项目申请' ? handleRead(item) : null">
+            @click="!['项目申请', '项目邀请', '项目邀请处理'].includes(item.eventType) ? handleRead(item) : null"
+>
             <div class="flex justify-between items-center">
               <div class="flex items-center gap-2">
                 <span v-if="!item.readStatus" class="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
@@ -92,7 +93,7 @@
                     class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">
                     取消
                   </button>
-                  <button @click="handleConfirm(item)"
+                  <button @click="handleConfirm(confirmItem)"
                     class="px-4 py-1 rounded bg-blue-600 text-white hover:bg-blue-700">
                     确定
                   </button>
@@ -155,6 +156,7 @@ function closeConfirm() {
   showConfirm.value = false
   confirmType.value = ''
   confirmItem.value = null
+  fetchNotifiList()
 }
 let eventSource = null
 
@@ -285,6 +287,8 @@ function getNotifTitle(item) {
     return `项目邀请处理：${item.notifBody.projectName}`
   if (item.eventType === '项目申请' && item.notifBody?.projectName)
     return `项目申请：${item.notifBody.projectName}`
+  if (item.eventType === '项目邀请' && item.notifBody?.projectName)
+    return `项目邀请：${item.notifBody.projectName}`
   if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle)
     return `评论：${item.notifBody.resourceTitle}`
   if (item.eventType === '用户关注') return '新关注'
@@ -360,19 +364,18 @@ async function handleProjectApply(item, accept) {
     const res = await axios.post(url)
 
     if (res.data?.code === 200) {
-      item.readStatus = true // 标记为已读
+      
       alert('操作成功')
     } else {
       const msg = res.data?.msg || '未知错误'
       if (msg === '用户已经是该项目的成员') {
-        item.readStatus = true // 标记为已读
         // 已读处理，不弹窗，直接刷新通知列表或忽略
         alert('操作失败: ' + msg)
       } else {
         alert('操作失败: ' + msg)
       }
     }
-
+    handleRead(item) // 标记为已读
   } catch (err) {
     alert('网络错误，操作失败')
     console.error(err)
@@ -385,38 +388,50 @@ async function handleConfirm(item) {
   if (!confirmItem.value) return
 
   const accept = confirmType.value === 'accept'
-
+  console.log('处理确认邀请:', item, accept) // 调试输出
   if (item.eventType === '项目申请') {
     // 调用项目申请处理接口
     await handleProjectApply(item, accept)
-  } else if (item.eventType === '项目邀请') {
-    // 现有的项目邀请处理逻辑（伪代码演示，原代码完整）
-    const inviterId = item.senderId
-    const inviteeId = item.receiverId
-    const projectId = item.notifBody?.projectId
-    if (!inviterId || !inviteeId || !projectId) {
-      console.error('缺少必要字段')
-      return
-    }
-    console.log('处理项目邀请参数:', { inviterId, inviteeId, projectId, isAccepted: accept }) // 调试输出
-    try {
-      const res = await axios.post(
-        buildApiUrl('/project/handleInvite'),
-        { inviterId, inviteeId, projectId, isAccepted: accept }
-      )
-      console.log('处理项目邀请响应:', res.data) // 调试输出
-      if (res.data?.code === 200) {
-
-        alert('操作成功')
-      } else {
-        alert('操作失败: ' + (res.data?.msg || '未知错误'))
-      }
-      item.readStatus = true // 标记为已读
-    } catch (err) {
-      alert('网络错误，操作失败')
-      console.error(err)
-    }
+  }else if (item.eventType === '项目邀请') {
+  const inviterId = item.senderId
+  const inviteeId = item.receiverId
+  const projectId = item.notifBody?.projectId
+  if (!inviterId || !inviteeId || !projectId) {
+    console.error('缺少必要字段')
+    return
   }
+
+  console.log('处理项目邀请参数:', { inviterId, inviteeId, projectId, isAccepted: accept })
+
+  try {
+    const res = await axios.post(
+      buildApiUrl('/project/handleInvite'),
+      {},  // 空 body，因为参数放在 query
+      {
+        params: {
+          inviterId,
+          inviteeId,
+          projectId,
+          isAccepted: accept
+        },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }
+    )
+
+    console.log('处理项目邀请响应:', res.data)
+    if (res.data?.code === 200) {
+      alert('操作成功')
+    } else {
+      alert('操作失败: ' + (res.data?.msg || '未知错误'))
+    }
+    handleRead(item) // 标记为已读
+  } catch (err) {
+    alert('网络错误，操作失败')
+    console.error(err)
+  }
+}
 
   closeConfirm()
 }
