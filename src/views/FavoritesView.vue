@@ -76,9 +76,11 @@ const contextMenu = ref<ContextMenuState>({
 const pasteFolder = async () => {
   if (!copiedFolder.value.uuid) return
 
+
+
   const [result, msg] = await moveFolder(
     copiedFolder.value.action,
-    copiedFolder.value.type,
+    copiedFolder.value.type ==='folder' ? 'folder': 'paper',
     copiedFolder.value.fromId,
     currentFolder.value.uuid,
   )
@@ -228,14 +230,12 @@ const handleFileUpload = async (event: Event) => {
     isLoading.value = true
     showModal.value = true
     const [result, msg] = await analyzePDF(file.value)
-    console.log('okok')
     isLoading.value = false
     if (result) {
       notify('success', `文件 ${file.value.name}解析完成`)
     } else {
       notify('error', `解析失败失败: ${msg}`)
     }
-    // showUploadModal.value = false
   }
 }
 
@@ -393,12 +393,13 @@ const handleKeydown = (event: KeyboardEvent) => {
         type: selectedFolder.type,
         fromId: selectedFolder.uuid,
       }
+      console.log(selectedFolder.type)
       notify('success', `文件已复制`)
     } else if ((event.metaKey || event.ctrlKey) && event.key === 'x') {
       copiedFolder.value = {
         uuid: selectedFolder.uuid,
         action: 'cut',
-        type: selectedFolder.type,
+        type: selectedFolder?.type || 'folder',
         fromId: selectedFolder.uuid,
       }
       notify('success', `文件已剪切`)
@@ -410,7 +411,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 
 const handleCopy = (folderUuid: string | null) => {
   if (folderUuid) {
-    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'copy',
@@ -423,7 +424,7 @@ const handleCopy = (folderUuid: string | null) => {
 
 const handleCut = (folderUuid: string | null) => {
   if (folderUuid) {
-    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid.value)
+    const selectedFolder = allFolders.value.find((folder) => folder.uuid === folderUuid)
     copiedFolder.value = {
       uuid: folderUuid,
       action: 'cut',
