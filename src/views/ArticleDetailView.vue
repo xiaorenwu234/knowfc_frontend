@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col h-screen">
     <div class="w-full">
       <div
         class="h-[380px] bg-gradient-to-r from-orange-800 to-orange-900 flex items-start px-8 py-6 text-white"
@@ -69,7 +69,7 @@
         <!-- 右侧期刊封面和信息 -->
         <div class="ml-8 flex-shrink-0 flex flex-col items-start justify-center h-full mr-[180px]">
           <img
-            :src="articleData.coverImage"
+            :src="articleDetail.coverUrl || 'brand-logomark-primary-large.jpg'"
             alt="Journal Cover"
             class="w-32 h-40 object-cover rounded shadow-lg mb-3"
           />
@@ -84,23 +84,19 @@
       <!-- 文章内容部分 -->
       <div class="w-full md:w-2/3 bg-white shadow-sm p-16">
         <!-- 作者信息 -->
-        <div class="mb-6">
-          <div class="flex items-center gap-4 text-sm text-gray-600">
-            <span class="text-lg font-semibold text-gray-800">
-              作者：{{
-                articleDetail.authors
-                  ? articleDetail.authors.map((author) => author.name).join(', ')
-                  : '暂无作者信息'
-              }}
-            </span>
-            <div class="flex items-center gap-2">
-              <span class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                <span class="text-white text-xs">✓</span>
-              </span>
-              <span>被引用量：11</span>
-            </div>
-          </div>
-        </div>
+        <!--        <div class="mb-6">-->
+        <!--          <div class="flex items-center gap-4 text-sm text-gray-600">-->
+        <!--            <span class="text-lg font-semibold text-gray-800">-->
+        <!--              作者：{{ articleDetail.authors ? articleDetail.authors.map(author => author.name).join(', ') : '暂无作者信息' }}-->
+        <!--            </span>-->
+        <!--            <div class="flex items-center gap-2">-->
+        <!--              <span class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">-->
+        <!--                <span class="text-white text-xs">✓</span>-->
+        <!--              </span>-->
+        <!--              <span>被引用量：11</span>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
 
         <!-- 摘要部分 -->
         <div id="abstract" class="mb-8">
@@ -110,25 +106,25 @@
           </div>
         </div>
         <!-- 相关文章推荐 -->
-        <div id="related" class="mb-8 bg-gray-50 p-6 rounded-lg">
-          <h3 class="text-lg font-semibold mb-4">其他人正在查看类似内容</h3>
-          <div class="space-y-3">
-            <div
-              v-for="(article, index) in relatedArticles"
-              :key="index"
-              class="p-3 bg-white rounded border hover:shadow-md transition-shadow cursor-pointer"
-            >
-              <h4 class="font-medium text-blue-600 hover:underline">{{ article.title }}</h4>
-              <p class="text-sm text-gray-600 mt-1">{{ article.authors }}</p>
-            </div>
-          </div>
-        </div>
+        <!--        <div id="related" class="mb-8 bg-gray-50 p-6 rounded-lg">-->
+        <!--          <h3 class="text-lg font-semibold mb-4">其他人正在查看类似内容</h3>-->
+        <!--          <div class="space-y-3">-->
+        <!--            <div-->
+        <!--              v-for="(article, index) in relatedArticles"-->
+        <!--              :key="index"-->
+        <!--              class="p-3 bg-white rounded border hover:shadow-md transition-shadow cursor-pointer"-->
+        <!--            >-->
+        <!--              <h4 class="font-medium text-blue-600 hover:underline">{{ article.title }}</h4>-->
+        <!--              <p class="text-sm text-gray-600 mt-1">{{ article.authors }}</p>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
 
         <!-- 引用部分 -->
-        <div id="citations" class="mb-8">
-          <h2 class="text-2xl font-bold mb-4">引用</h2>
-          <p class="text-gray-600">{{ articleData.citations || '无' }}</p>
-        </div>
+        <!--        <div id="citations" class="mb-8">-->
+        <!--          <h2 class="text-2xl font-bold mb-4">引用</h2>-->
+        <!--          <p class="text-gray-600">{{  || '无' }}</p>-->
+        <!--        </div>-->
 
         <!-- 作者信息详细 -->
         <div id="authors" class="mb-8">
@@ -176,10 +172,10 @@
         <div class="sticky top-24">
           <div class="bg-gray-100 rounded-lg overflow-hidden">
             <!-- 索引标题 -->
-            <div class="bg-gray-200 px-4 py-2 flex">
-              <span class="flex-1 font-semibold">概块</span>
-              <span class="text-blue-600 cursor-pointer hover:underline">引用</span>
-            </div>
+            <!--            <div class="bg-gray-200 px-4 py-2 flex">-->
+            <!--              <span class="flex-1 font-semibold">概块</span>-->
+            <!--              <span class="text-blue-600 cursor-pointer hover:underline">引用</span>-->
+            <!--            </div>-->
 
             <!-- 索引内容 -->
             <div class="p-4 space-y-3">
@@ -205,28 +201,28 @@
               >
                 摘要
               </a>
-              <a
-                @click="scrollToSection('related')"
-                :class="[
-                  'block cursor-pointer transition-colors',
-                  activeSection === 'related'
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
-                    : 'text-blue-600 hover:underline',
-                ]"
-              >
-                相关文章
-              </a>
-              <a
-                @click="scrollToSection('citations')"
-                :class="[
-                  'block cursor-pointer transition-colors',
-                  activeSection === 'citations'
-                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'
-                    : 'text-blue-600 hover:underline',
-                ]"
-              >
-                引用
-              </a>
+              <!--              <a-->
+              <!--                @click="scrollToSection('related')"-->
+              <!--                :class="[-->
+              <!--                  'block cursor-pointer transition-colors',-->
+              <!--                  activeSection === 'related'-->
+              <!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
+              <!--                    : 'text-blue-600 hover:underline',-->
+              <!--                ]"-->
+              <!--              >-->
+              <!--                相关文章-->
+              <!--              </a>-->
+              <!--              <a-->
+              <!--                @click="scrollToSection('citations')"-->
+              <!--                :class="[-->
+              <!--                  'block cursor-pointer transition-colors',-->
+              <!--                  activeSection === 'citations'-->
+              <!--                    ? 'text-gray-600 bg-gray-200 px-2 py-1 rounded'-->
+              <!--                    : 'text-blue-600 hover:underline',-->
+              <!--                ]"-->
+              <!--              >-->
+              <!--                引用-->
+              <!--              </a>-->
               <a
                 @click="scrollToSection('authors')"
                 :class="[
@@ -257,9 +253,7 @@
             <button
               class="w-full bg-orange-600 text-white py-2 px-4 rounded hover:bg-orange-700 transition-colors"
             >
-              <a :href="router.resolve({ name: 'UserProfile', params: { id: articleId as string } }).href" target="_blank"
-                >查看 PDF</a
-              >
+              <a :href="articleDetail.pdf_url">查看 PDF</a>
             </button>
             <button
               class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-50 transition-colors"
@@ -328,11 +322,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { cancelLikeArticle, getArticleLike, likeArticle, sendComment } from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
 
-const router = useRouter()
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
 const articleId = route.query.id
@@ -344,40 +337,8 @@ const getArticleDetail = async (articleId: string) => {
 }
 onMounted(async () => {
   await getArticleDetail(articleId as string)
-
   // publishDate.value = new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(articleDetail.date))
-  console.log(articleDetail.value)
 })
-// 文章数据
-const articleData = ref({
-  title: 'AI-generated or AI touch-up? Identifying AI contribution in text data',
-  type: 'Original Paper',
-  publishDate: '07 December 2024',
-  year: '2024',
-  journal: 'International Journal of Data Science and Analytics',
-  coverImage: 'brand-logomark-primary-large.jpg',
-  abstract:
-    '本文探讨了AI在文本数据中的贡献识别问题，提出了一种新的方法来区分AI生成的内容和AI辅助编辑的内容...',
-  citations: '无',
-  authors: [
-    {
-      name: '张三',
-      affiliation: '某某大学计算机学院',
-    },
-  ],
-})
-
-// 相关文章数据
-const relatedArticles = ref([
-  {
-    title: 'Deep Learning Approaches for Text Generation',
-    authors: 'Smith, J. et al.',
-  },
-  {
-    title: 'Detecting AI-Generated Content in Academic Papers',
-    authors: 'Wang, L. & Chen, M.',
-  },
-])
 
 // 平滑滚动到指定区域
 const scrollToSection = (sectionId: string) => {

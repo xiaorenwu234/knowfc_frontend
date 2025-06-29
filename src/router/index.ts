@@ -86,6 +86,11 @@ const router = createRouter({
       component: () => import('../views/UploadPaperView.vue'),
     },
     {
+      path: '/upload-patent',
+      name: 'upload-patent',
+      component: () => import('../views/UploadPatentView.vue'),
+    },
+    {
       path: '/pdf-view/:id',
       name: 'pdf-view',
       component: () => import('../views/PDFReaderView.vue'),

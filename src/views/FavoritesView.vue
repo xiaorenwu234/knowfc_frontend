@@ -13,6 +13,7 @@ import {
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
+import router from '@/router'
 
 const i = ref(0)
 
@@ -114,7 +115,11 @@ const openFolder = async (folderUuid: string) => {
       type: 'folder',
     })
   } else {
-    console.log('打开文件: ', folder.title)
+    const url = router.resolve({
+      name: 'pdf-view',
+      params: { id: folderUuid },
+    }).href
+    window.open(url, '_blank')
   }
   hideContextMenu()
 }

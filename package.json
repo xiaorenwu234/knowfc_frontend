@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "copy-webviewer": "mkdir -p ./public/lib/webviewer && cp -a ./node_modules/@pdftron/webviewer/public/* ./public/lib/webviewer",
+    "dev": "npm run copy-webviewer && vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "test:unit": "vitest",
-    "build-only": "vite build",
+    "build-only": "npm run copy-webviewer && vite build",
     "type-check": "vue-tsc --build",
     "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
     "lint:eslint": "eslint . --fix",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.19",
+    "@pdftron/webviewer": "^11.5.0",
     "@stomp/stompjs": "^7.1.1",
     "axios": "^1.10.0",
     "cropperjs": "^1.6.2",

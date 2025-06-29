@@ -123,8 +123,14 @@ const submit = async () => {
 }
 
 const handleFollow = async () => {
-  if (following.value) await unfollowUser(userIdOnDisplay)
-  else await followUser(userIdOnDisplay)
+  if (following.value) {
+    await unfollowUser(userIdOnDisplay)
+    if (following.value) fanCount.value--
+  } else {
+    await followUser(userIdOnDisplay)
+    if (!following.value) fanCount.value++
+  }
+
   following.value = !following.value
 }
 
