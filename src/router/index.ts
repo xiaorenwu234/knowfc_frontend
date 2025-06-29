@@ -90,6 +90,11 @@ const router = createRouter({
       name: 'pdf-view',
       component: () => import('../views/PDFReaderView.vue'),
     },
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('../views/FavoritesView.vue'),
+    },
   ],
 })
 
