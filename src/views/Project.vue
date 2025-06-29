@@ -3,8 +3,7 @@
     <div class="max-w-[120rem] w-full mx-auto flex flex-col flex-1">
       <!-- 顶部大色块 -->
       <div
-        class="h-[320px] bg-gradient-to-r from-blue-800 to-blue-900 rounded-t-2xl px-4 md:px-12 pb-8 text-white flex items-end"
-      >
+        class="h-[320px] bg-gradient-to-r from-blue-800 to-blue-900 rounded-t-2xl px-4 md:px-12 pb-8 text-white flex items-end">
         <div class="ml-20 flex-1">
           <div class="text-sm opacity-90 mb-2">
             <span class="hover:underline cursor-pointer">Home</span>
@@ -21,22 +20,17 @@
           </div>
         </div>
         <div class="ml-auto mr-20 flex flex-col items-center justify-end h-full">
-          <img
-            :src="project.owner?.avatar || '/default-avatar.png'"
-            alt="负责人头像"
+          <img :src="project.owner?.avatar || '/default-avatar.png'" alt="负责人头像"
             class="w-28 h-28 object-cover rounded-full border-4 border-white shadow-lg mb-3 cursor-pointer transition hover:scale-105"
-            @click="goToUser(project.owner?.id)"
-          />
-          <div class="text-lg text-left opacity-90 max-w-80">
-            <div class="font-semibold mb-1">{{ project.owner?.title || '' }}</div>
+            @click="goToUser(project.owner?.id)" />
+          <div class="text-lg text-center opacity-90 max-w-80">
+            <div class="font-semibold mb-1">{{ project.owner?.username || '' }}</div>
             <div class="text-xs">{{ project.owner?.institution || '' }}</div>
           </div>
         </div>
       </div>
       <!-- 下方内容区 -->
-      <div
-        class="flex flex-col h-screen md:flex-row gap-8 px-4 pb-12 bg-white rounded-b-2xl shadow-xl -mt-6"
-      >
+      <div class="flex flex-col h-screen md:flex-row gap-8 px-4 pb-12 bg-white rounded-b-2xl shadow-xl -mt-6">
         <!-- 主体卡片 -->
         <div class="flex-1 pt-8 ml-28">
           <!-- 项目简介 -->
@@ -57,16 +51,11 @@
           <div id="project-members" class="mb-4 scroll-mt-32">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">项目成员</h2>
             <div class="flex flex-wrap gap-4">
-              <div
-                v-for="member in project.members"
-                :key="member.id"
-                class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 shadow-sm"
-              >
-                <img
-                  :src="member.avatar || '/default-avatar.png'"
+              <div v-for="member in project.members" :key="member.id"
+                class="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 shadow-sm">
+                <img :src="member.avatar || '/default-avatar.png'"
                   class="w-8 h-8 rounded-full object-cover cursor-pointer transition hover:scale-110"
-                  @click="goToUser(member.id)"
-                />
+                  @click="goToUser(member.id)" />
                 <div>
                   <div class="font-medium text-gray-800 text-sm">
                     {{ member.username || '成员' }}
@@ -84,104 +73,71 @@
             <div class="bg-gray-50 rounded-2xl shadow-lg mb-6 overflow-hidden">
               <div class="bg-gray-100 px-6 py-3 font-semibold text-gray-700">项目导航</div>
               <div class="p-6 space-y-3">
-                <a
-                  @click="scrollToSection('intro')"
-                  :class="[
-                    'block cursor-pointer transition-colors px-2 py-1 rounded',
-                    activeSection === 'intro'
-                      ? 'text-gray-800 bg-gray-200 font-bold'
-                      : 'text-blue-700 hover:underline',
-                  ]"
-                >
+                <a @click="scrollToSection('intro')" :class="[
+                  'block cursor-pointer transition-colors px-2 py-1 rounded',
+                  activeSection === 'intro'
+                    ? 'text-gray-800 bg-gray-200 font-bold'
+                    : 'text-blue-700 hover:underline',
+                ]">
                   项目简介
                 </a>
-                <a
-                  @click="scrollToSection('terms')"
-                  :class="[
-                    'block cursor-pointer transition-colors px-2 py-1 rounded',
-                    activeSection === 'terms'
-                      ? 'text-gray-800 bg-gray-200 font-bold'
-                      : 'text-blue-700 hover:underline',
-                  ]"
-                >
+                <a @click="scrollToSection('terms')" :class="[
+                  'block cursor-pointer transition-colors px-2 py-1 rounded',
+                  activeSection === 'terms'
+                    ? 'text-gray-800 bg-gray-200 font-bold'
+                    : 'text-blue-700 hover:underline',
+                ]">
                   合作条款
                 </a>
-                <a
-                  @click="scrollToSection('members')"
-                  :class="[
-                    'block cursor-pointer transition-colors px-2 py-1 rounded',
-                    activeSection === 'members'
-                      ? 'text-gray-800 bg-gray-200 font-bold'
-                      : 'text-blue-700 hover:underline',
-                  ]"
-                >
+                <a @click="scrollToSection('members')" :class="[
+                  'block cursor-pointer transition-colors px-2 py-1 rounded',
+                  activeSection === 'members'
+                    ? 'text-gray-800 bg-gray-200 font-bold'
+                    : 'text-blue-700 hover:underline',
+                ]">
                   项目成员
                 </a>
               </div>
             </div>
             <div class="space-y-3">
-              <button
-                v-if="isJoined"
-                class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-xl cursor-not-allowed shadow"
-                disabled
-              >
+              <button v-if="isJoined"
+                class="w-full bg-gray-300 text-gray-500 py-2 px-4 rounded-xl cursor-not-allowed shadow" disabled>
                 已加入项目
               </button>
 
-              <button
-                v-else
+              <button v-else
                 class="w-full bg-blue-700 text-white py-2 px-4 rounded-xl hover:bg-blue-800 transition-colors shadow"
-                @click="applyProject"
-              >
+                @click="applyProject">
                 申请加入项目
               </button>
-              <button
-                v-if="
-                  user &&
-                  user.id &&
-                  project.owner &&
-                  project.owner.id &&
-                  user.id !== project.owner.id
-                "
+              <button v-if="
+                userid !== project.owner.id
+              "
                 class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-xl hover:bg-gray-50 transition-colors shadow"
-                @click="contactOwner"
-              >
+                @click="contactOwner">
                 联系负责人
               </button>
-              <button
+              <button v-if="isJoined"
                 class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-xl hover:bg-gray-50 transition-colors shadow"
-                @click="openInviteDialog"
-              >
+                @click="openInviteDialog">
                 邀请成员
               </button>
             </div>
             <!-- 邀请弹窗 -->
-            <div
-              v-if="showInviteDialog"
-              class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-            >
+            <div v-if="showInviteDialog" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div class="bg-white rounded-xl p-6 w-[500px] max-h-[80vh] overflow-y-auto shadow-xl">
                 <h3 class="text-lg font-bold mb-4 text-gray-800">邀请成员加入项目</h3>
 
                 <!-- 搜索框 -->
-                <input
-                  v-model="searchKeyword"
-                  type="text"
-                  class="w-full px-3 py-2 border border-gray-300 rounded mb-3"
-                  placeholder="请输入用户名、机构或研究领域关键字"
-                  @keyup.enter="searchUsers"
-                />
+                <input v-model="searchKeyword" type="text" class="w-full px-3 py-2 border border-gray-300 rounded mb-3"
+                  placeholder="请输入用户名、机构或研究领域关键字" @keyup.enter="searchUsers" />
 
                 <!-- 搜索结果 -->
                 <div v-if="searchResults.length === 0" class="text-gray-400 text-sm mb-2">
                   暂无搜索结果
                 </div>
                 <ul>
-                  <li
-                    v-for="user in searchResults"
-                    :key="user.id"
-                    class="flex items-center justify-between py-1"
-                  >
+                  <li v-for="user in searchResults" :key="user.id" class="flex items-center justify-between py-1">
                     <label class="flex items-center gap-2">
                       <input type="checkbox" v-model="selectedUserIds" :value="user.id" />
                       <span>{{ user.username }}（{{ user.institution || '未知机构' }}）</span>
@@ -190,16 +146,11 @@
                 </ul>
 
                 <div class="flex justify-end gap-2 mt-4">
-                  <button
-                    @click="closeInviteDialog"
-                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700"
-                  >
+                  <button @click="closeInviteDialog"
+                    class="px-4 py-1 rounded border border-gray-300 bg-gray-50 text-gray-700">
                     取消
                   </button>
-                  <button
-                    @click="sendInvites"
-                    class="px-4 py-1 rounded bg-green-600 text-white hover:bg-green-700"
-                  >
+                  <button @click="sendInvites" class="px-4 py-1 rounded bg-green-600 text-white hover:bg-green-700">
                     发送邀请
                   </button>
                 </div>
@@ -350,39 +301,57 @@ async function searchUsers() {
 
 // 发送邀请
 // 发送邀请
+// 发送邀请
 async function sendInvites() {
   const inviterId = userid
   const projectId = id || prompt('请输入项目ID')
 
   if (!projectId) return alert('缺少项目ID')
 
-  if (isJoined.value) {
-    alert('你已在项目里，无法发送邀请')
-    return
-  }
+  const currentMembers = [
+    project.value.owner?.id,
+    ...project.value.members.map((m) => m.id),
+  ]
+
+  let successCount = 0
+  let skippedUsers = []
 
   for (const inviteeId of selectedUserIds.value) {
-    await axios.post(
-      buildApiUrl('/project/invite'),
-      {
-        inviterId,
-        inviteeId,
-        projectId,
-      },
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        transformRequest: [
-          (data) =>
-            Object.entries(data)
-              .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-              .join('&'),
-        ],
-      },
-    )
+    if (currentMembers.includes(inviteeId)) {
+      skippedUsers.push(inviteeId)
+      continue
+    }
+
+    try {
+      await axios.post(
+        buildApiUrl('/project/invite'),
+        {
+          inviterId,
+          inviteeId,
+          projectId,
+        },
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          transformRequest: [
+            (data) =>
+              Object.entries(data)
+                .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+                .join('&'),
+          ],
+        },
+      )
+      successCount++
+    } catch (e) {
+      console.error(`邀请用户 ${inviteeId} 失败`, e)
+    }
   }
 
-  alert('邀请发送成功')
+  if (successCount > 0) alert(`成功邀请 ${successCount} 人`)
+  if (skippedUsers.length > 0)
+    alert(`以下用户已在项目里，邀请失败：\n${skippedUsers.join(', ')}`)
+
   closeInviteDialog()
 }
+
 
 </script>

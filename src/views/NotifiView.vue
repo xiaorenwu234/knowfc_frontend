@@ -161,11 +161,13 @@ let eventSource = null
 const eventTypes = [
   { label: '全部', value: '全部' },
   { label: '项目邀请处理', value: '项目邀请处理' },
+  { label: '项目邀请', value: '项目邀请' },
   { label: '项目申请', value: '项目申请' },
   { label: '成果被评论', value: '成果被评论' },
   { label: '用户关注', value: '用户关注' },
   { label: '系统通知', value: '系统通知' },
   { label: '问题收到回答', value: '问题收到回答' },
+
 ]
 
 function formatTime(time) {
@@ -280,7 +282,7 @@ async function cleanupOldNotifications() {
 function getNotifTitle(item) {
   if (item.eventType === '系统通知' && item.notifBody?.title) return item.notifBody.title
   if (item.eventType === '项目邀请处理' && item.notifBody?.projectName)
-    return `项目邀请：${item.notifBody.projectName}`
+    return `项目邀请处理：${item.notifBody.projectName}`
   if (item.eventType === '项目申请' && item.notifBody?.projectName)
     return `项目申请：${item.notifBody.projectName}`
   if (item.eventType === '成果被评论' && item.notifBody?.resourceTitle)
@@ -303,9 +305,13 @@ function handleTitleClick(item) {
     return
   }
   if (
-    (item.eventType === '项目邀请处理' || item.eventType === '项目申请') &&
+    (item.eventType === '项目邀请' || item.eventType === '项目申请') &&
     item.notifBody?.projectId
   ) {
+    router.push({ path: `/project/${item.notifBody.projectId}` })
+    return
+  }
+  if (item.eventType === '项目邀请处理' && item.notifBody?.projectId) {
     router.push({ path: `/project/${item.notifBody.projectId}` })
     return
   }
@@ -354,20 +360,19 @@ async function handleProjectApply(item, accept) {
     const res = await axios.post(url)
 
     if (res.data?.code === 200) {
-      item.readStatus=true // 标记为已读
+      item.readStatus = true // 标记为已读
       alert('操作成功')
-      fetchNotifiList()
     } else {
       const msg = res.data?.msg || '未知错误'
       if (msg === '用户已经是该项目的成员') {
-        item.readStatus=true // 标记为已读
+        item.readStatus = true // 标记为已读
         // 已读处理，不弹窗，直接刷新通知列表或忽略
         alert('操作失败: ' + msg)
       } else {
         alert('操作失败: ' + msg)
       }
     }
-    
+
   } catch (err) {
     alert('网络错误，操作失败')
     console.error(err)
@@ -393,19 +398,20 @@ async function handleConfirm(item) {
       console.error('缺少必要字段')
       return
     }
+    console.log('处理项目邀请参数:', { inviterId, inviteeId, projectId, isAccepted: accept }) // 调试输出
     try {
       const res = await axios.post(
         buildApiUrl('/project/handleInvite'),
         { inviterId, inviteeId, projectId, isAccepted: accept }
       )
+      console.log('处理项目邀请响应:', res.data) // 调试输出
       if (res.data?.code === 200) {
-        
+
         alert('操作成功')
-        fetchNotifiList()
       } else {
         alert('操作失败: ' + (res.data?.msg || '未知错误'))
       }
-      item.readStatus=true // 标记为已读
+      item.readStatus = true // 标记为已读
     } catch (err) {
       alert('网络错误，操作失败')
       console.error(err)
