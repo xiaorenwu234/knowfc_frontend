@@ -7,6 +7,7 @@ import 'cropperjs/dist/cropper.css'
 import { API_CONFIG, buildApiUrl } from '@/config/api.ts'
 import { useRoute } from 'vue-router'
 import router from '@/router'
+import { getUserId, logout, setUserDetail, type User } from '@/ts/User'
 import {
   checkFollowStatus,
   followUser,
@@ -14,10 +15,9 @@ import {
   getFanCount,
   getFanList,
   getFollowCount,
-  unfollowUser,
+  unfollowUser
 } from '@/ts/FollowUser.ts'
 import instance from '@/ts/axios'
-import { getUserId, logout } from '@/ts/User'
 import { notify } from '@/ts/toast'
 import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
@@ -25,13 +25,13 @@ import UserGraph from '@/views/UserGraph.vue'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   }
 }
 
@@ -39,22 +39,22 @@ const handleQuit = () => {
   logout()
   router.push('/')
 }
-const userId = getUserId()
+
 const messages = ref([])
 const ownerReference = ref('Ta')
 onMounted(async () => {
   try {
-    const res = await axios.get(buildApiUrl(`/users/${userId}/works`))
+    const res = await axios.get(buildApiUrl(`/users/${userIdOnDisplay}/works`))
 
     if (res.data.code === 200 && Array.isArray(res.data.data)) {
       console.log('加载论文', res.data)
-      messages.value = res.data.data.map(item => {
+      messages.value = res.data.data.map((item) => {
         return {
           time: item.publish_date || '未知时间',
           title: item.title || '无标题',
           content: item.abstractContent || '',
           user: item.users?.[0]?.username || '匿名作者',
-          avatar: item.users?.[0]?.avatar || '默认头像地址'
+          avatar: item.users?.[0]?.avatar || '默认头像地址',
         }
       })
     }
@@ -63,8 +63,7 @@ onMounted(async () => {
   }
 })
 
-
-const userInfo = ref(null)
+const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
 const url = buildApiUrl(API_CONFIG.ENDPOINTS.USER_INFO.replace('id', userIdOnDisplay))
@@ -87,7 +86,7 @@ const categories = computed(() => {
     `${ownerReference.value}创建的科研项目`,
     `${ownerReference.value}参与的科研项目`,
     `${ownerReference.value}的论文`,
-    `${ownerReference.value}的科研人员网络`,
+    `${ownerReference.value}的科研人员网络`
   ]
 })
 
@@ -112,7 +111,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: getUserId(),
-      content: reason.value,
+      content: reason.value
     })
     closeModal()
     alert('申请已提交成功！')
@@ -124,9 +123,18 @@ const submit = async () => {
 }
 
 const handleFollow = async () => {
-  if (following.value) await unfollowUser(userIdOnDisplay)
-  else await followUser(userIdOnDisplay)
+  if (following.value) {
+    await unfollowUser(userIdOnDisplay)
+    if (following.value)
+      fanCount.value--
+  } else {
+    await followUser(userIdOnDisplay)
+    if (!following.value)
+      fanCount.value++
+  }
+
   following.value = !following.value
+
 }
 
 const showFollowModal = ref(false)
@@ -215,7 +223,7 @@ const updateAvatar = async (avatar: File) => {
   formData.append('avatar', avatar)
   try {
     const response = await instance.post('/users/update-info', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (response.data.code === 200) {
       notify('success', '头像更新成功')
@@ -261,7 +269,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: '',
+  cooperationTerms: ''
 })
 const createError = ref('')
 
@@ -296,7 +304,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')

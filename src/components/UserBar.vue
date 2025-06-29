@@ -37,7 +37,7 @@
     </div>
     <!-- 书架 -->
     <div ref="shelf" class="normalAnimation h-6 w-6 my-auto m-2 rounded-full">
-      <div class="w-full h-full" @click="showForm = !showForm">
+      <div class="w-full h-full cursor-pointer" @click="router.push('/favorites')">
         <icon class="icon-[mi--favorite] w-full h-full" />
       </div>
     </div>
@@ -178,7 +178,6 @@
       <button class="btn btn-ghost w-full mt-2" @click="closeBatchResult">关闭</button>
     </div>
   </div>
-  <FavoritesView v-model:showForm="showForm" v-if="showForm"></FavoritesView>
 </template>
 
 <script setup>

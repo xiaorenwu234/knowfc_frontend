@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import DockBar from './components/DockBar.vue';
+import DockBar from './components/DockBar.vue'
 import Logo from './components/Logo.vue'
 import UserBar from './components/UserBar.vue'
 import SearchBar from './components/SearchBar.vue'
-import { ref, computed, useTemplateRef, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { hideHeader } from '@/ts/hidePaths.js'
 
@@ -34,23 +34,31 @@ watch(
     <DockBar />
   </div>
 
-  <div class=" w-screen sticky top-0 bg-container flex flex-col">
+  <div class="w-screen sticky top-0 bg-container flex flex-col">
     <!-- 遮罩 -->
     <div
       class="fixed w-screen h-24 z-30"
-      :class="{ 'bg-white': isWhiteRoute, blurblock: !isWhiteRoute ,'opacity-0': isHidden,'-translate-y-24': isHidden}"
+      :class="{
+        'bg-white': isWhiteRoute,
+        blurblock: !isWhiteRoute,
+        'opacity-0': isHidden,
+        '-translate-y-24': isHidden,
+      }"
     ></div>
 
     <!-- 左上logo -->
-    <Logo class="z-50 fixed" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
+    <Logo class="z-50 fixed" :class="{ 'opacity-0': isHidden, '-translate-y-24': isHidden }" />
 
     <!-- 右上用户栏 -->
-    <div :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}">
+    <div :class="{ 'opacity-0': isHidden, '-translate-y-24': isHidden }">
       <UserBar class="z-50 fixed" />
     </div>
 
     <!-- 首页logo -->
-    <div v-if="inHome" class="mt-24 my-4 text-center mx-auto top-0 w-full flex flex-col items-center justify-center">
+    <div
+      v-if="inHome"
+      class="mt-24 my-4 text-center mx-auto top-0 w-full flex flex-col items-center justify-center"
+    >
       <h1
         class="mb-5 font-bold galada-regular text-6xl mx-2 align-baseline"
         style="color: white; text-shadow: rgb(153, 36, 0) 6px 6px 3px"
@@ -64,17 +72,20 @@ watch(
     </div>
 
     <!-- 搜索栏 -->
-    <SearchBar class="z-40 sticky top-0" :class="{ 'opacity-0': isHidden,'-translate-y-24': isHidden}"/>
+    <SearchBar
+      class="z-40 sticky top-0"
+      :class="{ 'opacity-0': isHidden, '-translate-y-24': isHidden }"
+    />
 
     <!-- 主体 -->
     <div class="flex-1 min-h-screen bg-container z-0 mt-[-112px]">
-        <RouterView :key="$route.fullPath"></RouterView>
+      <RouterView :key="$route.fullPath"></RouterView>
     </div>
   </div>
-<!--  <UserGraph></UserGraph>-->
 </template>
 
 <style scoped>
+@import './style.css';
 .bg-container {
   background-image: url('/mountain.jpg');
   background-position: center;
@@ -84,8 +95,6 @@ watch(
   width: 100%;
   min-height: 100vh;
 }
-
-@import '../style.css';
 
 .blurblock {
   mask: linear-gradient(black, black, transparent);
