@@ -124,7 +124,7 @@ const handleSubmit = async () => {
     keywords: paperKeywords.value.split(',').map(k => k.trim()).filter(k => k),
     authors: paperAuthors.value,
     userId: getUserId(),
-    type: paperType.value || 'paper'
+    type: 'paper'
   };
 
   try {
