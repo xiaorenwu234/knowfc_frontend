@@ -15,23 +15,24 @@ import {
   getFanCount,
   getFanList,
   getFollowCount,
-  unfollowUser,
+  unfollowUser
 } from '@/ts/FollowUser.ts'
 import instance from '@/ts/axios'
 import { notify } from '@/ts/toast'
 import type { ProjectSummary } from '@/ts/ProjectSummary'
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue'
 import UserGraph from '@/views/UserGraph.vue'
+import PersonalCenterWorkDIsplay from '@/components/PersonalCenterWorkDIsplay.vue'
 
 const windowSize = ref({
   width: window.innerWidth,
-  height: window.innerHeight,
+  height: window.innerHeight
 })
 
 const updateWindowSize = () => {
   windowSize.value = {
     width: window.innerWidth,
-    height: window.innerHeight,
+    height: window.innerHeight
   }
 }
 
@@ -40,29 +41,8 @@ const handleQuit = () => {
   router.push('/')
 }
 
-const messages = ref([])
+const works = ref([])
 const ownerReference = ref('Ta')
-onMounted(async () => {
-  try {
-    const res = await axios.get(buildApiUrl(`/users/${userIdOnDisplay}/works`))
-
-    if (res.data.code === 200 && Array.isArray(res.data.data)) {
-      console.log('加载论文', res.data)
-      messages.value = res.data.data.map((item) => {
-        return {
-          time: item.publish_date || '未知时间',
-          title: item.title || '无标题',
-          content: item.abstractContent || '',
-          user: item.users?.[0]?.username || '匿名作者',
-          avatar: item.users?.[0]?.avatar || '默认头像地址',
-        }
-      })
-    }
-  } catch (err) {
-    console.error('加载论文失败', err)
-  }
-})
-
 const userInfo = ref<User>()
 const route = useRoute()
 const userIdOnDisplay = String(route.params.id)
@@ -85,8 +65,8 @@ const categories = computed(() => {
   return [
     `${ownerReference.value}创建的科研项目`,
     `${ownerReference.value}参与的科研项目`,
-    `${ownerReference.value}的论文`,
-    `${ownerReference.value}的科研人员网络`,
+    `${ownerReference.value}的科研成果`,
+    `${ownerReference.value}的科研人员网络`
   ]
 })
 
@@ -111,7 +91,7 @@ const submit = async () => {
     await axios.post(buildApiUrl(API_CONFIG.ENDPOINTS.APPLY_FOR_PROJECT), {
       projectId: projectId.value,
       applicantId: getUserId(),
-      content: reason.value,
+      content: reason.value
     })
     closeModal()
     alert('申请已提交成功！')
@@ -148,6 +128,19 @@ const showFan = () => {
 }
 const handleCloseFanModal = () => {
   showFanModal.value = false
+}
+const fetchWork = async () => {
+  try {
+    const res = await instance.get(`/users/${userIdOnDisplay}`)
+    if (res.data.code === 200) {
+      works.value = res.data.data.works
+      // const items = works.value
+      // works.value = [...items,...items,...items,...items,...items]
+      console.log(works.value)
+    }
+  } catch (err) {
+    console.error('加载论文失败', err)
+  }
 }
 
 const getOwnerProjects = async () => {
@@ -220,7 +213,7 @@ const updateAvatar = async (avatar: File) => {
   formData.append('avatar', avatar)
   try {
     const response = await instance.post('/users/update-info', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (response.data.code === 200) {
       notify('success', '头像更新成功')
@@ -238,6 +231,7 @@ onMounted(() => {
   window.addEventListener('resize', updateWindowSize)
   fetchUserInfo()
   ownerReference.value = userIdOnDisplay == getUserId().toString() ? '我' : 'Ta'
+  fetchWork()
   getOwnerProjects()
   getParticipatedProjects()
   checkFollowStatus(userIdOnDisplay).then((res) => {
@@ -266,7 +260,7 @@ const showCreateModal = ref(false)
 const createForm = ref({
   name: '',
   projectInfo: '',
-  cooperationTerms: '',
+  cooperationTerms: ''
 })
 const createError = ref('')
 
@@ -301,7 +295,7 @@ const submitCreate = async () => {
     formData.append('cooperationTerms', createForm.value.cooperationTerms)
     formData.append('ownerId', id.toString())
     const res = await axios.post(buildApiUrl('/project/create'), formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
     if (res.data && (res.data.code === 0 || res.data.code === 200)) {
       alert('项目创建成功！')
@@ -497,6 +491,9 @@ const submitCreate = async () => {
                     </div>
                   </div>
                 </div>
+              </template>
+              <template v-else-if="idx === 2">
+                <PersonalCenterWorkDIsplay :works="works"/>
               </template>
               <template v-else-if="idx === 3">
                 <UserGraph></UserGraph>
