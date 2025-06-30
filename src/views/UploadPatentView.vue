@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 // 导入上传函数 - 请根据实际文件路径调整
-// import { uploadPatent } from '@/ts/Upload';
+import { uploadPaper } from '@/ts/Upload';
 import { getUserId } from '@/ts/User';
 
 // 使用 ref 创建响应式数据
@@ -57,6 +57,7 @@ const handleSubmit = async () => {
 
   // 构建 patentInfo 对象
   const patentInfo = {
+    type: 'patent',
     title: patentTitle.value,
     abstractContent: patentAbstract.value,
     patentId: patentId.value,
@@ -70,7 +71,7 @@ const handleSubmit = async () => {
     console.log('准备上传的专利信息:', patentInfo);
   try {
     // TODO: 调用后端专利上传接口
-    // const result = await uploadPatent(patentInfo, selectedFile.value);
+    const result = await uploadPaper(patentInfo, selectedFile.value);
     
     console.log('专利上传成功:', result);
     showToast(`专利 "${patentTitle.value}" 提交成功！`, 'success');

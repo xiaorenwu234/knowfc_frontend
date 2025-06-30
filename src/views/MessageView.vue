@@ -254,7 +254,7 @@ const toggleCollapse = () => {
 const selectContact = async (contact) => {
   activeContact.value = contact
   readMessages(contact.chatWithUserId, getUserId())
-  message.value = []
+  messages.value = []
   messages.value = await getChatDetail(contact.chatWithUserId)
   console.log(messages.value)
 

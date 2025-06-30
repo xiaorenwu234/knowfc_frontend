@@ -134,6 +134,8 @@
               v-for="(author, index) in articleDetail.authors"
               :key="index"
               class="p-4 border rounded-lg"
+              :class="{'hover:underline cursor-pointer':author.userId}"
+              @click="handleClickOnUser(author.userId)"
             >
               <h4 class="font-semibold">姓名：{{ author.name }}</h4>
               <p class="text-sm text-gray-600 mt-2">所属机构：{{ author.affiliation }}</p>
@@ -333,6 +335,7 @@ import {
   sendComment
 } from '@/ts/ArticleDetail.js'
 import { getWorkDetail } from '@/ts/Work.js'
+import {useRouter} from 'vue-router'
 
 const activeSection = ref('') // 默认激活相关文章
 const route = useRoute()
@@ -351,6 +354,7 @@ onMounted(async () => {
   await fetchComments(articleId).then((res) => {
     comments.value = res
   })
+  console.log(articleDetail.value)
 })
 
 // 平滑滚动到指定区域
@@ -399,5 +403,11 @@ const submitComment = async () => {
   await sendComment(articleId, commentContent.value)
   closeCommentEditor()
   await getArticleDetail(articleId)
+}
+
+const router = useRouter()
+const handleClickOnUser=(userId:string|undefined)=>{
+  if(userId)
+    router.push(`/personal-center/${userId}`)
 }
 </script>
