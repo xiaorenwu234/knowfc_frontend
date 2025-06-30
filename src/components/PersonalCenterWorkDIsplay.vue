@@ -2,12 +2,10 @@
   <!-- 分类选择 -->
   <div class="mb-4">
     <label for="categorySelect" class="block text-lg font-semibold mb-2">选择科研成果类型</label>
-    <select
-      id="categorySelect"
-      v-model="selectedType"
-      class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      <option v-for="type in availableTypes" :key="type" :value="type">{{ translateType(type) }}</option>
+    <select class="select select-info w-full px-4" v-model="selectedType" id="categorySelect">
+      <option v-for="type in availableTypes" :key="type" :value="type">
+        {{ translateType(type) }}
+      </option>
     </select>
   </div>
 
@@ -55,8 +53,8 @@ import { ref, computed, watch, defineProps } from 'vue'
 const props = defineProps({
   works: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const selectedType = ref('') // 当前选择的科研成果类型
@@ -65,7 +63,7 @@ const currentPage = ref(1) // 当前页数
 
 // 获取所有可用的分类类型
 const availableTypes = computed(() => {
-  const types = new Set(props.works.map(item => item.type))
+  const types = new Set(props.works.map((item) => item.type))
   return Array.from(types)
 })
 
@@ -73,7 +71,7 @@ const availableTypes = computed(() => {
 const filteredWorks = computed(() => {
   // 如果选择了分类，则过滤
   return selectedType.value
-    ? props.works.filter(item => item.type === selectedType.value)
+    ? props.works.filter((item) => item.type === selectedType.value)
     : props.works // 如果没有选中分类，则返回所有科研成果
 })
 
@@ -107,11 +105,15 @@ const changePage = (page: number) => {
 }
 
 // 默认选中第一个分类
-watch(availableTypes, (types) => {
-  if (types.length > 0) {
-    selectedType.value = types[0]
-  }
-}, { immediate: true })
+watch(
+  availableTypes,
+  (types) => {
+    if (types.length > 0) {
+      selectedType.value = types[0]
+    }
+  },
+  { immediate: true },
+)
 
 // 监听分类类型变化，重置当前页数为 1
 watch(selectedType, () => {
