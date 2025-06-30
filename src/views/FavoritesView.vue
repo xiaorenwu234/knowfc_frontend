@@ -10,13 +10,17 @@ import {
   analyzePDF,
   uploadFile,
   deleteFile,
-  renameFile, subscribeToFolder,
+  renameFile,
+  subscribeToFolder,
+  allFolders,
+  isSearching,
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
 import router from '@/router'
 import { addHistory } from '@/ts/History'
 import { getUserId } from '@/ts/User'
+import SearchLibrary from '@/components/SearchLibrary.vue'
 
 const i = ref(0)
 
@@ -55,7 +59,6 @@ const copiedFolder = ref<CopiedFolder>({
 const currentFolder = ref<Folder>({ uuid: '', title: 'root', type: 'folder' })
 
 const folderPath = ref<Folder[]>([{ uuid: '', title: 'root' }])
-const allFolders = ref<Folder[]>([])
 
 // 上传相关状态
 const showUploadModal = ref(false)
@@ -99,6 +102,12 @@ const pasteFolder = async () => {
   const folders = await getChildrenFolders(currentFolder.value.uuid)
   handleFolders(folders.items)
   hideContextMenu()
+}
+
+const returnFolder = async () => {
+  const uuid = currentFolder.value.uuid
+  const folders = await getChildrenFolders(uuid)
+  handleFolders(folders.items)
 }
 
 const openFolder = async (folderUuid: string) => {
@@ -206,7 +215,6 @@ const showSubscribeModal = ref(false) // 订阅文献的模态框
 const modal = ref(null)
 const subscribeModal = ref(null)
 const uploadMode = ref('upload') // 上传模式，默认为上传，另一种是subscribe订阅
-
 
 watch(showModal, (newVal) => {
   if (newVal) {
@@ -388,25 +396,32 @@ const handleClickOutside = () => {
 }
 
 const subscribeData = ref({
-  keyword:'',
-  author:'',
+  keyword: '',
+  author: '',
   periodValue: '1',
   periodUnit: '日',
 })
 
-const submitSubscribe = async () =>{
-  const cycle = subscribeData.value.periodValue * (
-    subscribeData.value.periodUnit === '日' ? 1 :
-    subscribeData.value.periodUnit === '周' ? 7 :
-    subscribeData.value.periodUnit === '月' ? 30 :
-    365
+const submitSubscribe = async () => {
+  const cycle =
+    subscribeData.value.periodValue *
+    (subscribeData.value.periodUnit === '日'
+      ? 1
+      : subscribeData.value.periodUnit === '周'
+        ? 7
+        : subscribeData.value.periodUnit === '月'
+          ? 30
+          : 365)
+  const [result, message] = await subscribeToFolder(
+    subscribeData.value.keyword,
+    subscribeData.value.author,
+    cycle,
+    uploadCurrentFolder.value.uuid,
   )
-  const [result,message] = await subscribeToFolder(subscribeData.value.keyword, subscribeData.value.author, cycle, uploadCurrentFolder.value.uuid)
-  if(result){
+  if (result) {
     notify('success', `订阅成功`)
     showSubscribeModal.value = false
-  }
-  else{
+  } else {
     notify('error', `订阅失败: ${message}`)
   }
 }
@@ -515,7 +530,18 @@ onUnmounted(() => {
 })
 
 const returnRouter = () => {
-  window.history.back()
+  const currentUrlObj = new URL(window.location.href);
+  const previousUrl = document.referrer;
+
+  currentUrlObj.hash = '';
+  currentUrlObj.search = '';
+  const currentUrlClean = currentUrlObj.toString();
+
+  if (previousUrl && new URL(previousUrl).toString() === currentUrlClean) {
+    router.push('/')
+  } else {
+    window.history.back();
+  }
 }
 
 const submitFile = async () => {
@@ -557,6 +583,9 @@ const submitFile = async () => {
           <div class="ml-6 btn btn-outline btn-primary" @click="onSubscribeDocument">
             <icon class="icon-[material-symbols--subscriptions] w-5 h-5 mr-2" />
             论文自动收集
+          </div>
+          <div class="ml-6 h-12">
+            <SearchLibrary class="h-full" @returnFolder="returnFolder"></SearchLibrary>
           </div>
         </div>
 
@@ -631,7 +660,7 @@ const submitFile = async () => {
             剪切
           </button>
           <button
-            v-if="copiedFolder.uuid"
+            v-if="copiedFolder.uuid && !isSearching"
             class="px-4 py-2 text-left hover:bg-gray-100"
             @click="pasteFolder"
           >
@@ -644,7 +673,7 @@ const submitFile = async () => {
       </template>
 
       <template v-else-if="contextMenu.type === 'background' && !contextMenu.isCreating">
-        <button class="px-4 py-2 text-left hover:bg-gray-100 w-full" @click="createNewFolder">
+        <button class="px-4 py-2 text-left hover:bg-gray-100 w-full" @click="createNewFolder" v-if="!isSearching">
           <span class="flex items-center">
             <icon class="icon-[material-symbols--create-new-folder] w-5 h-5 mr-2" />
             新建文件夹
@@ -657,7 +686,7 @@ const submitFile = async () => {
           </span>
         </button>
         <button
-          v-if="copiedFolder.uuid"
+          v-if="copiedFolder.uuid&&!isSearching"
           class="px-4 py-2 text-left hover:bg-gray-100 w-full"
           @click="pasteFolder"
         >
@@ -779,7 +808,6 @@ const submitFile = async () => {
       <div class="min-h-[450px] w-full flex">
         <div class="flex flex-col min-h-[450px] w-full">
           <div class="flex-1">
-
             <label for="pdf_keywords" class="mt-6 ml-1 font-bold">关键词</label>
             <input
               v-model="subscribeData.keyword"
@@ -809,15 +837,16 @@ const submitFile = async () => {
                 class="w-2/3 px-4 py-3 border border-gray-200 rounded-l-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition outline-none text-base"
               />
 
-              <select class="w-1/3 border select select-bordered"
-                      v-model="subscribeData.periodUnit">
+              <select
+                class="w-1/3 border select select-bordered"
+                v-model="subscribeData.periodUnit"
+              >
                 <option>日</option>
                 <option>周</option>
                 <option>月</option>
                 <option>年</option>
               </select>
             </div>
-
           </div>
           <div class="modal-action flex w-full">
             <div class="flex-1"></div>
@@ -830,7 +859,6 @@ const submitFile = async () => {
       </div>
     </div>
   </dialog>
-
 
   <dialog ref="modal" class="modal" :class="{ 'modal-open': showModal }">
     <div class="modal-box">
