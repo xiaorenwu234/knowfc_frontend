@@ -233,3 +233,30 @@ export const renameFile = async (fileId: string, newName: string): Promise<[bool
     return [false, '文件重命名失败'] as [boolean, string]
   }
 }
+
+export const subscribeToFolder = async (
+  keyword: string,
+  author: string,
+  cycle: number,
+  parentId: string,
+): Promise<[boolean, string]> => {
+  const url = '/schedule-config/create'
+  const formData = new FormData()
+  formData.append('userId', getUserId().toString())
+  formData.append('keyword', keyword)
+  formData.append('author', author)
+  formData.append('cycle', cycle.toString())
+  formData.append('parentId', parentId)
+  try {
+    const response = await instance.post(url, formData)
+    console.log(response.data)
+    if (response.data.code === 200) {
+      return [true, '订阅成功'] as [boolean, string]
+    } else {
+      return [false, response.data.msg] as [boolean, string]
+    }
+  } catch (error) {
+    console.error('Error subscribing to folder:', error)
+    return [false, '订阅失败'] as [boolean, string]
+  }
+}

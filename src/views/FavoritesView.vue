@@ -9,7 +9,8 @@ import {
   paperData,
   analyzePDF,
   uploadFile,
-  deleteFile, renameFile,
+  deleteFile,
+  renameFile, subscribeToFolder,
 } from '@/ts/favorites.ts'
 import { notify } from '@/ts/toast.ts'
 import Loading from '@/components/loading.vue'
@@ -78,11 +79,9 @@ const contextMenu = ref<ContextMenuState>({
 const pasteFolder = async () => {
   if (!copiedFolder.value.uuid) return
 
-
-
   const [result, msg] = await moveFolder(
     copiedFolder.value.action,
-    copiedFolder.value.type ==='folder' ? 'folder': 'paper',
+    copiedFolder.value.type === 'folder' ? 'folder' : 'paper',
     copiedFolder.value.fromId,
     currentFolder.value.uuid,
   )
@@ -145,6 +144,7 @@ const createNewFolder = () => {
 
 const uploadDocument = () => {
   showUploadModal.value = true
+  uploadMode.value = 'upload'
   initUploadModal()
   hideContextMenu()
 }
@@ -202,7 +202,11 @@ const isLoading = ref(false)
 const showAIResults = ref(false)
 const file = ref(null)
 const showModal = ref(false)
+const showSubscribeModal = ref(false) // 订阅文献的模态框
 const modal = ref(null)
+const subscribeModal = ref(null)
+const uploadMode = ref('upload') // 上传模式，默认为上传，另一种是subscribe订阅
+
 
 watch(showModal, (newVal) => {
   if (newVal) {
@@ -255,7 +259,7 @@ const confirmNameChange = async () => {
   if (contextMenu.value.isRenaming && contextMenu.value.folderUuid) {
     const folder = allFolders.value.find((f) => f.uuid === contextMenu.value.folderUuid)
     if (folder && contextMenu.value.newName.trim()) {
-      if(folder.type === 'folder') {
+      if (folder.type === 'folder') {
         const [result, message] = await changeFolderName(
           contextMenu.value.folderUuid,
           contextMenu.value.newName,
@@ -266,8 +270,7 @@ const confirmNameChange = async () => {
         } else {
           notify('error', `重命名失败: ${message}`)
         }
-      }
-      else{
+      } else {
         const [result, message] = await renameFile(
           contextMenu.value.folderUuid,
           contextMenu.value.newName,
@@ -384,6 +387,30 @@ const handleClickOutside = () => {
   }
 }
 
+const subscribeData = ref({
+  keyword:'',
+  author:'',
+  periodValue: '1',
+  periodUnit: '日',
+})
+
+const submitSubscribe = async () =>{
+  const cycle = subscribeData.value.periodValue * (
+    subscribeData.value.periodUnit === '日' ? 1 :
+    subscribeData.value.periodUnit === '周' ? 7 :
+    subscribeData.value.periodUnit === '月' ? 30 :
+    365
+  )
+  const [result,message] = await subscribeToFolder(subscribeData.value.keyword, subscribeData.value.author, cycle, uploadCurrentFolder.value.uuid)
+  if(result){
+    notify('success', `订阅成功`)
+    showSubscribeModal.value = false
+  }
+  else{
+    notify('error', `订阅失败: ${message}`)
+  }
+}
+
 const handleKeydown = (event: KeyboardEvent) => {
   if (selectedFolderUuid.value !== null) {
     const selectedFolder = allFolders.value.find(
@@ -456,6 +483,13 @@ const jumpFolder = async (folderUuid: string) => {
   }
 }
 
+const onSubscribeDocument = async () => {
+  showUploadModal.value = true
+  uploadMode.value = 'subscribe'
+  initUploadModal()
+  hideContextMenu()
+}
+
 const handleFolders = (folders: any[]) => {
   allFolders.value = []
   for (const folder of folders) {
@@ -520,7 +554,10 @@ const submitFile = async () => {
             <icon class="icon-[material-symbols--upload] w-5 h-5 mr-2" />
             上传文献
           </div>
-          <div class="ml-6 btn btn-outline btn-primary">论文自动收集</div>
+          <div class="ml-6 btn btn-outline btn-primary" @click="onSubscribeDocument">
+            <icon class="icon-[material-symbols--subscriptions] w-5 h-5 mr-2" />
+            论文自动收集
+          </div>
         </div>
 
         <div class="w-full" id="favoritesBody" @click="handleClickOutside">
@@ -600,9 +637,6 @@ const submitFile = async () => {
           >
             粘贴
           </button>
-          <button class="px-4 py-2 text-left hover:bg-gray-100" @click="uploadDocument">
-            上传文献
-          </button>
           <button class="px-4 py-2 text-left text-red-500 hover:bg-gray-100" @click="deleteFolder">
             删除
           </button>
@@ -630,6 +664,12 @@ const submitFile = async () => {
           <span class="flex items-center">
             <icon class="icon-[material-symbols--content-paste] w-5 h-5 mr-2" />
             粘贴
+          </span>
+        </button>
+        <button class="px-4 py-2 text-left hover:bg-gray-100 w-full" @click="onSubscribeDocument">
+          <span class="flex items-center">
+            <icon class="icon-[material-symbols--subscriptions] w-5 h-5 mr-2" />
+            论文自动收集
           </span>
         </button>
       </template>
@@ -665,7 +705,9 @@ const submitFile = async () => {
         class="bg-white rounded-lg shadow-xl w-1/3 max-w-2xl min-w-[400px] max-h-[80vh] flex flex-col"
       >
         <div class="p-4 border-b">
-          <h3 class="text-lg font-medium">选择上传位置</h3>
+          <h3 class="text-lg font-medium">
+            选择{{ uploadMode === 'upload' ? '上传' : '订阅保存' }}位置
+          </h3>
         </div>
 
         <div class="p-4 border-b">
@@ -709,6 +751,7 @@ const submitFile = async () => {
             </button>
             <label
               class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+              v-if="uploadMode === 'upload'"
             >
               <input
                 type="file"
@@ -718,11 +761,76 @@ const submitFile = async () => {
               />
               选择文件
             </label>
+            <div
+              class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+              v-else
+              @click="showSubscribeModal = true"
+            >
+              修改订阅详情
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <dialog ref="subscribeModal" class="modal" :class="{ 'modal-open': showSubscribeModal }">
+    <div class="modal-box">
+      <div class="min-h-[450px] w-full flex">
+        <div class="flex flex-col min-h-[450px] w-full">
+          <div class="flex-1">
+
+            <label for="pdf_keywords" class="mt-6 ml-1 font-bold">关键词</label>
+            <input
+              v-model="subscribeData.keyword"
+              id="pdf_keywords"
+              type="text"
+              placeholder="关键词"
+              class="w-full my-2 px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition outline-none text-base"
+            />
+
+            <label for="pdf_authors" class="mt-6 ml-1 font-bold">作者</label>
+            <input
+              v-model="subscribeData.author"
+              id="pdf_authors"
+              type="text"
+              placeholder="作者"
+              class="w-full my-2 px-4 py-3 border border-gray-200 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition outline-none text-base"
+            />
+
+            <label for="subscription_period" class="mt-6 ml-1 font-bold">订阅周期</label>
+            <div class="flex items-center my-2">
+              <input
+                id="subscription_period"
+                v-model="subscribeData.periodValue"
+                type="number"
+                min="1"
+                placeholder="请输入数字"
+                class="w-2/3 px-4 py-3 border border-gray-200 rounded-l-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition outline-none text-base"
+              />
+
+              <select class="w-1/3 border select select-bordered"
+                      v-model="subscribeData.periodUnit">
+                <option>日</option>
+                <option>周</option>
+                <option>月</option>
+                <option>年</option>
+              </select>
+            </div>
+
+          </div>
+          <div class="modal-action flex w-full">
+            <div class="flex-1"></div>
+            <form method="dialog">
+              <button class="btn" @click="showSubscribeModal = false">关 闭</button>
+              <button class="btn btn-info ml-2" @click="submitSubscribe">确 定</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
 
   <dialog ref="modal" class="modal" :class="{ 'modal-open': showModal }">
     <div class="modal-box">
