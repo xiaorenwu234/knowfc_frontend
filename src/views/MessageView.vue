@@ -93,6 +93,22 @@
         <div v-else class="h-11 font-medium text-lg flex">
           <div class="m-auto">请选择联系人</div>
         </div>
+        <RouterLink
+          to="/"
+          class="absolute top-6 right-6 btn btn-ghost btn-sm btn-circle z-10"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1024 1024"
+            fill="currentColor"
+            aria-hidden="true"
+            class="home-icon w-5 h-5"
+          >
+            <path
+              d="M512 74.24L116.48 438.4v464h240V618.24h311.04V902.4h240v-464L512 74.24zM512 0c10.24 0 20.16 3.84 27.52 11.52l435.2 382.08c8.32 7.04 12.8 17.28 12.8 28.16v494.72c0 22.72-18.56 41.28-41.28 41.28h-320c-22.72 0-41.28-18.56-41.28-41.28v-202.24h-157.44v202.24c0 22.72-18.56 41.28-41.28 41.28h-320c-22.72 0-41.28-18.56-41.28-41.28V421.76c0-10.88 4.48-21.12 12.8-28.16l435.2-382.08c7.36-7.68 17.28-11.52 27.52-11.52z"
+            />
+          </svg>
+        </RouterLink>
       </div>
 
       <!-- 消息显示区域 -->
