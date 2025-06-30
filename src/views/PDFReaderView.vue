@@ -33,6 +33,30 @@ const getPDFDetail = async (id: string) => {
 const router = useRoute()
 const id = router.params.id as string
 const viewer = useTemplateRef('viewer')
+const xfdfRegex = /([^/]+?)(?:\.pdf)?$/
+const getXfdfName = (pdfUrl: string) => {
+  const match = pdfUrl.match(xfdfRegex)
+  if (match) {
+    return `${match[1]}_${getUserId()}.xfdf`
+  }
+  throw new Error('无法解析 URL')
+}
+const getXfdfUrl = (xfdfName: string) => {
+  return `https://knowfc.oss-cn-beijing.aliyuncs.com/notes/${xfdfName}`
+}
+const postNotes = async (url: string, xfdfString: string) => {
+  const formData = new FormData()
+  const xfdf = new File([xfdfString], 'note')
+  formData.append('url', url)
+  formData.append('note', xfdf)
+  try {
+    await instance.post('/paper/note', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  } catch (error) {
+    notify('error', '笔记保存失败', error?.toString())
+  }
+}
 
 onMounted(async () => {
   WebViewer(
@@ -46,6 +70,7 @@ onMounted(async () => {
     instance.UI.setLanguage('zh_cn')
     if (!url) {
       notify('error', '文件路径未知')
+      throw new Error('文件路径未知')
     } else if (url.startsWith('http://arxiv.org')) {
       const response = await fetch(url)
       if (!response.ok) {
@@ -57,8 +82,21 @@ onMounted(async () => {
     } else {
       instance.UI.loadDocument(url)
     }
-    const { annotationManager } = instance.Core
-    annotationManager.addEventListener('annotationChanged', () => {})
+    const { documentViewer, annotationManager } = instance.Core
+    const xfdfName = getXfdfName(url)
+    const xfdfUrl = getXfdfUrl(xfdfName)
+    const xfdf = await (await fetch(xfdfUrl)).text()
+    documentViewer.addEventListener('documentLoaded', async () => {
+      await annotationManager.importAnnotations(xfdf)
+    })
+    documentViewer.addEventListener('annotationsLoaded', () => {
+      annotationManager.addEventListener('annotationChanged', () => {
+        annotationManager.exportAnnotations().then((xfdfString) => {
+          postNotes(xfdfName, xfdfString)
+          console.log(xfdfName, 'uploaded')
+        })
+      })
+    })
   })
 })
 </script>
