@@ -260,3 +260,25 @@ export const subscribeToFolder = async (
     return [false, '订阅失败'] as [boolean, string]
   }
 }
+
+export const searchFiles = async (keyword: string): Promise<[boolean, any]> => {
+  const url = '/paper/search'
+  try {
+    const response = await instance.get(url, {
+      params: {
+        userId: getUserId().toString(),
+      },
+    })
+    if (response.data.code === 200) {
+      return [true, response.data.data] as [boolean, string]
+    }
+    return [false, response.data.msg] as [boolean, string]
+  } catch (error) {
+    console.error('Error searching files:', error)
+    return [false, '搜索失败'] as [boolean, string]
+  }
+}
+
+
+export const allFolders = ref([])
+export const isSearching = ref(false)
